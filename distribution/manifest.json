@@ -1,6 +1,6 @@
 {
   "files": {
-    "skills/README.md": "49695340fefd83f57f1f4dacfeef0480885f68c30b671ca5fa2dd2ecba8866ac",
+    "skills/README.md": "144ed80055d2dcb322c06ae3e2af56e04e1923f7adfa3d9bc6391c131b377637",
     "skills/architect/LICENSE": "9c31ea886ff0fdc36aab948579bbb74a2e44bcb5a9c8a165cabc1b38e24175d4",
     "skills/architect/SKILL.md": "cc7e6837bb26fa8cc37160e51bd26aafc43f6ffa7ba5ffe4dc7e1eeda2b64ea9",
     "skills/architect/examples/illustrated-statechart/guide.md": "b097472533a542257072d29c716cacfc24f9f68b2366f554bbfb8091ea102d84",
@@ -176,7 +176,7 @@
     "skills/orbyn-ai-application/references/tool-effects.md": "d1bb7f022d74ef31675bf7e17d9fd9d9c3bab6f020311d36fee64bf0f818f03e",
     "skills/orbyn-ai-application/references/trusted-intake.md": "63986745bbf4a0849c0c5742c36214a06492e329949910af62087d8a71735053",
     "skills/orbyn-astryx/LICENSE": "b960a8c01d83aa48ed709780a5c9940f8e2861f2fdcdc8f931fbe3ece90a5e04",
-    "skills/orbyn-astryx/SKILL.md": "f804dd4641d5e303a4906c776e76341a0fd665faa8f1a4c07130b9f385041ce0",
+    "skills/orbyn-astryx/SKILL.md": "6d18dc895d5b719c357c28e410328247dcc2a98729c1f671257900454da73fb8",
     "skills/orbyn-astryx/references/upstream/astryx-docs/LICENSE": "a6855be541fc8f446acd1bc4f2f8efce1ace6dce71dba32fcd8da553ee54b473",
     "skills/orbyn-astryx/references/upstream/astryx-docs/docs/README.md": "3a8368d7c7e40fff8616b44a14cd869fa2132ac521e78f7b055e861283ad1d40",
     "skills/orbyn-astryx/references/upstream/astryx-docs/docs/author-a-theme.doc.mjs": "77e104f928101638d5b30a4359700452af6e8b976e078e8e5507f71eebc5b4b7",
@@ -557,7 +557,7 @@
     "skills/orbyn-skill-creator/assets/contribution-lab/project/tools/forge.py": "095fed55870b90647a12900a9d537c3cf56118f8aaae01e4d639f91f68d4b21a",
     "skills/orbyn-skill-creator/evals/baselines/2026-10-24-55-skills.json": "0bd32833b884f715816e4b03c021c28120266aae8b31e429aa588341b13b7f14",
     "skills/orbyn-skill-creator/evals/baselines/2026-10-25-54-skills.json": "744d9724f0a8719bc0689ebade403d2452c8ffa0a8f19d47c8b5d7fdaa3659e6",
-    "skills/orbyn-skill-creator/evals/cases.json": "2abbb9b380117c0a9f634dbace1627f101eec55e19faa1cd6e74fb5a13b29313",
+    "skills/orbyn-skill-creator/evals/cases.json": "fe5368b442aaeebad50844d385cddb0eb5aa0fe759f7bb82d63fefd4701e9811",
     "skills/orbyn-skill-creator/evals/executable/background-job-no-poll/case.json": "060041ff8a6c0ddfe54cb6f8977795d65292ace084f8f67a9fb642820dee6aec",
     "skills/orbyn-skill-creator/evals/executable/background-job-no-poll/fake/bad.json": "dfa3d6745222735094f5b5b753b187c002ac60b4f6f70d38c4c8e13cabf9d490",
     "skills/orbyn-skill-creator/evals/executable/background-job-no-poll/fake/good.json": "74e76524c58205199caf8d0f0d9b06a2b9a8413c18899fa828b4e8dfde95e7b2",

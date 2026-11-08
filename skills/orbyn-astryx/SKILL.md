@@ -1,6 +1,6 @@
 ---
 name: orbyn-astryx
-description: "Build, theme and review React UI with Meta's Astryx design system (@astryxdesign packages): start pages from its templates, use its components and tokens, map a house style to an Astryx theme, and set up its agent docs without overwriting project files. Use when a project uses or adopts Astryx."
+description: "Build, theme and review React UI with Meta's Astryx design system (@astryxdesign): pages from its templates, its components and tokens, a house style as an Astryx theme. Versions change only via Dependabot, never by hand. Use when a project uses or adopts Astryx."
 ---
 
 # Astryx
@@ -50,8 +50,8 @@ A theme is token overrides, not a fork. Map the project's look, or the
 none, into `defineTheme({extends: <built theme>, ...})`: colours, type, radius,
 spacing and elevation to their token families, component changes through the
 `components` field and `astryx theme targets`. Generate shades with the palette
-command rather than by hand. Run `astryx theme build` for server-rendered apps and
-again after every Astryx upgrade. Eject (`swizzle`) a component only when a theme
+command rather than by hand. Run `astryx theme build` for server-rendered apps when you
+change a theme; after an upgrade, the Dependabot PR rebuilds it. Eject (`swizzle`) a component only when a theme
 override cannot express the change, and say why.
 
 Astryx owns light and dark: switch with its `Theme` component's `mode` (`light`, `dark`
@@ -62,18 +62,20 @@ component overrides flash on hydration.
 
 ## Where these rules override Astryx's setup
 
-1. **Project agent files belong to the project.** `astryx init --features agents`
-   writes a managed block into `AGENTS.md` or `CLAUDE.md`. Run it only with the
-   user's OK; it never replaces the project's own instructions, and in this library's
-   workspace it is never run against the library's own `AGENTS.md`.
-2. **No global install without asking.** A global CLI install writes a skill into
-   your home folder and links it into agent folders such as `~/.claude/skills/astryx`.
-   Ask before installing globally; `astryx init --user` writes that file and
-   `astryx init --user --remove-agents` turns it off. Inside a project, its own docs
-   come first. If that global `astryx` skill is also loaded, treat it as reference;
-   this skill's authority rules govern.
-3. **Packages are changes.** Adding `@astryxdesign/*`, StyleX or a theme package, or
-   upgrading them (`astryx upgrade --from <version> --apply`), needs the user's scope.
+1. **Never update Astryx by hand.** Do not run `astryx upgrade`, `astryx init` (in any
+   form, including `--features agents` and `--user`), a global CLI install, or a
+   package-manager bump of `@astryxdesign/*`, StyleX or a theme package, even when the
+   CLI or `astryx doctor` suggests it. Versions move only through the project's
+   Dependabot pull requests, which bump every `@astryxdesign/*` package to one release
+   together; that PR rebuilds custom themes (`astryx theme build`) and refreshes agent
+   docs. If something looks stale or missing, report it and point to the open
+   Dependabot PR or ask the owner to open one; do not fix it in your change.
+2. **Project agent files belong to the project.** `init` writes a managed block into
+   `AGENTS.md` or `CLAUDE.md`, and a global install links a skill into folders such as
+   `~/.claude/skills/astryx`. Leave both to the owners. If Astryx's own global
+   `astryx` skill is loaded, treat it as reference; this skill's rules govern.
+3. **Adopting Astryx is a decision, not a step.** Adding it to an app that lacks it
+   goes through [stack selection](../orbyn-stack-selection/SKILL.md) and the owner.
 4. **The hosted docs are optional.** Astryx's docs site serves an MCP endpoint. Adding
    that MCP server to a host is a configuration change: ask first.
 5. **Our checks still apply.** Verify in a real render: light and dark, the widths in
@@ -86,6 +88,7 @@ component overrides flash on hydration.
 The agent docs of [meta/astryx](https://github.com/meta/astryx/tree/c86484dc57847e7c4d1127810ff1422bc2174d4d/packages/cli/assets/docs)
 are bundled unmodified at `c86484d` (CLI 0.7.12), MIT, with the license and a
 `snapshot.json` of file hashes. They are `.mjs` modules the CLI prints; read their
-`prose`, `list` and `code` entries. Refresh them with
-[upstream review](../orbyn-upstream-review/SKILL.md) when Astryx releases, and prefer the
-project's installed CLI over this copy whenever they differ.
+`prose`, `list` and `code` entries, and prefer the project's installed CLI whenever
+they differ. Never edit or re-download them by hand: `scripts/upstream_watch.py`
+opens an issue when Astryx releases, and the refresh goes through
+[upstream review](../orbyn-upstream-review/SKILL.md) in a reviewed PR.

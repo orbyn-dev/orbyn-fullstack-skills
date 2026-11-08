@@ -3763,7 +3763,7 @@
       "copyright": "Copyright (c) 2026 Anh Dang and Orbyn contributors",
       "license": "MIT",
       "source": "https://github.com/orbyn-dev/orbyn-fullstack-skills/tree/main/skills/orbyn-astryx",
-      "changes": "Orbyn skill for building with Astryx: the CLI-first page workflow and rules from Astryx's agent docs, house-style theming through defineTheme, and overrides for project agent files, global installs, package changes and hosted MCP. Bundles Astryx's unmodified agent documentation as a pinned, hash-checked snapshot under references/upstream/astryx-docs/.",
+      "changes": "Orbyn skill for building with Astryx: the CLI-first page workflow and rules from Astryx's agent docs, house-style theming through defineTheme, and a rule that Astryx versions and docs change only through Dependabot pull requests and upstream review, never through its own upgrade, init or global install. Bundles Astryx's unmodified agent documentation as a pinned, hash-checked snapshot under references/upstream/astryx-docs/.",
       "reviewed_sources": [
         {
           "credit": "Meta Platforms, Inc. (meta/astryx)",
