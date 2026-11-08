@@ -54,6 +54,12 @@ command rather than by hand. Run `astryx theme build` for server-rendered apps a
 again after every Astryx upgrade. Eject (`swizzle`) a component only when a theme
 override cannot express the change, and say why.
 
+Astryx owns light and dark: switch with its `Theme` component's `mode` (`light`, `dark`
+or `system`), not with our `data-theme` attribute and script, and never both. Our
+outcome rules still hold: no flash of the wrong theme and nothing restyling after
+load, which in an Astryx app means wiring the built theme CSS, since a runtime theme's
+component overrides flash on hydration.
+
 ## Where these rules override Astryx's setup
 
 1. **Project agent files belong to the project.** `astryx init --features agents`
@@ -62,12 +68,14 @@ override cannot express the change, and say why.
    workspace it is never run against the library's own `AGENTS.md`.
 2. **No global install without asking.** A global CLI install writes a skill into
    your home folder and links it into agent folders such as `~/.claude/skills/astryx`.
-   Ask before installing globally; `astryx init --user` writes or turns off that file.
-   Inside a project, its own docs come first.
+   Ask before installing globally; `astryx init --user` writes that file and
+   `astryx init --user --remove-agents` turns it off. Inside a project, its own docs
+   come first. If that global `astryx` skill is also loaded, treat it as reference;
+   this skill's authority rules govern.
 3. **Packages are changes.** Adding `@astryxdesign/*`, StyleX or a theme package, or
    upgrading them (`astryx upgrade --from <version> --apply`), needs the user's scope.
-4. **The hosted docs are optional.** Astryx serves `llms.txt` and an MCP endpoint from
-   its docs site. Adding that MCP server to a host is a configuration change: ask first.
+4. **The hosted docs are optional.** Astryx's docs site serves an MCP endpoint. Adding
+   that MCP server to a host is a configuration change: ask first.
 5. **Our checks still apply.** Verify in a real render: light and dark, the widths in
    [design rules](../orbyn-ui-design/references/design-rules.md), and for a desktop app
    the built window's chrome. Review Astryx code with its rubric (`astryx docs

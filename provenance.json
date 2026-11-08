@@ -3770,7 +3770,8 @@
           "source": "https://github.com/meta/astryx/tree/c86484dc57847e7c4d1127810ff1422bc2174d4d/packages/cli/assets/docs",
           "revision": "c86484dc57847e7c4d1127810ff1422bc2174d4d",
           "license": "MIT",
-          "relationship": "bundled unmodified snapshot of @astryxdesign/cli 0.7.12 agent docs; see snapshot.json"
+          "relationship": "bundled unmodified snapshot of @astryxdesign/cli 0.7.12 agent docs; see snapshot.json",
+          "copyright": "Copyright (c) 2026 Meta Platforms, Inc."
         }
       ],
       "authoring": [

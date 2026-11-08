@@ -13731,7 +13731,7 @@
         "orbyn-astryx"
       ],
       "forbidden_skills": [
-        "product-illustration"
+        "orbyn-content-design"
       ],
       "forbidden_actions": [
         "publish",
@@ -13750,7 +13750,8 @@
         "orbyn-astryx"
       ],
       "forbidden_skills": [
-        "social-preview"
+        "social-preview",
+        "product-illustration"
       ],
       "forbidden_actions": [
         "publish",
@@ -13769,7 +13770,7 @@
         "orbyn-astryx"
       ],
       "forbidden_skills": [
-        "social-content"
+        "orbyn-security-audit"
       ],
       "forbidden_actions": [
         "publish",
@@ -13797,6 +13798,23 @@
         "message"
       ],
       "excluded": "Do not introduce Astryx unless asked."
+    },
+    {
+      "id": "adopt-astryx-existing-app",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Should we move our existing React 18 app with Material UI over to Astryx?",
+      "expected_skills": [
+        "orbyn-stack-selection"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not start migrating components before the decision."
     }
   ]
 }
