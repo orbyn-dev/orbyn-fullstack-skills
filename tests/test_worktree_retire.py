@@ -27,9 +27,9 @@ DEFAULT_IGNORE = 'target/\nnode_modules/\n.venv/\ndist/\nbuild/\nvenv/\n*.log\n.
 APP_FILES = {'Cargo.lock': 'x', 'REBUILD.txt': 'cargo build', 'src.txt': 'src\n'}
 
 
-# Git can start an auto-gc in the background after a commit or, in the remote, after a push.
-# It then packs loose objects while a later "changes nothing" snapshot is compared, which made
-# that check fail at random on CI. Fixtures never gc: the flags cover commands run here, and
+# After a commit or, in the remote, after a push, Git can start auto-gc or maintenance in the
+# background. Even with no work to do it touches objects/ (a lock file appears and goes), so a
+# later "changes nothing" snapshot failed at random on CI. Fixtures never gc: the flags cover commands run here, and
 # quiet_remote() covers receive-pack, which ignores a client's -c.
 NO_GC = ('-c', 'gc.auto=0', '-c', 'maintenance.auto=false', '-c', 'receive.autogc=false')
 
