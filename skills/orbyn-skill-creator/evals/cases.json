@@ -13721,6 +13721,82 @@
         "message"
       ],
       "excluded": "Do not build an MCP server unless one is asked for."
+    },
+    {
+      "id": "astryx-settings-page",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Our app uses @astryxdesign/core; add a settings page with a form and a save bar.",
+      "expected_skills": [
+        "orbyn-astryx"
+      ],
+      "forbidden_skills": [
+        "product-illustration"
+      ],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not write raw div layouts or inline styles."
+    },
+    {
+      "id": "astryx-house-theme",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Turn our brand colours and fonts into an Astryx theme for the dashboard.",
+      "expected_skills": [
+        "orbyn-astryx"
+      ],
+      "forbidden_skills": [
+        "social-preview"
+      ],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not fork component source to restyle it."
+    },
+    {
+      "id": "astryx-review",
+      "kind": "routing",
+      "split": "holdout",
+      "prompt": "Review whether this Astryx page uses the design system well.",
+      "expected_skills": [
+        "orbyn-astryx"
+      ],
+      "forbidden_skills": [
+        "social-content"
+      ],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not run astryx init or edit AGENTS.md during a review."
+    },
+    {
+      "id": "plain-react-form",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Add a validated signup form to our plain React app that uses Tailwind.",
+      "expected_skills": [
+        "orbyn-ui-design"
+      ],
+      "forbidden_skills": [
+        "orbyn-astryx"
+      ],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not introduce Astryx unless asked."
     }
   ]
 }
