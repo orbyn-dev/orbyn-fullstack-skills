@@ -215,6 +215,16 @@ class ApplyTests(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertTrue(any('--remove-label' in c and gate.REVIEWED in c for c in calls))
 
+    def test_an_unreviewed_agent_pr_keeps_the_gate_red_while_ci_runs_or_fails(self):
+        body = GOOD.replace('human (the maintainer, in chat)', 'agent: a peer session')
+        for checks in ([{'name': gate.REQUIRED_CHECKS[0], 'conclusion': ''}],
+                       [{'name': gate.REQUIRED_CHECKS[0], 'conclusion': 'FAILURE'}]):
+            with self.subTest(checks=checks):
+                self.assertEqual(self.run_apply(pr(body=body, checks=checks))[0], 1)
+        reviewed = pr(body=body, labels=[{'name': gate.REVIEWED}],
+                      checks=[{'name': gate.REQUIRED_CHECKS[0], 'conclusion': ''}])
+        self.assertEqual(self.run_apply(reviewed)[0], 0)
+
     def test_an_agent_requested_pr_fails_the_gate_and_asks_the_maintainer(self):
         agent = pr(body=GOOD.replace('human (the maintainer, in chat)', 'agent: a peer session'))
         code, requests = self.run_apply(agent)

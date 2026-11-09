@@ -157,15 +157,17 @@ def decide(pr):
     labels = {label.get('name') for label in pr.get('labels', [])}
     agent = agent_requested(pr, bot, labels)
     marks = [AGENT] if agent else []
+    held = agent and REVIEWED not in labels  # the gate stays red, whatever CI says
     results = {c.get('name'): c.get('conclusion') for c in pr.get('statusCheckRollup', [])}
     failed = [name for name in REQUIRED_CHECKS if results.get(name) in {'FAILURE', 'CANCELLED', 'TIMED_OUT'}]
     if failed:
         return {'state': 'failing', 'problems': [f'{name} did not pass.' for name in failed],
-                'add': marks, 'remove': [NEEDS, READY], 'request': False}
+                'add': marks, 'remove': [NEEDS, READY], 'request': False, 'held': held}
     if not all(results.get(name) == 'SUCCESS' for name in REQUIRED_CHECKS):
-        return {'state': 'waiting', 'problems': [], 'add': marks, 'remove': [NEEDS, READY], 'request': False}
-    if agent and REVIEWED not in labels:
-        return {'state': 'needs-human', 'add': marks, 'remove': [READY], 'request': True,
+        return {'state': 'waiting', 'problems': [], 'add': marks, 'remove': [NEEDS, READY], 'request': False,
+                'held': held}
+    if held:
+        return {'state': 'needs-human', 'add': marks, 'remove': [READY], 'request': True, 'held': True,
                 'problems': [f'An agent or bot requested this change. A human must review it and add the '
                              f'"{REVIEWED}" label; agents never add that label or merge this PR.']}
     return {'state': 'ready', 'problems': [], 'add': [READY] + marks, 'remove': [NEEDS], 'request': True}
@@ -205,7 +207,7 @@ def apply(number, maintainer, action=''):
     if result['request'] and pr['author']['login'] != maintainer and maintainer not in requested | reviewed:
         gh('pr', 'edit', number, '--repo', repo, '--add-reviewer', maintainer)
     print(json.dumps(result, indent=2))
-    return 1 if result['state'] in ('incomplete', 'needs-human') else 0
+    return 1 if result['state'] == 'incomplete' or result.get('held') else 0
 
 
 def main():
