@@ -65,6 +65,21 @@ Use `import type` for type-only dependencies. Match package exports, ESM/CommonJ
 behavior and consumer resolution; a tsconfig path alias does not rewrite a runtime
 import. Do not import application code into shared types to repair a cycle.
 
+## Folder structure in an app
+
+- **One front door per feature.** `features/<name>/index.ts` exports the feature's
+  public surface by name, and it is the only path other features import. It never
+  `export *`s the folder; internals stay private.
+- **One-way imports.** For example app → features → shared ui/lib/state → api. Two
+  features that need each other share their common piece through a shared feature.
+  Enforce the direction with the project's lint or a dependency-graph check.
+- **Co-locate.** A component's styles, tests and data hooks sit beside it. A global
+  stylesheet holds tokens and resets, not one feature's selectors.
+- **Size.** Past a soft cap (about 600 lines), turn the file into a folder with a
+  front door. Find unused exports with the compiler or a resolver-aware tool, not by
+  name. A whole-app move follows the
+  [folder refactor playbook](../../architect/references/folder-refactor.md).
+
 ## One contract across clients
 
 When changing a run's result shape, update the owning runtime schema, derived shared types, transport and web/mobile consumers together. Keep platform-only presentation state separate. Exhaustive handling should expose an unhandled lifecycle variant without forcing the domain layer to import application components.
