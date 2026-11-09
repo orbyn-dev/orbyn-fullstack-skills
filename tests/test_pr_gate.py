@@ -152,11 +152,25 @@ class DecideTests(unittest.TestCase):
 
     def test_an_agent_requested_pr_waits_for_a_human_review_label(self):
         agent = pr(body=GOOD.replace('Requested by: human (the maintainer, in chat)',
-                                     'Requested by: agent: Engineering 2 session'))
+                                     'Requested by: agent: a peer session'))
         result = gate.decide(agent)
         self.assertEqual((result['state'], result['add'], result['request']), ('needs-human', [gate.AGENT], True))
         self.assertIn(gate.READY, result['remove'])
         self.assertEqual(gate.decide({**agent, 'labels': [{'name': gate.REVIEWED}]})['state'], 'ready')
+
+    def test_an_agent_label_outlives_editing_the_line_to_human(self):
+        labelled = pr(labels=[{'name': gate.AGENT}])
+        self.assertEqual(gate.decide(labelled)['state'], 'needs-human')
+
+    def test_a_relayed_human_line_still_counts_as_an_agent(self):
+        relayed = pr(body=GOOD.replace('human (the maintainer, in chat)', 'human (relayed by the Engineering session)'))
+        self.assertEqual(gate.decide(relayed)['state'], 'needs-human')
+
+    def test_an_agent_pr_waits_for_ci_before_asking_a_human(self):
+        agent = pr(body=GOOD.replace('human (the maintainer, in chat)', 'agent: a peer session'),
+                   checks=[{'name': gate.REQUIRED_CHECKS[0], 'conclusion': 'FAILURE'}])
+        result = gate.decide(agent)
+        self.assertEqual((result['state'], result['request'], result['add']), ('failing', False, [gate.AGENT]))
 
     def test_requested_by_must_name_a_human_or_an_agent(self):
         self.assertTrue(any('Requested by' in p for p in gate.check(GOOD.replace('- Requested by: human (the maintainer, in chat)\n', ''))))
@@ -186,6 +200,19 @@ class ApplyTests(unittest.TestCase):
     def test_an_incomplete_pr_exits_one_and_requests_nobody(self):
         code, requests = self.run_apply(pr(body='nope'))
         self.assertEqual((code, requests), (1, []))
+
+    def test_a_push_after_human_review_needs_a_new_review(self):
+        reviewed = pr(body=GOOD.replace('human (the maintainer, in chat)', 'agent: a peer session'),
+                      labels=[{'name': gate.AGENT}, {'name': gate.REVIEWED}])
+        calls = []
+        def fake(*args):
+            calls.append(args)
+            return json.dumps(reviewed) if args[:2] == ('pr', 'view') else ''
+        with mock.patch.object(gate, 'gh', side_effect=fake), mock.patch.dict('os.environ', {'GH_REPO': 'o/r'}), \
+                mock.patch('builtins.print'):
+            code = gate.apply('7', 'kinqsradio', action='synchronize')
+        self.assertEqual(code, 1)
+        self.assertTrue(any('--remove-label' in c and gate.REVIEWED in c for c in calls))
 
     def test_an_agent_requested_pr_fails_the_gate_and_asks_the_maintainer(self):
         agent = pr(body=GOOD.replace('human (the maintainer, in chat)', 'agent: a peer session'))
