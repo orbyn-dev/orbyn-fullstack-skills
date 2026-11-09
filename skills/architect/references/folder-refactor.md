@@ -106,10 +106,20 @@ still moving. Report counts per unit against the map's baseline.
 - **A new guardrail makes every open PR's green check stale.** After it lands, merge
   the base branch into each open PR and rerun its checks before merging.
 
+## Keep a handoff log
+
+A refactor this size outlives one session and often one person. Keep one log in the
+repository (for example `docs/refactor.md`) with the target rules, the map's baseline
+counts, every unit with its status (done with PR, open with owner and lock, blocked
+with the decision it waits on) and the current counts. Update it in each unit's PR,
+so a stopped refactor can be handed to another agent who starts from the log, not
+from chat history.
+
 ## Return
 
 The map with its base revision, the target rules, the ordered unit list with owners
-and locks, the enforcement plan, and what each finished unit changed in the counts.
+and locks, the enforcement plan, what each finished unit changed in the counts, and
+the handoff log's location.
 
 In one real refactor of a desktop app, a 4,310-line shared contracts file of 336 types
 became a 50-line front door over 21 domain modules (largest 554 lines), with the same
@@ -117,7 +127,8 @@ became a 50-line front door over 21 domain modules (largest 554 lines), with the
 took import cycles from 8 to 0 and deep cross-feature imports from 69 to 0, then made
 both hard errors; split a server's routes into 28 area modules under a test pinning
 all 274 routes; and cut files over the size cap from 14 to 3 (TypeScript) and 6 to 3
-(Rust). Of eight
+(Rust), leaving one oversized stylesheet. At the handoff, the import-direction and
+tier baselines were empty, so every finished rule was a hard error. Of eight
 duration formatters, none agreed on every input, so they were renamed rather than
 merged, and none of about 16 Escape-key listeners could be replaced safely by one
 shared helper.

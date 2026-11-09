@@ -358,6 +358,13 @@
           "effort": "medium",
           "date": "2026-11-09",
           "scope": "Folder refactor playbook: second batch of real lessons (registry-file conflicts, pure-rename check, pinned surfaces, component-identity remounts, cross-language path reads, re-fingerprinted alerts) and results"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-09",
+          "scope": "Folder refactor playbook: a handoff log in the repository, and the refactor's final numbers"
         }
       ]
     },
