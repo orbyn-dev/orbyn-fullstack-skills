@@ -67,16 +67,17 @@ import. Do not import application code into shared types to repair a cycle.
 
 ## Folder structure in an app
 
-- **One front door per feature.** `features/<name>/index.ts` exports the feature's
-  public surface by name, and it is the only path other features import. It never
-  `export *`s the folder; internals stay private.
+- **A front door per feature, by default.** `features/<name>/index.ts` exports the
+  feature's public surface by name, and other features import only that. It never
+  `export *`s the folder: a wide barrel hides cycles and can defeat tree-shaking, so
+  keep it to what other features actually use.
 - **One-way imports.** For example app → features → shared ui/lib/state → api. Two
   features that need each other share their common piece through a shared feature.
   Enforce the direction with the project's lint or a dependency-graph check.
 - **Co-locate.** A component's styles, tests and data hooks sit beside it. A global
   stylesheet holds tokens and resets, not one feature's selectors.
-- **Size.** Past a soft cap (about 600 lines), turn the file into a folder with a
-  front door. Find unused exports with the compiler or a resolver-aware tool, not by
+- **Size.** Past the project's soft cap (a few hundred lines is a common choice),
+  turn the file into a folder with a front door. Find unused exports with the compiler or a resolver-aware tool, not by
   name. A whole-app move follows the
   [folder refactor playbook](../../architect/references/folder-refactor.md).
 

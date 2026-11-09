@@ -16,8 +16,9 @@ Inspect Cargo.toml edition/rust-version, rust-toolchain, Cargo.lock, enabled fea
 
 - **One module per capability**, with sub-modules per topic. A file of hundreds of
   types or thousands of lines becomes a folder: `mod.rs` (or `name.rs` beside
-  `name/`) declares the sub-modules and re-exports the public items by name, so
-  existing `use` paths keep working.
+  `name/`; pick one layout per crate) declares the sub-modules and re-exports the
+  public items by name with `pub use` at the old path's visibility, so existing `use`
+  paths keep working.
 - **Enforce, don't just group.** A folder of modules is not a boundary: make items
   `pub(crate)` or `pub(super)` unless another module must use them, and give each
   module a small public surface. When boundaries must hold across teams or builds,
