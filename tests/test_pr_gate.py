@@ -148,7 +148,8 @@ class DecideTests(unittest.TestCase):
         bot = pr(body='Bump', author={'login': 'dependabot[bot]'})
         self.assertEqual(gate.decide(bot)['state'], 'needs-human')
         self.assertEqual(gate.decide({**bot, 'labels': [{'name': gate.REVIEWED}]})['state'], 'ready')
-        self.assertEqual(gate.decide({**bot, 'statusCheckRollup': []})['state'], 'needs-human')
+        waiting = gate.decide({**bot, 'statusCheckRollup': []})
+        self.assertEqual((waiting['state'], waiting['add']), ('waiting', [gate.AGENT]))
 
     def test_an_agent_requested_pr_waits_for_a_human_review_label(self):
         agent = pr(body=GOOD.replace('Requested by: human (the maintainer, in chat)',
