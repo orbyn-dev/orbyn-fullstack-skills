@@ -22,6 +22,7 @@ Agents had no owner for this.
 - Models: claude-opus-5-5 (lead), claude-sonnet-5-5 (worker)
 - Effort: medium
 - Human role: Reviewed the result and decided scope
+- Requested by: human (the maintainer, in chat)
 - External sources: none
 
 ## Evidence
@@ -143,10 +144,24 @@ class DecideTests(unittest.TestCase):
     def test_a_draft_stays_quiet(self):
         self.assertFalse(gate.decide(pr(isDraft=True))['request'])
 
-    def test_a_dependency_bot_needs_no_disclosure_but_still_needs_ci(self):
+    def test_a_dependency_bot_needs_no_disclosure_but_needs_a_human(self):
         bot = pr(body='Bump', author={'login': 'dependabot[bot]'})
-        self.assertEqual(gate.decide(bot)['state'], 'ready')
-        self.assertEqual(gate.decide({**bot, 'statusCheckRollup': []})['state'], 'waiting')
+        self.assertEqual(gate.decide(bot)['state'], 'needs-human')
+        self.assertEqual(gate.decide({**bot, 'labels': [{'name': gate.REVIEWED}]})['state'], 'ready')
+        self.assertEqual(gate.decide({**bot, 'statusCheckRollup': []})['state'], 'needs-human')
+
+    def test_an_agent_requested_pr_waits_for_a_human_review_label(self):
+        agent = pr(body=GOOD.replace('Requested by: human (the maintainer, in chat)',
+                                     'Requested by: agent: Engineering 2 session'))
+        result = gate.decide(agent)
+        self.assertEqual((result['state'], result['add'], result['request']), ('needs-human', [gate.AGENT], True))
+        self.assertIn(gate.READY, result['remove'])
+        self.assertEqual(gate.decide({**agent, 'labels': [{'name': gate.REVIEWED}]})['state'], 'ready')
+
+    def test_requested_by_must_name_a_human_or_an_agent(self):
+        self.assertTrue(any('Requested by' in p for p in gate.check(GOOD.replace('- Requested by: human (the maintainer, in chat)\n', ''))))
+        self.assertTrue(any('Start "Requested by"' in p for p in gate.check(GOOD.replace('human (the maintainer, in chat)', 'someone'))))
+        self.assertEqual(gate.decide(pr())['state'], 'ready')
 
 
 class ApplyTests(unittest.TestCase):
@@ -171,6 +186,11 @@ class ApplyTests(unittest.TestCase):
     def test_an_incomplete_pr_exits_one_and_requests_nobody(self):
         code, requests = self.run_apply(pr(body='nope'))
         self.assertEqual((code, requests), (1, []))
+
+    def test_an_agent_requested_pr_fails_the_gate_and_asks_the_maintainer(self):
+        agent = pr(body=GOOD.replace('human (the maintainer, in chat)', 'agent: a peer session'))
+        code, requests = self.run_apply(agent)
+        self.assertEqual((code, requests[0][-1]), (1, 'kinqsradio'))
 
 
 class WorkflowTests(unittest.TestCase):

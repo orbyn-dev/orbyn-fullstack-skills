@@ -15,8 +15,11 @@ import subprocess
 import sys
 
 READY, NEEDS = 'ready-for-review', 'needs-disclosure'
+# A change an agent or bot asked for needs a human's review and a human's merge.
+AGENT, REVIEWED = 'agent-requested', 'human-reviewed'
+REQUESTER = re.compile(r'^(human|agent)\b', re.I)
 REQUIRED_CHECKS = ('Validate (Python 3.11)',)  # 3.13 runs on main and nightly, not on PRs
-DISCLOSURE_FIELDS = ('Tools', 'Models', 'Effort', 'Human role')
+DISCLOSURE_FIELDS = ('Tools', 'Models', 'Effort', 'Human role', 'Requested by')
 EVIDENCE_FIELDS = ('Static/helper checks', 'Recorded host trials')
 EMPTY = {'', 'none', 'n/a', 'na', 'tbd', 'todo', 'unknown', '-', '?'}
 COMMENT = re.compile(r'<!--.*?-->', re.S)
@@ -88,6 +91,10 @@ def check(body):
         for name in DISCLOSURE_FIELDS:
             if blank(field(disclosure, name)):
                 problems.append(f'Fill in "{name}" under Agent disclosure.')
+        requested = field(disclosure, 'Requested by')
+        if not blank(requested) and not REQUESTER.match(requested.strip('`*_ ')):
+            problems.append('Start "Requested by" with "human" (a person asked in chat) or "agent" '
+                            '(another session, subagent, bot or automated comment asked).')
         problems += source_problems(field(disclosure, 'External sources'))
         models = field(disclosure, 'Models')
         if not blank(models) and not SPECIFIC_MODEL.search(models):
@@ -126,6 +133,13 @@ def config_warnings(changes):
             for status, path in changes]
 
 
+def agent_requested(pr, bot):
+    """A bot author, or a disclosure that says an agent asked for the change."""
+    disclosure = section(COMMENT.sub('', (pr.get('body') or '').replace('\r\n', '\n')), 'Agent disclosure') or ''
+    requested = (field(disclosure, 'Requested by') or '').strip('`*_ ')
+    return bot or requested.lower().startswith('agent')
+
+
 def decide(pr):
     """Pure decision for one PR record: labels to set, and whether to request review."""
     author = pr.get('author', {}).get('login', '')
@@ -135,6 +149,11 @@ def decide(pr):
     problems = [] if bot else check(pr.get('body'))
     if problems:
         return {'state': 'incomplete', 'problems': problems, 'add': [NEEDS], 'remove': [READY], 'request': False}
+    labels = {label.get('name') for label in pr.get('labels', [])}
+    if agent_requested(pr, bot) and REVIEWED not in labels:
+        return {'state': 'needs-human', 'add': [AGENT], 'remove': [READY], 'request': True,
+                'problems': [f'An agent or bot requested this change. A human must review it and add the '
+                             f'"{REVIEWED}" label; agents never add that label or merge this PR.']}
     results = {c.get('name'): c.get('conclusion') for c in pr.get('statusCheckRollup', [])}
     failed = [name for name in REQUIRED_CHECKS if results.get(name) in {'FAILURE', 'CANCELLED', 'TIMED_OUT'}]
     if failed:
@@ -162,7 +181,7 @@ def apply(number, maintainer):
                        'author,body,isDraft,statusCheckRollup,reviewRequests,reviews,labels'))
     result = decide(pr)
     labels = {label['name'] for label in pr.get('labels', [])}
-    for name, colour in ((READY, '0e8a16'), (NEEDS, 'd93f0b')):
+    for name, colour in ((READY, '0e8a16'), (NEEDS, 'd93f0b'), (AGENT, 'b60205'), (REVIEWED, '5319e7')):
         gh('label', 'create', name, '--repo', repo, '--color', colour, '--force')
     for name in result['add']:
         gh('pr', 'edit', number, '--repo', repo, '--add-label', name)
@@ -174,7 +193,7 @@ def apply(number, maintainer):
     if result['request'] and pr['author']['login'] != maintainer and maintainer not in requested | reviewed:
         gh('pr', 'edit', number, '--repo', repo, '--add-reviewer', maintainer)
     print(json.dumps(result, indent=2))
-    return 1 if result['state'] == 'incomplete' else 0
+    return 1 if result['state'] in ('incomplete', 'needs-human') else 0
 
 
 def main():

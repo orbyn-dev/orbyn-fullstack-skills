@@ -3,7 +3,7 @@ name: PR gate
 # and never checks out or runs PR code, which is what makes pull_request_target safe.
 on:
   pull_request_target:
-    types: [opened, edited, synchronize, reopened, ready_for_review]
+    types: [opened, edited, synchronize, reopened, ready_for_review, labeled, unlabeled]
   workflow_run:
     workflows: [Validate skills]
     types: [completed]

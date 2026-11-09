@@ -2448,6 +2448,13 @@
           "effort": "medium",
           "date": "2026-11-09",
           "scope": "Orbyn subagents generated for Cursor, Copilot CLI, OpenCode and Gemini CLI on the session model; lead contract links the host table"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-09",
+          "scope": "Changes an agent asked for: Requested by disclosure, no standing merge authority, human-reviewed label only by a human, undo requests confirmed in chat"
         }
       ]
     },
