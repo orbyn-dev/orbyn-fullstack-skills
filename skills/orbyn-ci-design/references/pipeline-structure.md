@@ -88,7 +88,7 @@ Measure first: the slowest step, and how long a PR waits to turn green. Then:
   issue and an owner, so it neither blocks PRs nor hides real failures; fix it or
   delete it. See the [bulk method](bulk-failures.md) for many failures at once.
 - **Going further:** sharding, required aggregates, cache warming, CI-only build
-  profiles, path filters and merge watchers are in [making CI faster](ci-speed.md).
+  profiles, job selection and merge watchers are in [making CI faster](ci-speed.md).
 - **Use a merge queue** when several PRs land a day and main breaks from combinations
   that passed alone. It tests each PR on the latest main, so PRs need not re-run after
   every merge.
