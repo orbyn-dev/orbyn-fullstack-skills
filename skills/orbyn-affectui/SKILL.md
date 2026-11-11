@@ -16,8 +16,8 @@ covers the agent screens; this skill covers using these files.
 
 ## What is bundled
 
-Each item comes in two styles: `-clean` (white chips, hairline shadows) and classic.
-Pick one style per product.
+Components and blocks come in two styles: `-clean` (white chips, hairline shadows) and
+classic; pick one per product. Illustrations and motion have one file each.
 
 | Folder | Items |
 | --- | --- |
@@ -41,12 +41,13 @@ with a design draft first.
    revision (`affectUI 3c5df43`). This is the version we reviewed. Use the shadcn
    registry (`npx shadcn@latest add https://www.affectui.com/r/<item>.json`) only when
    the user asks for the live version, and say it may differ from the bundle.
-3. **Restyle through variables.** Each file declares its colours, radius, shadows and
-   easing as CSS custom properties: a shared `--aui-*` set and a per-item prefix (for
-   example `--ui-tclc-*` on the tool-call card). Map them to the project's tokens, or
-   to the [Orbyn house style](../orbyn-ui-design/references/house-style/README.md) when
-   it has none, in one place; leave the rest of the file alone so a later refresh is a
-   clean diff. Dark mode follows `.dark` or `data-theme="dark"` on an ancestor.
+3. **Restyle through variables.** Components and blocks declare their colours, radius,
+   shadows and easing as CSS custom properties: a shared `--aui-*` set and a per-item
+   prefix (for example `--ui-tclc-*` on the tool-call card). Illustrations and motion
+   use only their own prefix (for example `--ui-ti-*`, `--ui-nt-*`). Map those to the
+   project's tokens, or to the [Orbyn house style](../orbyn-ui-design/references/house-style/README.md)
+   when it has none, in one place; leave the rest of the file alone so a later refresh
+   is a clean diff. Dark mode follows `.dark` or `data-theme="dark"` on an ancestor.
 4. **Feed real state.** Drive status from real events: the thinking loader's `phase`
    from stream events, not its demo timer; a tool-call card's state from the actual
    call; decisions from the backend that will act on them. A component renders state
@@ -66,8 +67,8 @@ with a design draft first.
 - **No new MCP server without asking.** affectUI offers an MCP server and `llms.txt`
   for coding assistants. Adding that server to a host is a configuration change.
 - **Brand marks are not ours.** Logo blocks and some illustrations draw third-party
-  logos; the MIT licence covers the code, not those trademarks. Replace them with marks
-  the product may use.
+  logos or name other products (for example model providers); the MIT licence covers
+  the code, not those trademarks. Replace them with marks and names the product may use.
 - **Keep the licence.** A copied file keeps its header; the project credits affectUI
   (MIT, Florian Höller) where it lists third-party code.
 

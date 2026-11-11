@@ -27,11 +27,13 @@ The backend owns state, permissions and effects; these views render it and call 
   ("Send this email to 3 people"), and the backend re-checks authority when it acts;
   the UI choice is a request, not the authorization.
 - **Cost and time are real numbers.** Show the provider's reported tokens or cost and
-  measured durations, with units; label estimates as estimates.
-- **Generative UI maps to known views.** When a model picks a tool or returns data,
-  render it with a component the app already has, after validating the data against
-  that component's schema. Never execute model-generated code or markup, and show a
-  plain fallback for anything that does not validate.
+  measured durations, with units; label estimates as estimates. Missing usage is
+  unknown, not zero, and observed tokens are not billing
+  ([AI interactions](design-rules.md#ai-interactions)).
+- **Generative UI maps to known views.** A model's tool choice or data renders through
+  a component the app already has, after validating against its schema, with a plain
+  fallback that never executes generated code; [assistant chat](assistant-chat.md)
+  owns the renderer rules.
 - **Protocol is not presentation.** An MCP or tool connection supplies data; the view
   is still designed here, with every state: running, waiting for a person, failed,
   cancelled, empty and too large to show.

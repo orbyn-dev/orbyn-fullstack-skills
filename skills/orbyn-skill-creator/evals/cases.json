@@ -13911,6 +13911,25 @@
         "message"
       ],
       "excluded": "Do not copy affectUI's Pro trace waterfall."
+    },
+    {
+      "id": "affectui-pro-agent-tree",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Build an agent tree like affectUI's showing which sub-agents each agent started.",
+      "expected_skills": [
+        "orbyn-ui-design"
+      ],
+      "forbidden_skills": [
+        "product-illustration"
+      ],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not recreate affectUI's Pro agent tree from its website; design our own from a draft."
     }
   ]
 }
