@@ -19,8 +19,10 @@ Serve the last value at once, refresh in the background, then tell clients.
   affected keys. A background watcher must not drop a whole scope's cache on each
   pass.
 - **Fence refreshes.** Tag each refresh with the key's generation; a write bumps
-  it, and a refresh that finishes under an older generation is discarded.
-- **Failed refresh:** keep the last good value, log the failure, retry later.
+  it, and a refresh that finishes under an older generation is discarded. Callers
+  waiting on a discarded load retry once under the new generation.
+- **Failed refresh:** keep the last good value until the hard limit, then return
+  the error; log the failure and retry later.
 - **A force flag reads for real.** Refresh buttons and checks after an action use it.
 - **Keep authorization and trust checks on cache hits.** A cached value is data,
   not permission.

@@ -97,9 +97,8 @@ per host and port are shared by event streams and every call, so a few slow read
 delay fast ones. Confirm this by measurement first
 ([method](../../orbyn-workflow/playbooks/perf-issue.md#slow-screen-over-a-local-or-http11-service)).
 
-- **Slow lane:** known-slow GETs share a small cap, leaving connections for
-  interactive calls: about 6, minus long-lived streams, minus at least 2 for
-  interactive calls. Add a lane timeout so a hung read cannot hold a slot forever.
+- **Slow lane:** known-slow GETs share a cap of about 6, minus long-lived streams,
+  minus at least 2 kept for interactive calls. Add a lane timeout so a hung read cannot hold a slot forever.
 - **Priority:** what the person is looking at goes first; reads triggered by change
   events go last. Cap event bursts so they cannot fill the lane ahead of the next click.
 - **Polls stay out of the lane.** A poll that waits behind slow reads shows state

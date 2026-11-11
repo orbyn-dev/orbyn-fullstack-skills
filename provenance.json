@@ -773,7 +773,7 @@
           "model": "claude-sonnet-5-5 (lead, draft), claude-opus-5-5 (lead, review fixes; reviewer child)",
           "effort": "medium",
           "date": "2026-11-11",
-          "scope": "Slow-read caching reference: stale-while-revalidate rules, keys, invalidation, forced refresh"
+          "scope": "Slow-read caching reference: stale-while-revalidate rules, keys, invalidation, forced refresh, cold-miss single flight, generation fencing, staleness limit, failed-refresh and lock rules"
         }
       ]
     },
@@ -1983,7 +1983,7 @@
           "model": "claude-sonnet-5-5 (lead, draft), claude-opus-5-5 (lead, review fixes; reviewer child)",
           "effort": "medium",
           "date": "2026-11-11",
-          "scope": "Async-state: capped slow lane, priority, quiet re-reads and polls kept out of the lane"
+          "scope": "Async-state: capped slow lane, priority, quiet re-reads and polls kept out of the lane; in-flight reuse scoped to reads started before a write, stale-data failure handling"
         }
       ]
     },
@@ -2516,7 +2516,7 @@
           "model": "claude-sonnet-5-5 (lead, draft), claude-opus-5-5 (lead, review fixes; reviewer child)",
           "effort": "medium",
           "date": "2026-11-11",
-          "scope": "Performance playbook: measure-first method for a slow screen over a local HTTP/1.1 service (arrival vs server time, connection count, traps, re-measure)"
+          "scope": "Performance playbook: measure-first method for a slow screen over a local HTTP/1.1 service (arrival vs server time, connection count, traps, re-measure); trimmed cross-side traps and a preliminary receipt"
         }
       ]
     },
