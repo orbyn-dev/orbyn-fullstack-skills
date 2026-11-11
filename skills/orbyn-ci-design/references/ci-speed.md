@@ -31,6 +31,8 @@ Windows; compiling was not the limiter.
   `cargo test --doc` on one shard.
 - **Stop adding shards** when fixed setup (checkout, toolchain, download) is bigger
   than the tests a shard runs. Measure your setup; in one project it was 1-1.5 min.
+- **A flaky shard** follows the [rerun rule](pipeline-structure.md#make-it-fast):
+  quarantine the test with an issue and an owner, never re-run into green.
 
 ## Keep a required check stable
 
@@ -57,7 +59,7 @@ after, not just the work per job, and drop the split if the critical path got lo
   that does not embed the job id (for example rust-cache `shared-key`). Without a
   warm job, one project's first PR run went from 8 to 13 min.
 - **Test-only settings get their own key.** In Cargo, flags that change only for
-  test jobs (`RUSTFLAGS` such as a different linker, profile debug level) change the
+  test jobs (`RUSTFLAGS` such as a different linker, or the profile's debug level) change the
   build fingerprint and would thrash a shared cache. Each key adds pressure on the
   repository's cache quota (10 GB on GitHub), so watch for evictions.
 - **A CI-only build profile** may trade runtime speed for build time on PRs, for
@@ -84,6 +86,3 @@ every required check, including one still marked expected. A script that polls
 not reported yet (for example from a workflow that has not started) is not in that
 list. If you must script it, wait for every workflow run on the head commit, not
 one run.
-
-A known flaky test follows the [rerun rule](pipeline-structure.md#make-it-fast):
-quarantined with an issue and an owner, not re-run into green.
