@@ -9,25 +9,30 @@ Caching a read nobody measured adds a staleness bug for no gain.
 
 Serve the last value at once, refresh in the background, then tell clients.
 
-- **Single flight per key.** One refresh runs at a time; later callers reuse the
-  last value.
-- **Bounded keys and explicit TTL constants,** named and reviewed, not magic numbers.
-  Keep TTLs short until the client reacts to change events.
-- **Key by everything that changes the answer:** project, thread, engine, account.
-  Never share a cache across them.
-- **Invalidate on every write** that changes the data: drop exactly the affected
-  keys. A background watcher must not drop a whole project's cache on each pass.
+- **Single flight per key.** One refresh runs at a time. On a warm key later
+  callers get the last value; on a cold miss they await the same in-flight load.
+- **Bounded keys, named TTL constants and a hard staleness limit.** Past the limit,
+  serve no stale value. Keep TTLs short until clients react to change events.
+- **Key by everything that changes the answer:** account or tenant, resource scope,
+  and any backend or option that changes the result.
+- **Invalidate on every write** that changes the data, dropping exactly the
+  affected keys. A background watcher must not drop a whole scope's cache on each
+  pass.
+- **Fence refreshes.** Tag each refresh with the key's generation; a write bumps
+  it, and a refresh that finishes under an older generation is discarded.
+- **Failed refresh:** keep the last good value, log the failure, retry later.
 - **A force flag reads for real.** Refresh buttons and checks after an action use it.
 - **Keep authorization and trust checks on cache hits.** A cached value is data,
   not permission.
 - **Never cache progress or state that decides an action** (update progress, "is it
   running") behind a TTL.
-- **Do not hold a lock across `await`** while refreshing.
-- **Announce fresh data** on the existing event stream with a topic name per key
-  family, so clients re-read quietly. Add no second channel.
+- **Do not hold the cache map's lock, or any sync mutex, across the slow read.**
+  Record an in-flight marker or shared future per key, release the lock, then await.
+- **Announce fresh data** with a topic name per key family. Reuse the existing event
+  stream if there is one.
 
 ## Check before merge
 
-Staleness after each write path, key completeness, invalidation coverage, lock
-scope, and whether the first cold read still blocks an interactive path. Cold reads
-stay slow; say so in the report.
+Staleness after each write path, key completeness, generation fencing, lock scope,
+cold-miss behavior, and whether the first cold read still blocks an interactive
+path. Cold reads stay slow; say so in the report.
