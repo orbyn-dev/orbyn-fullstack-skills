@@ -89,3 +89,25 @@ escalation, use the content owner's [attention method](../../orbyn-content-desig
 It does not replace operation identity, delivery deduplication or durable review.
 
 For agent/model event streams, the AI owner’s [streaming interaction contract](../../orbyn-ai-application/references/streaming-interactions.md) connects projection convergence and passive history to current effects. Keep request generations and draft ownership here; a stream snapshot is not an automatic overwrite or completion witness.
+
+## Keep slow reads from starving the screen
+
+Applies to a webview or browser talking to a plain-HTTP service: about 6 HTTP/1.1
+connections per host are shared by event streams and every call, so a few slow reads
+delay fast ones that were measured to take milliseconds. Confirm this by measurement
+first ([method](../../orbyn-workflow/playbooks/perf-issue.md#slow-screen-over-a-local-or-http11-service)).
+
+- **Slow lane:** known-slow GETs share a small cap (for example 2), leaving
+  connections for interactive calls. Add a lane timeout so a hung read cannot hold a
+  slot forever.
+- **Priority:** what the person is looking at goes first; reads triggered by change
+  events go last. Cap event bursts so they cannot fill the lane ahead of the next click.
+- **Polls stay out of the lane.** A poll that waits behind slow reads shows state
+  that is no longer true.
+- **No shared in-flight GETs.** De-duplicating identical requests caused stale data
+  after an action; the lane alone is enough.
+- **Quiet re-reads:** on a change event, refresh without a loading state and never
+  replace data with an error. Re-read after the event stream reconnects following a
+  gap. A Refresh button forces a real read.
+- **Check neighbours:** a cap can slow a screen that needs the laned call; give the
+  visible one foreground priority and re-measure it.

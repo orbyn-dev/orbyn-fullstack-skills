@@ -57,6 +57,47 @@ no arbitrary minimum iteration count, relaxed target or unlimited hillclimb.
 
 For code that runs every frame or tick, read [real-time loops](../references/real-time-loops.md). For ordinary UI or RN motion, read the [motion performance method](../../orbyn-ui-design/references/animation-performance.md). Compare the same completed interaction under the same workload, preserving input/layout and runtime identity; screenshots alone cannot establish speed.
 
+## Slow screen over a local or HTTP/1.1 service
+
+Use when a screen feels slow but the service answers fast, or many calls take
+seconds together. Measure the running system before reading code or building a mock.
+
+1. **Time each call directly** against the running service, two rounds (cold, then
+   warm), and read the service's own request trace (name, duration, end time).
+2. **Compare server time with arrival time.** A call that takes 1-2 ms on the
+   server but arrives 0.3-2.4 s after its siblings is queueing in the client.
+3. **Count connections.** A browser or webview holds about 6 HTTP/1.1 connections
+   per host, and browsers need TLS for HTTP/2, so a plain-HTTP local service cannot
+   escape the cap. List the established sockets (for example `lsof -iTCP:<port>
+   -sTCP:ESTABLISHED`) and name what holds each: long-lived event streams, slow
+   reads, polls. Design around the limit.
+4. **Fix both sides.** Server: [cache slow reads](../../orbyn-backend-design/references/slow-read-caching.md).
+   Client: [lane the slow reads](../../orbyn-ui-design/references/async-state.md#keep-slow-reads-from-starving-the-screen).
+5. **Re-measure the shipped build** from the app's own trace, the same way as
+   steps 1-2. Cold first reads stay slow; keep them off the interactive path
+   rather than claiming they got faster.
+
+Traps seen in practice:
+
+- Keep polled reads out of the slow lane. A poll queued behind slow reads made the
+  app believe a finished or running task was still in its old state.
+- Do not share identical in-flight GETs: it caused stale data after an action. Use
+  the lane alone.
+- A background watcher that drops a whole project's cache each pass undoes the
+  gain.
+- Update or progress state must not sit behind a TTL.
+- Event bursts must not fill the lane ahead of what the person clicks next.
+- Capping slow reads can slow a screen that needs them: check every screen that
+  uses a laned call, and give the visible one foreground priority.
+
+Give an independent reviewer the diff with these questions: staleness, cache keys,
+invalidation on every write, locks held across `await`, and whether the change
+slows another screen.
+
+Example receipt (repeat visit, same machine): list read 1.8 s to 1 ms; settings
+read 0.44 s to 2 ms; arrival spread of sibling reads up to 2.4 s to 6-160 ms. Cold
+reads of 3-7 s were unchanged and moved off the interactive path.
+
 ## Ticks that carry nothing
 
 A timer that refetches every few seconds costs the same whether or not anything
