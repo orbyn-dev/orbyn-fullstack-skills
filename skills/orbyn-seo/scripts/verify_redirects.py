@@ -7,7 +7,9 @@ base + each source without following redirects, then follows the answer by hand 
 status and Location. It only ever sends a request to the `--base` host or an `--allow-host`; a hop to any other host is
 reported and not requested. A rule passes when the first response is 301 or 308, points straight at the expected
 target (exact match after dropping the scheme, lowercasing the host and, in `--slash loose`, the trailing slash) and
-the target finally returns 200. HEAD is used, with GET as the fallback on 405 or 501. Standard library only.
+the target finally returns 200. A final 3xx without Location or any non-200 final answer fails. Requests connect to
+the parsed hostname and port; URLs with a username or password are never requested, and a bare `--allow-host host`
+allows only the scheme's default port (`host:port` allows that port, the `--base` origin its own port). HEAD is used, with GET as the fallback on 405 or 501. Standard library only.
 
 Exit codes: 0 everything passes, 1 any offline issue or live rule fails, 2 bad input.
 """
@@ -18,23 +20,40 @@ import json
 from pathlib import Path
 import sys
 import time
-from urllib.parse import urljoin, urlsplit
+from urllib.parse import quote, urljoin, urlsplit
 
 MAX_HOPS = 5
 USER_AGENT = 'orbyn-seo-redirect-check'
 PERMANENT = (301, 308)
 TEMPORARY = (302, 307)
+DEFAULT_PORTS = {'http': 80, 'https': 443}
+PATH_SAFE = "/%:@!$&'()*+,;=-._~"
+QUERY_SAFE = PATH_SAFE + '?'
 
 
 class Unusable(Exception):
     pass
 
 
-def norm(value, slash, base_host=''):
-    """(host, path, query) of a path or URL; scheme and fragment dropped, host lowercased."""
+def hostport(parts):
+    """`host` or `host:port` of a split URL, lowercase, brackets on IPv6, the scheme's default port dropped."""
+    host = parts.hostname or ''
+    if ':' in host:
+        host = f'[{host}]'
+    port = parts.port
+    if port and port != DEFAULT_PORTS.get(parts.scheme):
+        host = f'{host}:{port}'
+    return host
+
+
+def norm(value, slash, hosts=()):
+    """(host, path, query) of a path or URL; scheme and fragment dropped, host lowercased, default port dropped.
+
+    A host listed in `hosts` (an origin such as the old site) is treated as a plain path. Raises ValueError on a
+    malformed URL."""
     parts = urlsplit(value)
-    host = parts.netloc.lower()
-    if host == base_host:
+    host = hostport(parts)
+    if host in hosts:
         host = ''
     path = parts.path or '/'
     if slash == 'loose':
@@ -45,10 +64,15 @@ def norm(value, slash, base_host=''):
 def valid_ref(value):
     if not isinstance(value, str) or not value.strip():
         return False
-    parts = urlsplit(value.strip())
+    value = value.strip()
+    try:
+        parts = urlsplit(value)
+        parts.port
+    except ValueError:
+        return False
     if parts.scheme in ('http', 'https'):
         return bool(parts.netloc)
-    return value.strip().startswith('/') and not value.strip().startswith('//')
+    return value.startswith('/') and not value.startswith('//')
 
 
 def load_map(path):
@@ -74,7 +98,7 @@ def load_map(path):
     return [(row.get(fields['from']), row.get(fields['to'])) for row in reader]
 
 
-def offline_checks(entries, slash, base_host, old_pages):
+def offline_checks(entries, slash, hosts, old_pages):
     issues = []
     rules = []  # (from, to) valid, in file order
     for index, (src, dst) in enumerate(entries, 1):
@@ -83,7 +107,7 @@ def offline_checks(entries, slash, base_host, old_pages):
         else:
             issues.append({'check': 'malformed', 'from': src, 'to': dst, 'detail':
                            f'entry {index}: from and to must each be a path starting with / or an http(s) URL'})
-    key = lambda value: norm(value, slash, base_host)
+    key = lambda value: norm(value, slash, hosts)
     first, seen = {}, {}
     for src, dst in rules:
         seen.setdefault(key(src), []).append((src, dst))
@@ -125,7 +149,13 @@ def offline_checks(entries, slash, base_host, old_pages):
                            f'; redirect {src} straight to {final}'})
     if old_pages is not None:
         for page in old_pages:
-            if key(page) not in first:
+            try:
+                known = key(page) in first
+            except ValueError:
+                issues.append({'check': 'malformed', 'from': page, 'to': None,
+                               'detail': 'old page is not a valid path or URL'})
+                continue
+            if not known:
                 issues.append({'check': 'missing', 'from': page, 'to': None, 'detail': 'old page has no redirect rule'})
     return issues, unique
 
@@ -138,38 +168,55 @@ def load_old_pages(path):
     return [line.strip() for line in lines if line.strip() and not line.strip().startswith('#')]
 
 
+def parse_origin(entry):
+    """(scheme or None, hostname, port or None) of an `--allow-host` or `--base` value."""
+    text = entry.strip()
+    try:
+        parts = urlsplit(text if '://' in text else '//' + text)
+        host, port = parts.hostname, parts.port
+    except ValueError:
+        raise Unusable(f'not a valid host: {entry}')
+    if (not host or parts.username is not None or parts.password is not None or parts.path not in ('', '/')
+            or parts.query or parts.scheme not in ('', 'http', 'https')):
+        raise Unusable(f'not a valid host (no username, password or path allowed): {entry}')
+    return parts.scheme or None, host, port
+
+
 class Checker:
     def __init__(self, base, allow, slash, timeout, delay):
         self.base = base.rstrip('/')
         self.slash = slash
         self.timeout = timeout
         self.delay = delay
-        self.origin = urlsplit(self.base).netloc.lower()
-        self.exact = {self.origin}
-        self.bare = set()
-        for entry in allow:
-            netloc = urlsplit(entry).netloc.lower() if '://' in entry else entry.strip().lower()
-            self.exact.add(netloc)
-            if ':' not in netloc.rpartition(']')[2]:
-                self.bare.add(netloc)
+        _scheme, host, port = parse_origin(base)
+        self.hosts = {hostport(urlsplit(self.base))}
+        self.entries = [(None, host, port)] + [parse_origin(entry) for entry in allow]
         self.requests = 0
 
     def allowed(self, url):
-        parts = urlsplit(url)
-        if parts.scheme not in ('http', 'https'):
+        try:
+            parts = urlsplit(url)
+            host, port = parts.hostname, parts.port
+        except ValueError:
             return False
-        return parts.netloc.lower() in self.exact or (parts.hostname or '') in self.bare
+        if parts.scheme not in DEFAULT_PORTS or not host or parts.username is not None or parts.password is not None:
+            return False
+        default = DEFAULT_PORTS[parts.scheme]
+        for scheme, name, allowed_port in self.entries:
+            if name == host and scheme in (None, parts.scheme) and (port or default) == (allowed_port or default):
+                return True
+        return False
 
     def fetch(self, url):
         """One request without following: (status, location). HEAD, then GET on 405 or 501."""
         parts = urlsplit(url)
         cls = http.client.HTTPSConnection if parts.scheme == 'https' else http.client.HTTPConnection
-        target = (parts.path or '/') + (f'?{parts.query}' if parts.query else '')
+        target = quote(parts.path or '/', safe=PATH_SAFE) + (f'?{quote(parts.query, safe=QUERY_SAFE)}' if parts.query else '')
         for method in ('HEAD', 'GET'):
             if self.requests and self.delay:
                 time.sleep(self.delay)
             self.requests += 1
-            conn = cls(parts.netloc, timeout=self.timeout)
+            conn = cls(parts.hostname, parts.port, timeout=self.timeout)
             try:
                 conn.request(method, target, headers={'User-Agent': USER_AGENT, 'Accept': '*/*'})
                 response = conn.getresponse()
@@ -197,10 +244,11 @@ class Checker:
         expected = self.expected_url(dst)
         current, visited = start, {norm(start, 'strict')}
         redirects = 0
+        refused = False
         while True:
             try:
                 status, location = self.fetch(current)
-            except (TimeoutError, OSError, http.client.HTTPException) as error:
+            except (TimeoutError, OSError, http.client.HTTPException, ValueError) as error:
                 timed_out = isinstance(error, TimeoutError) or 'timed out' in str(error)
                 problems.append(f'timeout requesting {current}' if timed_out else f'request failed for {current}: {error}')
                 return result
@@ -210,23 +258,30 @@ class Checker:
             if not (300 <= status < 400 and location):
                 break
             redirects += 1
-            nxt = urljoin(current, location)
+            try:
+                nxt = urljoin(current, location)
+                key = norm(nxt, 'strict')
+                matches = self.same(nxt, expected)
+            except ValueError:
+                problems.append(f'malformed Location, not requested: {location!r}')
+                return result
             if redirects == 1:
                 if status in TEMPORARY:
                     problems.append(f'{status} used for a permanent move; use 301 or 308')
                 elif status not in PERMANENT:
                     problems.append(f'unexpected redirect status {status}')
-                if not self.same(nxt, expected):
+                if not matches:
                     problems.append(f'wrong target: points at {nxt}, expected {expected}')
-            if norm(nxt, 'strict') in visited:
+            if key in visited:
                 problems.append(f'loop: {nxt} was already requested')
                 return result
-            visited.add(norm(nxt, 'strict'))
+            visited.add(key)
             if redirects > MAX_HOPS:
                 problems.append(f'more than {MAX_HOPS} hops; stopped at {nxt}')
                 return result
             if not self.allowed(nxt):
                 problems.append(f'hop to host not allowed, not requested: {nxt} (add --allow-host to verify it)')
+                refused = True
                 break
             current = nxt
         if redirects == 0:
@@ -235,8 +290,11 @@ class Checker:
             if redirects > 1:
                 problems.append(f'chain of {redirects} hops; redirect straight to the final target')
             final = result['hops'][-1]
-            if self.allowed(final['url']) and final['status'] != 200 and not (300 <= final['status'] < 400):
-                problems.append(f'target {final["url"]} returned {final["status"]}')
+            if not refused and final['status'] != 200:
+                if 300 <= final['status'] < 400:
+                    problems.append(f'target {final["url"]} returned {final["status"]} with no Location')
+                else:
+                    problems.append(f'target {final["url"]} returned {final["status"]}')
         result['ok'] = not problems
         return result
 
@@ -269,6 +327,7 @@ def main(argv=None):
     parser.add_argument('--base', help='live mode: old site origin, such as https://old.example.com')
     parser.add_argument('--allow-host', action='append', default=[], metavar='HOST',
                         help='extra host that live mode may request (the new site); repeatable')
+    parser.add_argument('--host', help='offline: origin whose absolute URLs count as plain paths, such as https://example.com')
     parser.add_argument('--slash', choices=('strict', 'loose'), default='loose',
                         help='trailing slash in target comparison (default loose)')
     parser.add_argument('--timeout', type=float, default=10.0, help='seconds per request (default 10)')
@@ -276,16 +335,19 @@ def main(argv=None):
     parser.add_argument('--json', action='store_true', help='print JSON instead of text')
     args = parser.parse_args(argv)
     try:
-        if args.base and urlsplit(args.base).scheme not in ('http', 'https'):
-            raise Unusable('--base must start with http:// or https://')
+        for flag, value in (('--base', args.base), ('--host', args.host)):
+            if value:
+                parse_origin(value)
+                if not value.lower().startswith(('http://', 'https://')):
+                    raise Unusable(f'{flag} must start with http:// or https://')
         if args.allow_host and not args.base:
             raise Unusable('--allow-host needs --base')
         if args.timeout <= 0 or args.delay < 0:
             raise Unusable('--timeout must be positive and --delay not negative')
         entries = load_map(args.map)
         old_pages = load_old_pages(args.old_pages) if args.old_pages else None
-        base_host = urlsplit(args.base).netloc.lower() if args.base else ''
-        offline, unique = offline_checks(entries, args.slash, base_host, old_pages)
+        hosts = {hostport(urlsplit(value.rstrip('/'))) for value in (args.base, args.host) if value}
+        offline, unique = offline_checks(entries, args.slash, hosts, old_pages)
         live = None
         if args.base:
             checker = Checker(args.base, args.allow_host, args.slash, args.timeout, args.delay)

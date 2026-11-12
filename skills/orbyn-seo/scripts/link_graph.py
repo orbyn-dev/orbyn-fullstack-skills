@@ -10,6 +10,9 @@ count and open no path for the depth search. Inbound counts distinct linking pag
 A page is weak when it has at least one inbound link but fewer than `--min-inbound`; orphans are listed apart.
 Standard library only.
 
+A page file is skipped, with its reason listed in the report, when it resolves outside `--site` (a symlink out) or is
+larger than 20 MB. A malformed href such as `http://[x` is counted as a broken link.
+
 Exit codes: 0 for a successful read, 2 for bad input (missing folder, no pages, unknown home).
 """
 import argparse
@@ -24,6 +27,7 @@ from urllib.parse import unquote, urljoin, urlsplit
 
 SKIP_SCHEMES = ('mailto:', 'tel:', 'javascript:', 'sms:', 'data:', 'ftp:')
 TOP_LINKING = 5
+MAX_BYTES = 20 * 1024 * 1024
 
 
 class Unusable(Exception):
@@ -61,14 +65,27 @@ def key_of(path):
 
 
 def scan_site(site):
-    """Return (pages {key: {'path', 'base', 'file'}}, files {posix path}) for a built folder."""
-    pages, files = {}, set()
+    """Return (pages {key: {'path', 'base', 'file'}}, files {posix path}, skipped [{file, reason}])."""
+    pages, files, skipped = {}, set(), []
     for root, _dirs, names in os.walk(site):
         for name in names:
             full = Path(root) / name
             rel = '/' + full.relative_to(site).as_posix()
-            files.add(rel)
             if not name.endswith('.html'):
+                files.add(rel)
+                continue
+            try:
+                inside = full.resolve().is_relative_to(Path(site).resolve())
+                size = full.stat().st_size
+            except OSError as error:
+                skipped.append({'file': rel, 'reason': f'unreadable: {error.strerror or error}'})
+                continue
+            if not inside:
+                skipped.append({'file': rel, 'reason': 'resolves outside --site (symlink)'})
+                continue
+            files.add(rel)
+            if size > MAX_BYTES:
+                skipped.append({'file': rel, 'reason': 'larger than 20 MB'})
                 continue
             if name == 'index.html':
                 base = rel[:-len('index.html')]
@@ -80,7 +97,7 @@ def scan_site(site):
             if key in pages and pages[key]['file'] < rel:
                 continue
             pages[key] = {'path': path, 'base': base, 'file': rel, 'disk': full}
-    return pages, files
+    return pages, files, sorted(skipped, key=lambda item: item['file'])
 
 
 def resolve(href, page, origin):
@@ -99,7 +116,7 @@ def resolve(href, page, origin):
 
 
 def build(site, base_url, home):
-    pages, files = scan_site(site)
+    pages, files, skipped = scan_site(site)
     if not pages:
         raise Unusable(f'no .html pages under {site}')
     origin = urlsplit(base_url).netloc.lower() if base_url else ''
@@ -113,7 +130,12 @@ def build(site, base_url, home):
         parser = AnchorParser()
         parser.feed(page['disk'].read_text(encoding='utf-8', errors='replace'))
         for href, nofollow in parser.links:
-            target = resolve(href, page, origin)
+            try:
+                target = resolve(href, page, origin)
+            except ValueError:
+                link_count += 1
+                broken.add((page['path'], href))
+                continue
             if target is None:
                 continue
             link_count += 1
@@ -125,11 +147,11 @@ def build(site, base_url, home):
                 continue  # an asset or other file that exists
             else:
                 broken.add((page['path'], href))
-    return pages, edges, sorted(broken), link_count, home_key
+    return pages, edges, sorted(broken), link_count, home_key, skipped
 
 
 def analyse(site, base_url, home, money, min_inbound):
-    pages, edges, broken, link_count, home_key = build(site, base_url, home)
+    pages, edges, broken, link_count, home_key, skipped = build(site, base_url, home)
     followed = {}
     nofollow_in = {key: 0 for key in pages}
     for source, target, nofollow in edges:
@@ -164,6 +186,7 @@ def analyse(site, base_url, home, money, min_inbound):
         'broken': [{'source': source, 'href': href} for source, href in broken],
         'depth': {show(k): depth[k] for k in order if k in depth},
         'unreachable': [show(k) for k in order if k not in depth],
+        'skipped': skipped,
         'money': [],
     }
     for path in money:
@@ -197,6 +220,9 @@ def render(report):
     for level in sorted(levels):
         lines.append(f'  {level}: ' + ', '.join(levels[level]))
     lines += ['', f"unreachable from home: {len(report['unreachable'])}"] + [f'  {p}' for p in report['unreachable']]
+    if report['skipped']:
+        lines += ['', f"skipped files: {len(report['skipped'])}"]
+        lines += [f"  {item['file']}: {item['reason']}" for item in report['skipped']]
     if report['money']:
         lines += ['', 'money pages']
         for item in report['money']:

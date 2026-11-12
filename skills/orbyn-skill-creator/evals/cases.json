@@ -14051,7 +14051,7 @@
         "orbyn-seo"
       ],
       "forbidden_skills": [
-        "orbyn-ui-design"
+        "social-preview"
       ],
       "forbidden_actions": [
         "publish",
@@ -14079,6 +14079,25 @@
         "message"
       ],
       "excluded": "Do not publish unsourced claims about the competitor or use their logo."
+    },
+    {
+      "id": "page-metadata-not-seo",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Add Open Graph tags, a canonical and a favicon to our docs pages.",
+      "expected_skills": [
+        "orbyn-ui-design"
+      ],
+      "forbidden_skills": [
+        "orbyn-seo"
+      ],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not start a site-wide SEO audit for a head-tag change."
     }
   ]
 }

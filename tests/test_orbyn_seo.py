@@ -1,5 +1,7 @@
 """orbyn-seo helpers: link graph report values, redirect map checks offline and against a local server."""
+import importlib.util
 import json
+import os
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 import subprocess
@@ -12,6 +14,13 @@ ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / 'skills/orbyn-seo/scripts'
 LINK_GRAPH = SCRIPTS / 'link_graph.py'
 REDIRECTS = SCRIPTS / 'verify_redirects.py'
+
+
+def load(script):
+    spec = importlib.util.spec_from_file_location(script.stem, script)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def run(script, *args):
@@ -110,6 +119,38 @@ class LinkGraphTests(unittest.TestCase):
         empty.mkdir()
         self.assertEqual(run(LINK_GRAPH, '--site', str(empty))[0], 2)
 
+    def test_malformed_href_is_broken_and_run_continues(self):
+        (self.site / 'bad.html').write_text(page(a('http://[x'), a('/about')))
+        report = self.graph('--base-url', 'https://example.com')
+        self.assertIn({'source': '/bad', 'href': 'http://[x'}, report['broken'])
+        self.assertEqual(report['inbound']['/about'], 3)
+
+    @unittest.skipUnless(hasattr(os, 'symlink'), 'needs symlinks')
+    def test_symlinked_page_outside_site_is_skipped(self):
+        with tempfile.TemporaryDirectory() as outside:
+            secret = Path(outside) / 'secret.html'
+            secret.write_text(page(a('/pricing')))
+            try:
+                os.symlink(secret, self.site / 'leak.html')
+            except OSError:
+                self.skipTest('symlinks not permitted')
+            report = self.graph('--base-url', 'https://example.com')
+            self.assertEqual(report['skipped'], [{'file': '/leak.html', 'reason': 'resolves outside --site (symlink)'}])
+            self.assertNotIn('/leak', report['inbound'])
+            self.assertEqual(report['inbound']['/pricing'], 2)
+            code, out, _ = run(LINK_GRAPH, '--site', str(self.site))
+            self.assertIn('skipped files: 1', out)
+            self.assertIn('/leak.html: resolves outside --site (symlink)', out)
+
+    def test_oversized_file_is_skipped(self):
+        module = load(LINK_GRAPH)
+        module.MAX_BYTES = 1000
+        (self.site / 'huge.html').write_text(page(a('/about')) + '<!--' + 'x' * 3000 + '-->')
+        report = module.analyse(self.site.resolve(), None, '/', [], 2)
+        self.assertEqual(report['skipped'], [{'file': '/huge.html', 'reason': 'larger than 20 MB'}])
+        self.assertNotIn('/huge', report['inbound'])
+        self.assertEqual(report['inbound']['/about'], 2)
+
     def test_read_only(self):
         before = sorted(p.relative_to(self.site).as_posix() for p in self.site.rglob('*'))
         run(LINK_GRAPH, '--site', str(self.site))
@@ -183,6 +224,25 @@ class OfflineRedirectTests(unittest.TestCase):
         code, report, _ = self.check(self.write('m.csv', text))
         self.assertEqual((code, report['offline']), (0, []))
 
+    def test_malformed_url_entries_are_flagged_not_crashes(self):
+        code, report, err = self.check(self.write('m.csv', 'from,to\n/a,http://[x\nhttp://[y/z,/b\n/ok,/fine\n'),
+                                       '--old-pages', self.write('old.txt', 'http://[q\n/ok\n'))
+        self.assertEqual(code, 1, err)
+        self.assertEqual(len(self.issues(report, 'malformed')), 3)
+        self.assertEqual(self.issues(report, 'missing'), [])
+
+    def test_host_flag_treats_origin_urls_as_paths(self):
+        text = 'from,to\nhttps://Example.com:443/a,https://example.com/b\n/b,/c\nhttps://example.com/s,/s\n'
+        _, plain, _ = self.check(self.write('m.csv', text))
+        self.assertEqual(plain['offline'], [])  # origin URLs and paths are different forms without --host
+        code, report, _ = self.check(self.write('m.csv', text), '--host', 'https://example.com')
+        self.assertEqual(code, 1)
+        chain = self.issues(report, 'chain')
+        self.assertEqual([c['from'] for c in chain], ['https://Example.com:443/a'])
+        self.assertIn('straight to /c', chain[0]['detail'])
+        self.assertEqual([i['to'] for i in self.issues(report, 'self')], ['/s'])
+        self.assertEqual(self.check(self.write('m.csv', text), '--host', 'example.com')[0], 2)
+
     def test_bad_input_exits_two(self):
         self.assertEqual(self.check(str(self.dir / 'absent.csv'))[0], 2)
         self.assertEqual(self.check(self.write('bad.json', '{oops'))[0], 2)
@@ -190,6 +250,9 @@ class OfflineRedirectTests(unittest.TestCase):
         self.assertEqual(self.check(self.write('nohead.csv', 'a,b\n/x,/y\n'))[0], 2)
         good = self.write('m.csv', 'from,to\n/a,/b\n')
         self.assertEqual(self.check(good, '--base', 'ftp://x')[0], 2)
+        self.assertEqual(self.check(good, '--base', 'http://user:pw@old.test')[0], 2)
+        self.assertEqual(self.check(good, '--base', 'http://[bad')[0], 2)
+        self.assertEqual(self.check(good, '--base', 'http://old.test', '--allow-host', 'u:p@new.test')[0], 2)
         self.assertEqual(self.check(good, '--allow-host', 'x.test')[0], 2)
         self.assertEqual(self.check(good, '--old-pages', str(self.dir / 'nope.txt'))[0], 2)
         self.assertEqual(run(REDIRECTS)[0], 2)
@@ -217,10 +280,16 @@ class Handler(BaseHTTPRequestHandler):
             '/gone': (301, '/missing'), '/boom': (301, '/err'), '/wrong': (301, '/other'),
             '/headless': (301, '/nohead'), '/slashy': (301, '/new/'), '/offsite': (301, 'http://example.invalid/x'),
             '/xhost': (301, f'http://localhost:{port}/new'), '/slow': (301, '/slowtarget'),
+            '/upper': (301, f'http://LOCALHOST:{port}/new'), '/userinfo': (301, f'http://u:pw@localhost:{port}/new'),
+            '/file': (301, 'file:///etc/hosts'), '/proto': (301, '//evil.invalid/x'),
+            '/nonascii': (301, '/caf\u00e9'), '/nolocation': (302, None), '/p3xx': (301, '/nolocation'),
+            '/badloc': (301, 'http://[bad/x'), '/v6': (301, 'http://[::1]:1/new'),
         }
         if path in redirects:
             return self.reply(*redirects[path])
         if path in ('/new', '/new/', '/other'):
+            return self.reply(200)
+        if path == '/caf%C3%A9':
             return self.reply(200)
         if path == '/nohead':
             return self.reply(405) if self.command == 'HEAD' else self.reply(200)
@@ -309,8 +378,61 @@ class LiveRedirectTests(unittest.TestCase):
     def test_allowed_host_is_followed(self):
         target = f'http://localhost:{self.server.server_address[1]}/new'
         self.assertEqual(self.live([('/xhost', target)])[0], 1)
-        code, results = self.live([('/xhost', target)], '--allow-host', 'localhost')
+        self.assertEqual(self.live([('/xhost', target)], '--allow-host', 'localhost')[0], 1)  # bare host: port 80 only
+        code, results = self.live([('/xhost', target)], '--allow-host', f'localhost:{self.server.server_address[1]}')
         self.assertEqual(code, 0, results)
+
+    def test_uppercase_host_matches(self):
+        port = self.server.server_address[1]
+        code, results = self.live([('/upper', f'http://localhost:{port}/new')], '--allow-host', f'localhost:{port}')
+        self.assertEqual(code, 0, results)
+
+    def refused(self, route, target):
+        code, results = self.live([(route, target)], '--allow-host', 'localhost', '--allow-host', 'example.invalid')
+        self.assertEqual(code, 1)
+        problems = results[route]['problems']
+        self.assertTrue(any('not requested' in p for p in problems), problems)
+        self.assertEqual(len(results[route]['hops']), 1)
+
+    def test_userinfo_location_is_never_requested(self):
+        port = self.server.server_address[1]
+        self.refused('/userinfo', f'http://localhost:{port}/new')
+
+    def test_file_and_protocol_relative_locations_are_not_requested(self):
+        self.refused('/file', '/new')
+        self.refused('/proto', 'http://evil.invalid/x')
+
+    def test_non_ascii_location_is_encoded(self):
+        code, results = self.live([('/nonascii', '/caf\u00e9')])
+        self.assertEqual(code, 0, results)
+        self.assertEqual(results['/nonascii']['hops'][-1]['status'], 200)
+
+    def test_malformed_location_is_a_problem(self):
+        code, results = self.live([('/badloc', '/new')])
+        self.assertEqual(code, 1)
+        self.assertTrue(any('malformed Location' in p for p in results['/badloc']['problems']), results)
+
+    def test_final_3xx_without_location_fails(self):
+        code, results = self.live([('/p3xx', '/nolocation')])
+        self.assertEqual(code, 1)
+        self.assertTrue(any('with no Location' in p for p in results['/p3xx']['problems']), results)
+
+    def test_allowed_rules_for_ports_ipv6_and_userinfo(self):
+        checker = load(REDIRECTS).Checker('http://old.test', ['new.test', 'https://secure.test', 'other.test:8080',
+                                                                  '[::1]:9'], 'loose', 1, 0)
+        for url in ('http://old.test/x', 'http://OLD.test:80/x', 'https://old.test/x', 'http://new.test:80/x',
+                    'https://NEW.test:443/x', 'https://secure.test/x', 'http://other.test:8080/x', 'http://[::1]:9/x'):
+            self.assertTrue(checker.allowed(url), url)
+        for url in ('http://old.test:8080/x', 'http://new.test:8080/x', 'http://other.test/x', 'http://secure.test/x',
+                    'http://[::1]/x', 'http://[::2]:9/x', 'http://u:p@old.test/x', 'http://u@new.test/x',
+                    'file:///etc/hosts', 'http://[bad/x', 'http:///x'):
+            self.assertFalse(checker.allowed(url), url)
+
+    def test_norm_drops_default_ports_and_case(self):
+        norm = load(REDIRECTS).norm
+        self.assertEqual(norm('HTTP://Example.COM:80/a/', 'loose'), norm('https://example.com:443/a', 'loose'))
+        self.assertNotEqual(norm('http://example.com:8080/a', 'loose'), norm('http://example.com/a', 'loose'))
+        self.assertEqual(norm('http://[::1]:80/a', 'strict')[0], '[::1]')
 
     def test_timeout_is_flagged(self):
         code, results = self.live([('/slow', '/slowtarget')], '--timeout', '0.3')

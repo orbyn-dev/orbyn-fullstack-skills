@@ -1,29 +1,33 @@
 # Comparison and alternative pages
 
-"Us vs them", "alternatives to X" and "best X for Y" pages convert well and attract
-legal and credibility risk. Publish only what you can show.
+"Us vs them", "alternatives to X" and "best X for Y" pages convert well and carry
+legal and credibility risk. Every claim on them must survive the other company
+reading it.
 
-## Evidence first
+## Collect evidence before drafting
 
-Before drafting, write the facts to a dated notes file in the repository, one row per
-claim, with its source URL and the date checked:
+Keep a dated notes file in the repository with one row per claim: the claim, where
+it came from (URL), and the day it was checked.
 
-- A complaint counts as a reason to switch only when it recurs from several
-  independent people in the last year; one angry review is an anecdote.
-- Confirm prices, plans and features on the other product's live pages or docs on
-  the day of writing.
-- Write facts, not feelings: "Support on the starter plan is email only (pricing
-  page, checked 2026-11-12)", not "their support is bad".
-- List where the other product wins, and keep it on the page.
+- Treat a reason people leave the other product as real only when many unrelated
+  users report it recently; a single complaint proves little.
+- Read the other product's current pricing page and documentation on the day you
+  write; plans and features change.
+- Phrase each point as a checkable fact with its source: "The free plan allows three
+  projects (their pricing page, checked 2027-01-15)", not an opinion about quality.
+- Record what the other product does better, and say so on the page; readers trust
+  a comparison that admits trade-offs.
 
 ## Page rules
 
-- No unsourced claim about another product. If a price is unverified, link to their
-  pricing page instead of stating it.
-- Never claim they lack a feature without checking their docs that day.
-- No competitor logos or screenshots of their interface; use text and your own
-  screenshots.
-- Use the comparison block from [answer engines](answer-engines.md) for each product.
+- Every statement about the other product links to, or names, its source. If a
+  price cannot be confirmed, point readers to their pricing page instead of quoting
+  a number.
+- Absence claims ("they have no export") need the documentation checked that day.
+- Use your own screenshots and words. Their logos and interface captures invite
+  trademark complaints and go out of date.
+- Give each product the same fields, as in [answer engines](answer-engines.md).
 - Title and description name the comparison ("X vs Y", "X alternative") within the
   [page metadata](../../orbyn-ui-design/references/page-metadata.md) title rules.
-- Recheck the facts on a schedule the person sets; a stale claim is worse than none.
+- Recheck the facts on a schedule the person sets; an outdated claim costs more
+  trust than leaving it out.
