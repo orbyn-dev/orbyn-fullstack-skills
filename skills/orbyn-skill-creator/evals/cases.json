@@ -14144,8 +14144,7 @@
         "orbyn-workflow"
       ],
       "forbidden_skills": [
-        "orbyn-data-migration",
-        "orbyn-worktree"
+        "orbyn-data-migration"
       ],
       "forbidden_actions": [
         "publish",

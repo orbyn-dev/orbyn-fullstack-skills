@@ -9,8 +9,8 @@ watch or publication authority beyond what the user already gave.
 ## Work mode decides how much overlap
 
 - `simple`: no extra worktree. Wait, or continue work that belongs to the same task.
-- `isolated`: one tree per task, so at most one new build beside the waiting PR,
-  done by the lead itself.
+- `isolated`: one tree per task; this playbook's default is at most one new build
+  beside the waiting PR, done by the lead itself.
 - `parallel`: the next item may get its own tree, or its own session where the host
   can start one, within `max_active`.
 
@@ -19,7 +19,8 @@ lead owns that item ([delegate within the session](../references/lead-contract.m
 
 ## Hand over, then start the next item
 
-1. **N is reviewed and open.** Its reviewer verdict came before the PR opened
+1. **N is reviewed and open.** Its reviewer verdict, or the self-review a small
+   docs-only change gets, came before the PR opened
    ([review before the PR](../references/lead-contract.md#review-before-the-pr)).
 2. **Watch N, never poll.** The default is `pr_watch.py wait` in the background,
    which only reads ([watch the PRs you own](pr-iteration.md#watch-the-prs-you-own),
@@ -34,7 +35,8 @@ lead owns that item ([delegate within the session](../references/lead-contract.m
    child, or the lead), re-push, and land it only within merge authority you
    already have. Then return to N+1. A waiting PR outranks new work.
 
-The reviewer slot is free while N waits; it next reviews N+1 before N+1's PR opens.
+While N waits, the reviewer slot is free apart from re-reviewing a fix to N; it next
+reviews N+1 before N+1's PR opens.
 
 ## Stack only what depends on N
 
