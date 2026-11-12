@@ -1496,7 +1496,7 @@
           "model": "claude-opus-5-5 (lead)",
           "effort": "medium",
           "date": "2026-11-12",
-          "scope": "Routing cases for building while a PR waits: two development, one holdout"
+          "scope": "Routing cases for building while a PR waits: three development, one holdout, including an adjacent case where orbyn-ci-design wins"
         }
       ],
       "reviewed_inspiration": [
@@ -3436,13 +3436,6 @@
           "effort": "medium",
           "date": "2026-11-12",
           "scope": "Slimmed SKILL.md entry: detail moved to references, no rule changed"
-        },
-        {
-          "tool": "Claude Code",
-          "model": "claude-opus-5-5 (lead)",
-          "effort": "medium",
-          "date": "2026-11-12",
-          "scope": "Pointer: the next item while a PR waits gets its own tree counted toward max_active"
         }
       ],
       "reviewed_inspiration": [

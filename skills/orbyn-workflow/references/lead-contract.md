@@ -267,10 +267,10 @@ the execution and remote-ref checks. Preserve the patch when host metadata is
 blocked. Start a PR, merge, publish, deployment, external message or monitor only
 under explicit authority; delegation and playbooks grant none.
 
-While a pushed PR waits on CI or review, start the next independent item in its own
-worktree rather than waiting idle, and return to the PR when its watcher wakes
-([build while waiting](../playbooks/build-while-waiting.md)). The reviewer for that
-PR uses the reviewer slot while a worker builds the next item.
+When a reviewed PR waits on CI or human review, more assigned work is queued and
+the work mode allows another tree, start the next independent item there and return
+to the PR when its watcher wakes ([build while waiting](../playbooks/build-while-waiting.md)).
+The reviewer slot stays free for the next item's review before its PR.
 
 If the current task demonstrates a meaningful general skill gap, follow the
 [optional contribution feedback](../../orbyn-skill-creator/references/contribution-feedback.md):

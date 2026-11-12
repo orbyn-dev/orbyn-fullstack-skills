@@ -14103,7 +14103,7 @@
       "id": "overlap-while-ci-runs",
       "kind": "routing",
       "split": "development",
-      "prompt": "PR 41 is pushed and waiting on CI. Start on the next item in the queue while it runs.",
+      "prompt": "PR 41 is reviewed, open and waiting on CI. Start on the next assigned item in the queue while it runs.",
       "expected_skills": [
         "orbyn-workflow",
         "orbyn-worktree"
@@ -14123,7 +14123,8 @@
       "split": "development",
       "prompt": "The next feature needs the endpoint from PR 41, which is still in review. Can we start it now?",
       "expected_skills": [
-        "orbyn-workflow"
+        "orbyn-workflow",
+        "orbyn-worktree"
       ],
       "forbidden_skills": [],
       "forbidden_actions": [
@@ -14142,7 +14143,10 @@
       "expected_skills": [
         "orbyn-workflow"
       ],
-      "forbidden_skills": [],
+      "forbidden_skills": [
+        "orbyn-data-migration",
+        "orbyn-worktree"
+      ],
       "forbidden_actions": [
         "publish",
         "deploy",
@@ -14150,6 +14154,25 @@
         "message"
       ],
       "excluded": "Do not start overlapping work on a migration the waiting PR also changes."
+    },
+    {
+      "id": "waiting-pr-ci-too-slow",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "CI on PR 41 takes 40 minutes. Make the required checks faster.",
+      "expected_skills": [
+        "orbyn-ci-design"
+      ],
+      "forbidden_skills": [
+        "orbyn-worktree"
+      ],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not start a parallel build to hide a slow pipeline; shorten the required checks."
     }
   ]
 }

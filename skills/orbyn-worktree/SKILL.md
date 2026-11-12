@@ -34,8 +34,7 @@ Before creating a checkout, inspect registered trees, remotes, host attachments 
 any reference cache. Reuse a worktree only when repository, owner, branch,
 source and local work fit and no active session holds it. Continue a task/PR in its
 owned branch; start independent work from the verified default branch and a stack
-from its exact reviewed dependency (the next item while a PR waits gets its own tree,
-counted toward `max_active`: [build while waiting](../orbyn-workflow/playbooks/build-while-waiting.md)); never reuse a historical branch because it is
+from its exact reviewed dependency; never reuse a historical branch because it is
 current or create a clone per agent/day/retry.
 
 ## Sibling location and names
