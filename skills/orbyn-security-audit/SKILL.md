@@ -37,7 +37,7 @@ Read [the threat-model method](references/threat-model.md) first. In short:
 
 ### Worked failure
 
-For "expiring share links, before we build", a first draft listing "token guessing, XSS, CSRF" with no file, actor capability or deciding observation fails the checker. The corrected pass reads the code: revoke deletes the row (`src/share/revoke.ts:40-58`) but the stream reads the link once at connect (`src/share/stream.ts:12-30`), so a connected recipient keeps receiving. It records the deciding question and a `not_run` check, and hands `tm:T1` to audit. (Synthetic paths.)
+For "expiring share links, before we build", a first draft listing "token guessing, XSS, CSRF" with no file, actor capability or deciding observation fails the checker. The corrected pass reads the code: revoke deletes the row (`src/share/revoke.ts:40-58`) but the stream reads the link once at connect (`src/share/stream.ts:12-30`), so a connected recipient keeps receiving. It records the deciding question and a `not_run` check, and hands `tm:T1` to audit; audit confirms it, remediation rechecks per frame, and a fresh verifier runs the check. (Synthetic paths.)
 
 ## Method: audit mode
 

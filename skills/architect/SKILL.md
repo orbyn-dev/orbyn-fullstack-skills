@@ -15,13 +15,11 @@ and trace the current design with [how](../how/SKILL.md). Use
 
 1. **Start from one real caller** and a failure it must handle. Write the proposed call and result before drawing directories, then the necessary types, owner, interfaces and lifecycle. Include authority, concurrency, failure, recovery and compatibility when the task affects them.
 2. **Inventory the current owner** of identity, mutable state, effects and cleanup. A new interface must take responsibility away from callers rather than merely rename their parameters.
-3. **Compare alternatives where the choice is consequential;** a small sketch is enough when an established pattern fits. Follow one normal and one interrupted operation through each alternative's owners, and compare the decisions callers must repeat, compatibility with released consumers and recovery cost. If a measurement is needed, give the smallest prototype a decision threshold and disposable inputs. Use [arena](../arena/SKILL.md) only when competing candidates would settle a real uncertainty, never as a model panel for every boundary.
+3. **Compare alternatives where the choice is consequential;** a small sketch is enough when an established pattern fits; otherwise follow one normal and one interrupted operation through each alternative's owners, and compare the decisions callers must repeat, compatibility with released consumers and recovery cost. Select a design when that resolves the choice. If a measurement is needed, give the smallest prototype a decision threshold and disposable inputs. Use [arena](../arena/SKILL.md) only when competing candidates would settle a real uncertainty, never as a model panel for every boundary.
 4. **Choose the smallest coherent design** and explain its trade-off. Keep domain ownership separate from platform rendering: a task editor can share the update contract while web and mobile keep their own focus and navigation behavior. If escape hatches or duplicated state interpretation keep recurring, reconsider the owner/type design and fix that source of complexity instead of adding wrappers.
 5. **Check the interface** against a stale write, revoked access and a retry after an unknown result, where those cases apply.
 6. **Return** an owner/interface table, a representative call, state transitions, the rejected alternative and a migration order. Use [orbyn-plan](../orbyn-plan/SKILL.md) when the design needs a delivery sequence. Record a durable rationale only when future maintainers need the decision.
 7. **Review a written design before code** when it will drive a substantial build: fresh reviewer children read only the document and its linked files, through zoom-out, comprehension and implementation-readiness lenses ([design review](references/design-review.md)).
-
-Worked example: [approving a proposal](examples/proposal-approval.md).
 
 ## Scope and delivery
 
@@ -41,17 +39,17 @@ For durable transitions, put the migration owner's concrete writer/admission con
 
 ## Read when needed
 
-- Whole-app folder refactor (giant files, feature cycles, deep imports, duplicated helpers): [folder refactor](references/folder-refactor.md).
+- Whole-app folder refactor (giant files, feature cycles, deep imports, duplicated helpers, logic in the transport layer): [folder refactor](references/folder-refactor.md).
 - Checked-in designs or READMEs that may not match the code or built app: [design drift](references/design-drift.md). Report only; change nothing without the user.
 - Where code belongs, cross-feature imports or shared-code extraction: [vertical code organization](references/vertical-codebase.md). Explaining an existing import path belongs to `how`.
 - Statecharts, lifecycle races or behavior a human must inspect: [statecharts](references/statecharts.md); domain artwork over one: [illustrated statecharts](references/illustrated-statecharts.md).
-- Deployed services and how they connect: [stack-diagram](../stack-diagram/SKILL.md).
+- Deployed services and how they connect, not states over time: [stack-diagram](../stack-diagram/SKILL.md).
 - Caller burden, shallow wrappers, cycles or API longevity: [maintainable modules](references/maintainable-modules.md); across languages: [polyglot example](examples/polyglot-contract.md).
-- Unresolved language, framework or storage choice: [stack selection](../orbyn-stack-selection/SKILL.md) first. An established project's bounded feature usually keeps its stack.
+- Unresolved language, framework or storage choice: [stack selection](../orbyn-stack-selection/SKILL.md) first, then own interfaces and lifecycle here. An established project's bounded feature usually keeps its stack.
 - Implementation: the relevant [language reference](../language-best-practices/SKILL.md), preserving FFI/transport encoding, ownership and failure contracts.
 - Cross-team, independently released or quantitatively constrained systems: [large changes](references/large-changes.md). Never infer deployed adoption from local edits.
 - A new service or materially changed operating envelope: [service readiness](references/service-readiness.md).
-- Command-interface design: [CLI contract](references/cli-contract.md). Async admission, recovery, event ordering or registry keys: [runtime boundaries](references/runtime-boundaries.md).
+- Command-interface design or terminal behavior: [CLI contract](references/cli-contract.md). Async admission, recovery, event ordering, duplicate registry keys or stale catalog entries: [runtime boundaries](references/runtime-boundaries.md).
 - Expo modules, DOM/native bridges or incremental web migration: [mobile boundaries](references/mobile-boundaries.md).
-- Worked examples: [approving a proposal](examples/proposal-approval.md) and [organizing a task editor](examples/vertical-task-editor.md).
+- Worked examples (reuse the reasoning, not the synthetic owners): [approving a proposal](examples/proposal-approval.md), before designing approve or apply buttons, and [organizing a task editor](examples/vertical-task-editor.md).
 - One decision needing a worked check, reading only that method: [foundations](references/principles/foundational-thinking.md), [subtraction](references/principles/subtract-before-you-add.md), [simplification](references/principles/laziness-protocol.md), [reader load](references/principles/minimize-reader-load.md), [coherent redesign](references/principles/redesign-from-first-principles.md), [structural prevention](references/principles/encode-lessons-in-structure.md), [domain structure](references/principles/model-the-domain.md), [repeated failure](references/principles/attack-the-premise.md), [alternatives](references/principles/exhaust-the-design-space.md) or [API retirement](references/principles/migrate-callers-then-delete-legacy-apis.md).

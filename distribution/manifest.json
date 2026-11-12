@@ -2,7 +2,7 @@
   "files": {
     "skills/README.md": "eaaee523883e322d6d509a67147fff32445d836880af71f13fc0e59fea6e01e4",
     "skills/architect/LICENSE": "9c31ea886ff0fdc36aab948579bbb74a2e44bcb5a9c8a165cabc1b38e24175d4",
-    "skills/architect/SKILL.md": "a876ef020d7672bbe1ecb047e9af12c3c0c9ab066c91c021bc1ef95cb1574c74",
+    "skills/architect/SKILL.md": "6dc59daa87f7d8f993e456153ee7e685fac06d4312b33cfcd70149ea044364e3",
     "skills/architect/examples/illustrated-statechart/guide.md": "b097472533a542257072d29c716cacfc24f9f68b2366f554bbfb8091ea102d84",
     "skills/architect/examples/illustrated-statechart/spaceport.json": "b8f833914064094b1461f4cf20a8cff3aeba9c512d3a0b1b4eaa35b49f18bb8f",
     "skills/architect/examples/illustrated-statechart/workflow.json": "b07e1aa33159d0c29ae026e1e885ad44a3b26bb0b97036504fdef3b44d091a5e",
@@ -566,7 +566,7 @@
     "skills/orbyn-research/references/marketingskills-LICENSE.txt": "b70d71e24e40fce5da8f4b6f9cd862096a048e433db7f3c8cac5e348e6d34591",
     "skills/orbyn-research/references/user-evidence.md": "d75e7149e6edfefd4f024d8d9e86736ec893a0a351592e3adabdfc49c412d52c",
     "skills/orbyn-security-audit/LICENSE": "e598e694aa506650c7192d5ea3be0e50aca0d356ea00551c53429f0b01eb6391",
-    "skills/orbyn-security-audit/SKILL.md": "f90a989346e978845973ec49c1a37418120a2ed97200306b4422b0dd68ccaf00",
+    "skills/orbyn-security-audit/SKILL.md": "09b3603cb6ad37c2e59adc34a3bdf6711f5e3312ef1e738f43fdb474ae7c0649",
     "skills/orbyn-security-audit/examples/static-limit.md": "e2bfd83097a1c5adf825b780d00f483d29efe2c217c38eab519863e19eca391c",
     "skills/orbyn-security-audit/references/ecc-LICENSE.txt": "326146379f01bb137c0a5d3c54770c1aa31076705c8b88a7f6b26a460f6221b2",
     "skills/orbyn-security-audit/references/protocol.md": "c15c87558dd3b1474b7e9053be642d499b0302610ca2ab48ffd5c8b50f9ae83a",
