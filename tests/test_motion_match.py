@@ -49,7 +49,7 @@ class MotionMatchTests(unittest.TestCase):
                      'Never download someone else', 'stay closed', 'ignored local folder',
                      'Only the written numbers carry forward', 'Stop after 5 rounds'):
             self.assertIn(rule, body)
-        self.assertIn('### Worked failure', body)
+        self.assertIn('## Worked failure', (SKILL/'references/verify.md').read_text())
 
     def test_excluded_capabilities_are_absent(self):
         for name in EXCLUDED_FILES:
