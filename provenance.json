@@ -1483,6 +1483,13 @@
           "effort": "medium",
           "date": "2026-11-12",
           "scope": "Two development routing cases for screen decisions and the tactile theme"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-12",
+          "scope": "Routing cases for orbyn-seo: three development, one holdout"
         }
       ],
       "reviewed_inspiration": [
