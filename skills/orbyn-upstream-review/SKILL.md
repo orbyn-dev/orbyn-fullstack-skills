@@ -24,7 +24,7 @@ Read consumer instructions, current Git state and source ownership first. Identi
 the canonical upstream, relevant subtree, adapted owner and baseline, and record
 separately the source/import pin, latest reviewed revision, deployed version and
 outer library revision. Online and in scope, resolve and freeze a full candidate
-commit, and review the actual diff of commits touching the relevant subtree
+commit, record the observation date, release, exact source URLs and license, and review the actual diff of commits touching the relevant subtree
 (headlines are leads; a truncated compare is no complete inventory). Offline, use
 local snapshots, name the available revision, and say current freshness is
 unverified; never invent a latest version, silently install a provider or advance a
@@ -69,10 +69,17 @@ cleanup or scans grant no authority. A new version or skill count is no reason t
 
 When the update concerns this skill library or its harness, propose what the source
 now does that we do not as one table (one row per gap, including ones you recommend
-skipping; format in [gap table](references/review-method.md#propose-the-gaps-in-one-table))
+skipping; format in [gap table](references/review-method.md#gap-table))
 before editing any skill. Then stop and wait: adopt only the rows the human approves.
 A pin that still holds with nothing new is closed as reviewed without a table. A
 consuming project follows its own update policy instead.
+
+### Worked failure
+
+An old pin is reviewed offline against a local snapshot B. The failure is calling B
+"latest", bumping the import revision without replacing or verifying source files,
+copying a company release procedure into public source, or reporting source
+inspection as runtime evidence ([example](examples/stale-source.md)).
 
 ## Apply and verify only the agreed change
 

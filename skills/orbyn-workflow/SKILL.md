@@ -33,7 +33,7 @@ decisions explicit.
    needed current facts, when allowed; report stale or missing evidence.
 4. Start from the requested outcome, current source and
    [stack ownership](references/project-policy.md#stack-and-ownership). Choose one
-   playbook; a clear small edit can proceed directly. Keep the plan short, load only what
+   playbook; a clear small edit or a narrow explanation can proceed directly. Keep the plan short, load only what
    the task needs and leave checklists out of routine replies.
 
 ## Choose a playbook
@@ -68,12 +68,15 @@ decisions explicit.
 
 Select handoffs from the [skill system](references/project-policy.md#routing); the
 [handoff index](references/operating-method.md#handoff-index) lists every owner
-(plan, research, how, why, architect, backend, data, CI, language, stack, upstream,
-security, mobile, scope, artifacts). Always:
+(plan, research, why, backend, data, CI, language, stack, upstream, mobile, scope,
+artifacts). Always:
 
+- Changing unfamiliar behavior: [how](../how/SKILL.md). Consequential data/ownership decisions: [architect](../architect/SKILL.md).
+- Threat modelling or design-stage security review, or an explicitly requested portable/offline source audit: [orbyn-security-audit](../orbyn-security-audit/SKILL.md).
 - Setup: [orbyn-setup](../orbyn-setup/SKILL.md). Isolation or a worktree: [orbyn-worktree](../orbyn-worktree/SKILL.md).
-- Memory (on by default, `ORBYN_MEMORY=off` opts out): search at task start; save
-  only on "remember" or an approved lesson ([memory flow](../reflect/references/memory.md)).
+- Memory (on by default, `ORBYN_MEMORY=off` opts out): search project and personal
+  scope at task start and treat results as hints; save on "remember"; after substantial
+  work suggest at most three lessons, save only approved ones ([memory flow](../reflect/references/memory.md)).
   Durable handoff: optional [task record](references/task-record.md).
 
 ## Lead substantial work
@@ -90,6 +93,13 @@ dispatching or reviewing a child, and before a commit or push.
 - Never poll a background job or child (`sleep`, `ps`, `pgrep`, `top`); [wait without polling](references/waiting.md).
 - For substantial work, write the [answer key](references/answer-key.md) first; the worker gets the outcome only.
 - Inspect returned artifacts and diff; a delegate's summary is evidence. The lead writes the final assessment.
+
+### Worked failure
+
+A synthetic test filter exits zero with `0 tests selected`. That is missing
+evidence, not a passing baseline: read the runner configuration, find the supported
+selector, and name any unverified mode instead of claiming all passed
+([worked decisions: a green command that selected nothing](references/contribution-examples.md)).
 
 ## Verify and deliver
 

@@ -26,14 +26,12 @@ Where the workflow's handoffs go; the notes below say how each applies.
 
 - Plans: [orbyn-plan](../../orbyn-plan/SKILL.md).
   External facts: [orbyn-research](../../orbyn-research/SKILL.md). Skill changes: [orbyn-skill-creator](../../orbyn-skill-creator/SKILL.md).
-- Unfamiliar behavior [how](../../how/SKILL.md); data/ownership decisions [architect](../../architect/SKILL.md);
-  history [why](../../why/SKILL.md); larger task [figure-it-out](../../figure-it-out/SKILL.md).
+- History [why](../../why/SKILL.md); larger task [figure-it-out](../../figure-it-out/SKILL.md).
 - Cross-layer: [Orbyn Engineering contract](fullstack-contract.md),
   [orbyn-backend-design](../../orbyn-backend-design/SKILL.md), [orbyn-data-migration](../../orbyn-data-migration/SKILL.md),
   [orbyn-ci-design](../../orbyn-ci-design/SKILL.md). Code: [language guidance](../../language-best-practices/SKILL.md);
   technology choice: [stack selection](../../orbyn-stack-selection/SKILL.md).
 - Upstream freshness or updates: [orbyn-upstream-review](../../orbyn-upstream-review/SKILL.md).
-  Threat model or requested offline audit: [orbyn-security-audit](../../orbyn-security-audit/SKILL.md).
 - [Mobile routing](mobile-engineering.md) (Expo/EAS), [engineering scope](engineering-scope.md)
   (onboarding, review, levels), [artifact lifecycle](artifact-lifecycle.md) (prototypes, evidence, servers),
   [method index](principles.md), [contribution feedback](../../orbyn-skill-creator/references/contribution-feedback.md) (general skill gap).

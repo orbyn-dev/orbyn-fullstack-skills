@@ -17,11 +17,7 @@ orbyn-references/
     comparison.json         local comparison evidence
 ```
 
-Before the first download, add the exact root `/orbyn-references/` to the owning
-repository's ignore rules without replacing existing rules. Verify the intended
-path is ignored and that neither `orbyn-references/` nor `openSrc/` is tracked or
-staged. Never use force-add to defeat this boundary. Existing ignored `openSrc/`
-research can stay where it is; never move or delete it just to enforce the new name.
+The ignore-rule steps for `/orbyn-references/` and `openSrc/` are in the entry skill.
 
 ## Non-Git sources and existing locations
 

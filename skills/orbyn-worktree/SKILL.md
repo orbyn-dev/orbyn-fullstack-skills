@@ -57,11 +57,15 @@ unpushed work before cleanup; a local branch survives only with its checkout.
 ## Create and verify the selected checkout
 
 Resolve the base before writes: continue a task/PR from its actual branch, start new
-work from the verified default branch (not a stale local `main`). Create a branch with `git worktree add -b <branch> <path> <base>`; avoid
-`-B`, `--force` and duplicate branch checkouts. Verify path, branch, base/HEAD and
-status before editing, then use that worktree for every edit/check. Never copy
-secrets or run setup hooks from source; assign shared databases, ports and services
-separately.
+work from the verified default branch (not a stale local `main`). Fetch only when
+available and authorized; label an offline/cached base as such. Create a branch with
+`git worktree add -b <branch> <path> <base>`; reuse an existing branch only after
+ownership inspection; avoid `-B`, `--force` and duplicate branch checkouts. Verify
+path, branch, base/HEAD and status before editing, then use that worktree for every
+edit/check. After selecting or switching checkout, reread nested instructions and
+re-resolve search roots there ([action scope](../orbyn-setup/references/action-scope.md)).
+Preserve project environment files; never copy secrets or run setup hooks from
+source; assign shared databases, ports and services separately.
 If the host denies Git metadata writes, preserve the patch and report delivery as
 blocked; never rewrite `.git`, supply an alternate index or bypass the sandbox.
 
@@ -88,7 +92,18 @@ A refusal has no automatic force fallback; ref deletion and tracking prune stay 
 After a merge, [retire the worktree in the same closeout](references/task-closeout.md#retire-at-delivery)
 when you have cleanup authority; never hand-run `git worktree remove` on a live tree,
 which deletes ignored files. Keep a merged tree only with a named reason and review
-event in a `HOLD.json`. At closeout, before creating a worktree and on low disk, [run workspace cleanup](references/task-closeout.md#clean-the-workspace).
+event in a `HOLD.json`. At closeout, before creating a worktree and on low disk, [run workspace cleanup](references/task-closeout.md#clean-the-workspace)
+(`worktree_retire.py report`, then `apply`). It trashes only finished worktrees,
+rebuildable caches and idle output, archive and references; everything else in
+`repo/` is report-only.
+
+### Worked failure
+
+PR 17 merged by squash, but its tree has a later local commit, ignored review
+captures and a live preview. Treating the merged badge, a clean status or ancestry as
+proof it is disposable cache is the failure: keep the later source and a verified
+evidence package, check dependent work and get the owner's release first
+([closeout example](references/task-closeout.md#synthetic-closeout-example)).
 
 Return the path/base/head, verified delivery state, retained resources, recovery
 pointers and closeout disposition.
