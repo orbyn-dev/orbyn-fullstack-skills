@@ -94,13 +94,6 @@ dispatching or reviewing a child, and before a commit or push.
 - For substantial work, write the [answer key](references/answer-key.md) first; the worker gets the outcome only.
 - Inspect returned artifacts and diff; a delegate's summary is evidence. The lead writes the final assessment.
 
-### Worked failure
-
-A synthetic test filter exits zero with `0 tests selected`. That is missing
-evidence, not a passing baseline: read the runner configuration, find the supported
-selector, and name any unverified mode instead of claiming all passed
-([worked decisions: a green command that selected nothing](references/contribution-examples.md)).
-
 ## Verify and deliver
 
 Complete the agreed outcome, including necessary caller migration and removal,
@@ -114,3 +107,10 @@ Deliver only the requested scope. Follow [unslop](../unslop/SKILL.md) and report
 behavior/artifacts, evidence, limits and local/committed/pushed/merged/deployed state. Start a PR, merge, publish,
 deployment, external message or monitor only under explicit authority; delegation
 and playbooks grant none.
+
+### Worked failure
+
+A synthetic test filter exits zero with `0 tests selected`. That is missing
+evidence, not a passing baseline: read the runner configuration, find the supported
+selector, and name any unverified mode instead of claiming all passed
+([worked decisions: a green command that selected nothing](references/contribution-examples.md)).

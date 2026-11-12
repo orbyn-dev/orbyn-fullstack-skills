@@ -74,13 +74,6 @@ before editing any skill. Then stop and wait: adopt only the rows the human appr
 A pin that still holds with nothing new is closed as reviewed without a table. A
 consuming project follows its own update policy instead.
 
-### Worked failure
-
-An old pin is reviewed offline against a local snapshot B. The failure is calling B
-"latest", bumping the import revision without replacing or verifying source files,
-copying a company release procedure into public source, or reporting source
-inspection as runtime evidence ([example](examples/stale-source.md)).
-
 ## Apply and verify only the agreed change
 
 For an authorized update, use an owned branch/worktree under
@@ -97,6 +90,13 @@ Return baseline/candidate identities, reference location and exclusion evidence,
 dispositions, applied files or next steps, checks/limits and actual
 local/PR/merged state. Report selected guidance as selected; never claim the entire
 upstream was updated.
+
+### Worked failure
+
+An old pin is reviewed offline against a local snapshot B. The failure is calling B
+"latest", bumping the import revision without replacing or verifying source files,
+copying a company release procedure into public source, or reporting source
+inspection as runtime evidence ([example](examples/stale-source.md)).
 
 ## Read when needed
 
