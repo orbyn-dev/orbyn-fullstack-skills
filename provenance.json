@@ -365,6 +365,13 @@
           "effort": "medium",
           "date": "2026-11-12",
           "scope": "Design rule: land the API slice and generated types before its UI; display-only UI uses sample data, no guessed client"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-12",
+          "scope": "Slimmed SKILL.md entry: detail moved to references, no rule changed"
         }
       ]
     },
@@ -3273,6 +3280,13 @@
           "effort": "medium",
           "date": "2026-11-12",
           "scope": "Tool credential boundaries: pointer to text-matching deny list guidance"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-12",
+          "scope": "Slimmed SKILL.md entry: detail moved to references, no rule changed"
         }
       ]
     },
@@ -3881,6 +3895,13 @@
           "effort": "medium",
           "date": "2026-11-06",
           "scope": "Review fix: contact-sheet ffmpeg command as its own code block"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-sonnet-5-5 (worker)",
+          "effort": "medium",
+          "date": "2026-11-12",
+          "scope": "Slimmed SKILL.md entry: detail moved to references, no rule changed"
         }
       ]
     },
@@ -3918,6 +3939,13 @@
           "effort": "medium",
           "date": "2026-11-06",
           "scope": "Refreshed Stageshow to 1.1.1: new Button, Card, Divider, Kbd and Draft parts, Collapse and Roll fixes, stricter film gate, buttons and cards examples; guides merged"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-sonnet-5-5 (worker)",
+          "effort": "medium",
+          "date": "2026-11-12",
+          "scope": "Slimmed SKILL.md entry: detail moved to references, no rule changed"
         }
       ]
     },
@@ -3987,6 +4015,13 @@
           "effort": "medium",
           "date": "2026-11-09",
           "scope": "Note 1ed53e3 recheck: tile radius and gallery sharing not adopted"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-sonnet-5-5 (worker)",
+          "effort": "medium",
+          "date": "2026-11-12",
+          "scope": "Slimmed SKILL.md entry: detail moved to references, no rule changed"
         }
       ],
       "reviewed_sources": [
@@ -4026,6 +4061,13 @@
           "effort": "medium",
           "date": "2026-11-02",
           "scope": "Adapted and reviewed in Orbyn"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-sonnet-5-5 (worker)",
+          "effort": "medium",
+          "date": "2026-11-12",
+          "scope": "Slimmed SKILL.md entry: detail moved to references, no rule changed"
         }
       ]
     },
