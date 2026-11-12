@@ -1799,7 +1799,7 @@
           "license_file": "skills/orbyn-ui-design/references/upstream/tactile-design/LICENSE",
           "license_sha256": "0da495ced97ec87d10505ed4fc334ad8114d327242abbd8f4c08c0143442a8be",
           "relationship": "selected-method-adaptation",
-          "changes": "Orbyn-written adaptation of the decision order, working posture, review at zoom and a worked example; values kept as defaults behind project tokens. The unmodified source is pinned under references/upstream/tactile-design."
+          "changes": "Close adaptation, reworded in places, of the decision order, working posture, review at zoom and a worked example; values kept as defaults behind project tokens. The unmodified source is pinned under references/upstream/tactile-design."
         },
         {
           "source": "https://github.com/kosta4a/tactile-design/tree/30495a2db7cb59a72bacea106118ffeab7af00d9",
@@ -1810,7 +1810,7 @@
           "license_file": "skills/orbyn-ui-design/references/upstream/tactile-design/LICENSE",
           "license_sha256": "0da495ced97ec87d10505ed4fc334ad8114d327242abbd8f4c08c0143442a8be",
           "relationship": "selected-method-adaptation",
-          "changes": "Orbyn-written adaptation of the surface, control, motion and phone values and the never-ship list; values kept as defaults behind project tokens. The unmodified source is pinned under references/upstream/tactile-design."
+          "changes": "Close adaptation, reworded in places, of the surface, control, motion and phone values and the never-ship list; values kept as defaults behind project tokens. The unmodified source is pinned under references/upstream/tactile-design."
         }
       ],
       "reviewed_sources": [

@@ -19,7 +19,7 @@ class; set once on the root, they will not follow the parent.
 | Part | Light | Dark |
 | --- | --- | --- |
 | Fill | the top surface (white) | parent + 2 steps for controls, + 1 for cards |
-| Edge | 1 px ring of `ink / .08` | one solid 0.5 px outline, three steps above the fill, same colour all round |
+| Edge | 1 px ring of `ink / .08` | one solid 0.5 px outline, three steps above a control's fill (ink-6 on cards), same colour all round |
 | Drop | `0 1px 2px 0 rgb(ink / .12)` | `0 1px 2px 0 rgb(0 0 0 / .5)`, always darker than the parent |
 
 - Shadows are crisp: the ring and 1 px drop plus at most one short drop (card
@@ -27,7 +27,7 @@ class; set once on the root, they will not follow the parent.
 - Dark mode is designed, not inverted: never a lit top edge, an outline that changes
   colour, an edge over 0.5 px, or a shadow lighter than its parent (a glow).
 - Dark changes colour and shadow only; sizes, padding and radius never fork by theme.
-- Fields are wells: a sunk fill, no border; focus deepens the fill and adds the ring.
+- Fields are wells: a sunk fill, no border; focus deepens the fill and adds the ring on keyboard focus.
 - Structural lines are 0.5 px. White on white gets its edge from the ring, not a fill.
 
 ## Controls
@@ -64,12 +64,8 @@ class; set once on the root, they will not follow the parent.
 
 ## Never ship
 
-- More than one primary, or a primary that is not the real next step.
-- Hierarchy made with bold or colour; hue on anything but status or identity.
-- A fill, edge or drop fixed regardless of the surface beneath.
-- Double borders, or structural lines over 0.5 px.
-- Actions below the data they act on, or a pager inside a table's card.
+Beyond the rules above and the [screen decisions](screen-decisions.md):
+
 - An eyebrow label over a title, or "Step 1 of 4" over a progress bar.
 - A toast for a successful copy, or a copy tick that waits for the clipboard.
 - One hover highlight that slides between rows.
-- Not checked at 4-8× zoom in each theme.
