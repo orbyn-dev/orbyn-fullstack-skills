@@ -21,6 +21,8 @@ and trace the current design with [how](../how/SKILL.md). Use
 6. **Return** an owner/interface table, a representative call, state transitions, the rejected alternative and a migration order. Use [orbyn-plan](../orbyn-plan/SKILL.md) when the design needs a delivery sequence. Record a durable rationale only when future maintainers need the decision.
 7. **Review a written design before code** when it will drive a substantial build: fresh reviewer children read only the document and its linked files, through zoom-out, comprehension and implementation-readiness lenses ([design review](references/design-review.md)).
 
+**Worked failure.** A proposal-approval design that starts from the Apply button lets web and mobile each invent their own lifecycle. Specify the durable proposal state, authenticated apply, stale-version behavior and shared result shape first ([approving a proposal](examples/proposal-approval.md)).
+
 ## Scope and delivery
 
 A design-only request ends with the design contract and reorganizes no files. This skill request does not authorize reorganizing a consuming application. A small clear fix needs no architecture redesign. Keep sketches out of production code unless they are being completed in the same delivery. Implementation checks belong to the resulting change, within the user's scope.
