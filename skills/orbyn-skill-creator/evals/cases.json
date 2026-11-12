@@ -13946,13 +13946,13 @@
         "merge",
         "message"
       ],
-      "excluded": "Check which workers actually started before relaunching; never two writers in one worktree."
+      "excluded": "Do not relaunch a worker that already started or put a second copy of a writer in its worktree."
     },
     {
       "id": "ui-before-api-routes",
       "kind": "routing",
       "split": "development",
-      "prompt": "Build the screens for the new billing feature now; its HTTP routes are not merged yet.",
+      "prompt": "How should we sequence the API and the screens for the new billing feature? Its HTTP routes do not exist yet.",
       "expected_skills": [
         "architect",
         "orbyn-ui-design"
@@ -13964,7 +13964,7 @@
         "merge",
         "message"
       ],
-      "excluded": "Display-only UI uses drawn sample data and no guessed client until routes and generated types land."
+      "excluded": "Do not have the UI write a guessed client before the routes exist; use fixture or sample data until then."
     }
   ]
 }
