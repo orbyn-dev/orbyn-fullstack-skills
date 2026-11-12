@@ -9,6 +9,7 @@ import sys
 import tempfile
 import threading
 import unittest
+import unittest.mock
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / 'skills/orbyn-seo/scripts'
@@ -150,6 +151,10 @@ class LinkGraphTests(unittest.TestCase):
         self.assertEqual(report['skipped'], [{'file': '/huge.html', 'reason': 'larger than 20 MB'}])
         self.assertNotIn('/huge', report['inbound'])
         self.assertEqual(report['inbound']['/about'], 2)
+        (self.site / 'links-big.html').write_text(page(a('/huge.html'), a('/huge')))
+        report = module.analyse(self.site.resolve(), None, '/', [], 2)
+        broken = {(b['source'], b['href']) for b in report['broken']} if report['broken'] and isinstance(report['broken'][0], dict) else set(map(tuple, report['broken']))
+        self.assertTrue({('/links-big', '/huge.html'), ('/links-big', '/huge')} <= broken, report['broken'])
 
     def test_read_only(self):
         before = sorted(p.relative_to(self.site).as_posix() for p in self.site.rglob('*'))
@@ -427,6 +432,24 @@ class LiveRedirectTests(unittest.TestCase):
                     'http://[::1]/x', 'http://[::2]:9/x', 'http://u:p@old.test/x', 'http://u@new.test/x',
                     'file:///etc/hosts', 'http://[bad/x', 'http:///x'):
             self.assertFalse(checker.allowed(url), url)
+
+    def test_ipv6_without_port_connects_to_the_default_port(self):
+        module = load(REDIRECTS)
+        seen = []
+
+        class Stop(Exception):
+            pass
+
+        class Fake:
+            def __init__(self, host, port=None, timeout=None):
+                seen.append((host, port))
+                raise Stop
+
+        checker = module.Checker('http://[::1]', [], 'loose', 1, 0)
+        with unittest.mock.patch.object(module.http.client, 'HTTPConnection', Fake):
+            with self.assertRaises(Stop):
+                checker.fetch('http://[::1]/x')
+        self.assertEqual(seen, [('::1', 80)])
 
     def test_norm_drops_default_ports_and_case(self):
         norm = load(REDIRECTS).norm

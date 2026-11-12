@@ -83,10 +83,10 @@ def scan_site(site):
             if not inside:
                 skipped.append({'file': rel, 'reason': 'resolves outside --site (symlink)'})
                 continue
-            files.add(rel)
             if size > MAX_BYTES:
                 skipped.append({'file': rel, 'reason': 'larger than 20 MB'})
                 continue
+            files.add(rel)
             if name == 'index.html':
                 base = rel[:-len('index.html')]
                 path = base

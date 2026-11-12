@@ -6,14 +6,15 @@ former addresses long after a move, so treat the redirects as permanent.
 
 ## Mistakes that lose rankings
 
-- Redirecting many old URLs to the home page: search engines treat it as a soft 404
-  and the old pages' links stop counting.
-- Chains (`http` to `https` to new slug to new domain): send every old URL straight
-  to its final URL in one hop.
-- Launching with the staging `noindex` or `Disallow: /`.
-- Blocking the old domain in robots.txt: crawlers then never see its redirects.
-- Mapping only URLs in the current sitemap: retired pages with links start to 404.
-- Removing the redirects or letting the old domain lapse.
+- **Losing pages from the map.** Build the list from every source, not just today's
+  sitemap, and send each page somewhere relevant; pointing many unrelated pages at
+  the home page makes search engines treat them as missing.
+- **Extra hops.** Each old address goes straight to its final address; stacking a
+  protocol change, a slug change and a domain change multiplies the hops.
+- **Hiding the redirects.** If the old domain disallows crawling, or lapses, or the
+  rules are removed later, crawlers stop learning where pages went.
+- **Shipping preview settings.** A leftover `noindex` or blanket disallow on the new
+  site removes it from the index at launch.
 
 ## Steps
 

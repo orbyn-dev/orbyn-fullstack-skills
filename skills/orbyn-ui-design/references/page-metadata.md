@@ -25,7 +25,7 @@ neutral. Keep the diff to metadata.
 - Every page has a title, in one site-wide format. Short, readable, no stuffing.
 - Lead with the words people search for. Results pages cut long titles by display
   width, so keep the part that matters short (roughly 50 to 60 characters is a
-  common guide). Title, description, H1 and URL slug describe the same thing.
+  common guide). A page's title, heading, description and address should all point at one topic.
 - Titles are unique and say what the page is: never "Home", "Products" or a bare
   category. Do not change a slug only to chase a year or number.
 - Shareable or searchable pages have a plain-text description. No markdown, no

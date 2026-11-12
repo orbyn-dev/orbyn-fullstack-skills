@@ -216,7 +216,7 @@ class Checker:
             if self.requests and self.delay:
                 time.sleep(self.delay)
             self.requests += 1
-            conn = cls(parts.hostname, parts.port, timeout=self.timeout)
+            conn = cls(parts.hostname, parts.port or DEFAULT_PORTS[parts.scheme], timeout=self.timeout)
             try:
                 conn.request(method, target, headers={'User-Agent': USER_AGENT, 'Accept': '*/*'})
                 response = conn.getresponse()

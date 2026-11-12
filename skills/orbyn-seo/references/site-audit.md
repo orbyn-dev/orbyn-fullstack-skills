@@ -25,8 +25,9 @@ fail or not checked, with the command or page that shows it.
 
 ## 2. Locales
 
-Keep only locales that are fully translated and that people use. Half-translated
-locale trees are near-duplicates. Each kept page lists every locale version,
+Keep only locales that are fully translated and that people use. A locale whose
+pages are mostly the default language competes with those pages rather than adding
+to them. Each kept page lists every locale version,
 including itself, and each version links back; an `x-default` is recommended.
 Drop the rest with `noindex`, remove them from the sitemap and from every kept
 page's alternates, or redirect them to the default page.
@@ -55,8 +56,8 @@ person before changing them.
 
 For each money page: in the sitemap, canonical to itself, linked from the home page
 or main navigation, several links from body text on related pages (navigation and
-footer excluded; three is a reasonable floor), no redirect chain, and the first screen shows the product's value
-rather than only a "book a demo" wall. Check indexation in Search Console when the
+footer excluded; three is a reasonable floor), no redirect chain, and a first screen
+that shows the product's value rather than only a "book a demo" wall. Check indexation in Search Console when the
 person has it; otherwise mark it not checked.
 
 ## Report
