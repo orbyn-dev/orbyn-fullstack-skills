@@ -1299,7 +1299,10 @@ def retire(repo, target, base, archive, workspace=None):
     if repo is None:
         # No --repo: the target's own registration names its primary checkout, so a nested
         # target's worktree (repo/<target>-wt/...) retires without naming the target clone.
-        repo = worktrees(canon(target))[0]['worktree']
+        try:
+            repo = worktrees(canon(target))[0]['worktree']
+        except Refused:
+            raise Refused(f'Not a linked worktree of any repository: {clean(target)}') from None
     repo = canon(repo)
     with locked(ws/'output'):
         ctx = Context(ws, base, [repo])

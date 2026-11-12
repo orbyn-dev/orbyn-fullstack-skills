@@ -81,8 +81,10 @@ worktree, and when `harness.py resolve` prints `LOW DISK` (free space under
    so it frees no space until the user empties it; the tool never does, and
    Finder's 30-day removal option is the user's own setting and can remove Trash items
 with nobody emptying it, so do not promise recovery for long. The Trash sits on the
-   same volume, so on a low disk the space comes back only when the user empties it:
-   ask them to, and say how much this cleanup put there. If `apply` cannot free
+   same volume, so on a low disk the space comes back only when those items leave it:
+   ask the user, list the retired items and their size, and say that deleting them is
+   permanent and ends their recovery. Suggest deleting only those items, not emptying
+   the whole Trash, which also removes the user's own files. If `apply` cannot free
    enough even then, tell the user. Do not remove files by hand, force anything
    or empty the Trash.
 

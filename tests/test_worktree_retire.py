@@ -1120,6 +1120,17 @@ class ClassTests(CleanupCase):
         self.assertFalse(done.exists())
         self.assertEqual(self.trashed[-1].name, done.name)
 
+    def test_retire_without_repo_still_refuses_a_primary_or_a_subfolder(self):
+        done = self.done()
+        (done/'sub').mkdir()
+        for path in (self.app, done/'sub'):
+            with mock.patch('builtins.print'):
+                self.assertEqual(tool.main(['--base', BASE, 'retire', str(path),
+                                            '--archive', str(self.lib/'output/worktree-archive'),
+                                            '--workspace', str(self.lib)]), 1)
+        self.assertTrue(self.app.exists() and done.exists())
+        self.assertEqual(self.trashed, [])
+
 class SecondReviewTests(CleanupCase):
     # --- second review: N1 to N16 and the low list
 
