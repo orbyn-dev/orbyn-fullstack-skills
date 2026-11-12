@@ -22,7 +22,7 @@
       "relationship": "byte-identical-selected-source"
     },
     "SKILL.md": {
-      "sha256": "6f4f454b2ddf461f4d3ac9827bc16347910b8a53310cea4647de2de0c2b33bce",
+      "sha256": "8dc726233d97c4ee24e8b857e0a2386470cd727f7790faee40eff67a8e329294",
       "source_path": "skills/stack-diagram/SKILL.md",
       "original_sha256": "b32b05b7eeb0f93fcc297fa1e1d8e56a7306b6b7c989c4ed4f8522a996a9086e",
       "relationship": "maintained-adaptation"

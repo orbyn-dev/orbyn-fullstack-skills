@@ -32,9 +32,26 @@ The fix: a full, structured screen in quiet grays, real words only on what the s
 5. **Start from the closest gold** in [gold examples](references/gold-examples.md): film it and copy its folder to `examples/<yours>/`. Keep its stage size, crop, spacing, beats and kit parts. Read [craft](references/craft.md) in full. Replace look and content; a renamed copy is unfinished. Then frame it ([framing](references/framing.md)) and film one still beside the gold's at both widths. If yours is emptier, flatter or more boxed, fix the frame first.
 6. **Build the screen.** Spend 3 to 7 real strings. Build with kit tokens, `Bar`, `Text`, `Row`, `Card`, `Button` and `Kbd`; never hand-build a lookalike of a kit part. Mark what the cursor touches with `data-target` and `data-cursor`; measure with `rect()`, never hard-code ([kit](references/kit.md)).
 7. **Choreograph.** Keep what appears mounted and toggle it so exits animate. Animate the relationship: a new row carries the rows below it. Beats overlap, the payoff holds, the loop ends where it began or resets with a visible cause.
-8. **Rehearse for real.** Set `poster` first: the beat that tells the story alone, with the result on screen. Film the loop, not just a still, at shown width, again at `--width 390`, and with `--states`, always with `--gate`: it exits 1 on any fault, and you do not hand over until it ends `rehearsal passed`. That is necessary, not sufficient. Read every frame; fix the largest fault first (framing, hierarchy, motion, polish) and re-film. Finish with [rehearse](references/rehearse.md) (commands), [verify](references/verify.md) and `REHEARSAL.md` beside the component, naming the gold, what changed and what you did not check.
+8. **Rehearse for real.** Set `poster` first: the beat that tells the story alone, with the result on screen. Film the loop, not just a still, at shown width, again at `--width 390`, and with `--states`, always with `--gate` ([film command](references/build-method.md#film-command)): it exits 1 on any fault, and you do not hand over until it ends `rehearsal passed`. That is necessary, not sufficient. Read every frame; fix the largest fault first (framing, hierarchy, motion, polish) and re-film. Finish with [rehearse](references/rehearse.md) (commands), [verify](references/verify.md) and `REHEARSAL.md` beside the component, naming the gold, what changed and what you did not check.
 
-Before handing over, run the [recurring checks](references/build-method.md#check-these-before-handing-over). The gold examples are the bar ([how hard to press](references/build-method.md#how-hard-to-press)).
+### Worked failure
+
+A hero for invoice approval is built as a complete 480-wide window on a tinted plate with real names in all twelve rows. The gate passes, but beside `static-card` it reads as a screenshot. Fix the largest fault first: drop the plate, run the window off the bottom edge at 720 wide, keep real words only on the selected row and its total, and let the approval move that total. Full version: [build method](references/build-method.md#worked-failure).
+
+## Check these before handing over
+
+Each comes back every round. The gold examples are the bar ([how hard to press](references/build-method.md#how-hard-to-press)).
+
+- Content that swaps instead of moving.
+- Gray bars where the eye lands; filler belongs at the edges.
+- A plate behind the window, or a window floating with air on four sides.
+- Empty bands, cut controls and cut shadows.
+- Stock AI and made-up logos: sparkles, purple, a letter in a colored square.
+- Busy rows and uneven insets.
+- Long holds and a reset with no cause.
+- A selection that isn't under the I-beam.
+- A status bar or home indicator drawn by hand; the `Phone` draws both.
+- A centered amount centered with its sign.
 
 ## Boundaries
 
@@ -45,7 +62,7 @@ Before handing over, run the [recurring checks](references/build-method.md#check
 
 ## Read when needed
 
-- Step detail, bar, worked failure, pre-handover checks: [build method](references/build-method.md).
+- Step detail, bar, full worked failure: [build method](references/build-method.md).
 - Example to copy: [gold examples](references/gold-examples.md); props: [kit](references/kit.md).
 - Still frame: [craft](references/craft.md), [framing](references/framing.md); grid: [bento](references/bento.md); grounds: [backgrounds](references/backgrounds.md); leaders and dimensions: [annotations](references/annotations.md).
 - Story, loops, cursors: [motion](references/motion.md); overlapping changes: [choreography](references/choreography.md).

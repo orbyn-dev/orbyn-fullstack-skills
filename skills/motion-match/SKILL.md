@@ -52,7 +52,9 @@ Work in `output/motion-match/<name>/`, or another folder Git ignores. Keep every
 9. **Stop after 5 rounds** if a row still fails, and report it with its numbers and the reason. Keep the thresholds where they are.
 10. **Report** so the message stands alone ([report block](references/verify.md#report-block)): rights and fidelity, what was matched and added, files and trigger, the last round's table, sheet paths, each residual with a number and a reason, and where any raw third-party capture sits.
 
-Worked failure and pitfalls (viewport, fonts, scroll, springs, canvas, recordings, CSS easing): [verify](references/verify.md#worked-failure).
+### Worked failure
+
+Round 1 of three cards fails: every row is late by +300 ms, while the easing curve and the gaps are right. The only cause is the base delay, so change that one number and re-film. Aligning the frames would pass the row and ship a 300 ms late animation, which is why `compare.mjs` refuses `--auto-align` between two captures. Full numbers: [verify](references/verify.md#worked-failure). Pitfalls (viewport, fonts, scroll, springs, canvas, recordings, CSS easing) are in the same file.
 
 ## Boundaries
 

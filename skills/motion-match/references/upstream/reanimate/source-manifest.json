@@ -13,7 +13,7 @@
       "relationship": "byte-identical-selected-source"
     },
     "SKILL.md": {
-      "sha256": "da009d715f37b82e5c597a3da4666bf951d26292374698f4758af8d8354bb4ea",
+      "sha256": "6bccdc80849206769b391bd57e43b792fa7bf57ff33ddd7caf85eb43ad49dbf5",
       "source_path": "skills/reanimate/SKILL.md",
       "original_sha256": "dec8499d220918750de9d5ca14162f7fe5bf96edda84dbf851355545e1adedc8",
       "relationship": "maintained-adaptation"

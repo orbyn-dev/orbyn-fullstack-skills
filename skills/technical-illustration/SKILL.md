@@ -26,7 +26,7 @@ Send these to their owners: ordinary app layout to UI design; social posters to 
 
 Apply these contracts when the request matches ([route contracts](references/route-contracts.md)):
 
-- Requested illustrated statecharts: architect's [art contract](../architect/references/illustrated-statecharts.md); architect retains state, guard, projection and verification ownership.
+- Requested illustrated statecharts: architect's [art contract](../architect/references/illustrated-statecharts.md); architect retains state, guard, projection and verification ownership. Keep exact numbered paths and the plain/text fallback.
 - Arbitrary code-authored layered compositions, sampled tracks, rational clocks, vector/audio/media adapters or conditional 3D/simulation/effects: the [code-driven motion contract](../orbyn-ui-design/examples/spatial-review/motion/README.md). Its Lottie input, Three.js profile and packaged adapters fall under the [code-only rule](references/code-only.md), so use them only when the user approves them.
 
 ## Set the boundary
@@ -46,7 +46,7 @@ No browser bypass, publisher, auth edit, history capture or model call is implie
 3. Define takeover, reversal, readiness, timing and cleanup ([motion and input](references/motion-and-input.md)). Keep usable controls and
    meaningful updates with reduced motion and without advanced rendering. For
    timed UI, explainers/data, 3D choreography or kinetic films, use
-   [motion sequences](references/motion-sequences.md).
+   [motion sequences](references/motion-sequences.md) (deterministic scenes, interruption, text/media and delivery qualification).
 4. Select only the required delivery path: standalone SVG/HTML core;
    [React/accessibility](references/react-and-accessibility.md);
    [print](references/print.md); [WebGL](references/webgl.md); or documented
@@ -55,7 +55,7 @@ No browser bypass, publisher, auth edit, history capture or model call is implie
    the images ([capture and drive](references/capture-and-drive.md)).
    Fix the model/source before recapturing. A saved image or green banner is not
    proof of geometry, accessibility, complete input coverage or a real GPU path.
-6. For MP4 delivery, follow the [film pipeline](references/film-pipeline.md): validated spec, `check-code-only.py` before rendering, `flash-check.py` on the finished file (exit 1: fix the source, render again), legibility and audio checks.
+6. For MP4 delivery, use the original [motion-film exporter](../orbyn-ui-design/examples/spatial-review/motion-films.md) via the [film pipeline](references/film-pipeline.md): validated scene/beat spec, `check-code-only.py` before rendering, `flash-check.py` on the finished file (exit 1: fix the source, render again), the legibility check when it carries words or a logo, and `audio-bake.py` for audio-reactive or lyric frames.
 7. Package the selected modules, artifact model/style/assets and reproducible checks
    ([dependencies and update](references/dependencies-and-update.md)). Preserve
    notices and original/adapted hashes. Deliver artifact, evidence and actual limits.
@@ -65,13 +65,13 @@ No browser bypass, publisher, auth edit, history capture or model call is implie
 - Full-length song, or any film over 120 seconds or 3,600 frames: [long-form streaming](../orbyn-ui-design/examples/spatial-review/motion-films.md#stream-a-full-length-film).
 - WebGL framebuffers or `readPixels`: [full-screen pass orientation](references/fullscreen-pass-orientation.md).
 - Flash result scope and action: [motion sequences](references/motion-sequences.md#check-flashing-on-the-rendered-file).
-- Any video built from an image: [animate an image](references/animate-an-image.md); the character in it must move, and camera motion alone never counts.
+- Any video built from an image: [animate an image](references/animate-an-image.md) (fixed crop, slow drawn blinks); the character in it must move, and camera motion alone never counts.
 - Music video, lyric video, anime-style or ambient background, full animation, motion graphics or visualizer: [video scenarios](references/video-scenarios.md) first.
 - Measuring a reference's motion and proving a build matches it: [motion-match](../motion-match/SKILL.md).
-- A style's motion and timing: [video styles](references/video-styles.md).
+- A style's motion and timing, such as hit-pulse, word-stack or kinetic-cut: [video styles](references/video-styles.md).
 - Character, body movement, walk, face, hair or acting: [character animation](references/character-animation.md).
 - Terrain, worlds, raymarching, cameras or a figure in 3D: [3D worlds](references/3d-worlds.md).
-- Individually timed lyric typography with artwork performance: [lyric performance](references/lyric-performance.md).
+- Individually timed lyric typography with artwork performance: [lyric performance](references/lyric-performance.md) (representative preview, local puppeting limits, blink integrity).
 - Logo, brand mark, intro, outro or end card: [logo and branding](references/logo-and-branding.md).
 - Relighting, parallax or echoes on an animated image, only if the user approves OpenCV: [still to layers](references/still-to-layers.md).
 

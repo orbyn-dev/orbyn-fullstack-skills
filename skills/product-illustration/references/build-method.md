@@ -26,18 +26,3 @@ Copy the kit root outside the library, or copy `kit/` into the project's React a
 ## Worked failure
 
 A brief asks for a hero showing invoice approval. The first build is a complete window, 480 wide, centered on a tinted plate, with real names in all twelve rows. The gate passes, but beside `static-card` it reads as a screenshot. Largest fault first: remove the plate, run the window off the bottom edge at 720 wide, keep real words on the selected row and its total, and turn the other rows into bars. Then the approval moves the total, because that is the payoff.
-
-## Check these before handing over
-
-Each comes back every round:
-
-- Content that swaps instead of moving.
-- Gray bars where the eye lands; filler belongs at the edges.
-- A plate behind the window, or a window floating with air on four sides.
-- Empty bands, cut controls and cut shadows.
-- Stock AI and made-up logos: sparkles, purple, a letter in a colored square.
-- Busy rows and uneven insets.
-- Long holds and a reset with no cause.
-- A selection that isn't under the I-beam.
-- A status bar or home indicator drawn by hand; the `Phone` draws both.
-- A centered amount centered with its sign.

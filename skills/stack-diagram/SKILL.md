@@ -54,7 +54,11 @@ Render with `scripts/render_png.py` ([build and render](references/build-and-ren
 - Group labels sit top-left, clear of nodes and edges, with matching left and right padding.
 - Nothing sticks out of its group or clips at the canvas edge.
 
-Fix and render again until clean. Worked failure: [build and render](references/build-and-render.md#worked-failure).
+Fix and render again until clean.
+
+### Worked failure
+
+An API node's tile top is 120 and a database sits below it at 350. The first draft draws the vertical edge from the tile bottom, and the render shows the line running through the name and role. Start it at the box bottom (120+100+6) instead, then list every vertical segment and ask which node boxes it passes between its two ends; the answer must be none. Full coordinates: [build and render](references/build-and-render.md#worked-failure).
 
 ### 6. Deliver
 
