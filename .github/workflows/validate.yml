@@ -29,7 +29,10 @@ jobs:
         run: python -m unittest discover -s tests -p test_worktree_retire_windows.py -v
   validate:
     name: Validate (Python ${{ matrix.python }})
-    runs-on: ubuntu-latest
+    # Self-hosted only when the repository variable CI_RUNNER is 'local' and the run is not
+    # from a fork. Keep CI_RUNNER unset while this repository is public: the orbyn-local
+    # runner group serves private repositories only. Windows stays on hosted runners.
+    runs-on: ${{ vars.CI_RUNNER == 'local' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && fromJSON('["self-hosted","orbyn-local"]') || 'ubuntu-24.04' }}
     timeout-minutes: 10
     strategy:
       fail-fast: false

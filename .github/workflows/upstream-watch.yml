@@ -14,7 +14,8 @@ jobs:
   watch:
     name: Upstream watch
     if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    # Scheduled or manual on main only, so never a fork; keep CI_RUNNER unset while public.
+    runs-on: ${{ vars.CI_RUNNER == 'local' && fromJSON('["self-hosted","orbyn-local"]') || 'ubuntu-24.04' }}
     timeout-minutes: 15
     permissions:
       contents: read
