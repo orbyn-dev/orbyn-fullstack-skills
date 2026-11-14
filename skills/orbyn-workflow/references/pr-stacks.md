@@ -11,7 +11,7 @@ merged yet; independent work goes in its own PR from the trunk instead
 - One concern per layer, ordered by dependency: shared types and schema lowest, the
   code that uses them above, tests with the layer they test. A layer depends only on
   its own branch or lower ones, and builds and passes its checks on its own.
-- At most two PRs open in a stack by default, within the lead's open-PR limit
+- A stack at most two PRs deep by default, within the lead's open-PR limit
   ([stack limits](../playbooks/build-while-waiting.md#stack-only-what-depends-on-n)).
   A third layer (schema, then API, then UI) waits until the bottom one lands, unless
   the user raises the limit.
@@ -39,7 +39,8 @@ merged yet; independent work goes in its own PR from the trunk instead
    that one in its own worktree, bottom-up.
 3. **From a fork, neither works,** because a PR's base must be a branch in the
    upstream repository. Wait for the base PR, or open the dependent PR against the
-   trunk as a draft that says it depends on the base PR.
+   trunk as a draft that says it depends on the base PR; it carries the base PR's
+   commits until that PR lands, then rebase it.
 
 ## Authority
 
