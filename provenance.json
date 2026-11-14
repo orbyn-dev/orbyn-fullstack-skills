@@ -1503,7 +1503,7 @@
           "model": "claude-sonnet-5-5 (lead)",
           "effort": "medium",
           "date": "2026-11-14",
-          "scope": "Routing cases for stacked PRs: two development, one holdout, one adjacent"
+          "scope": "Routing cases for stacked PRs: four development (one adjacent where orbyn-ci-design wins), one holdout"
         }
       ],
       "reviewed_inspiration": [

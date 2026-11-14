@@ -8,59 +8,72 @@ merged yet; independent work goes in its own PR from the trunk instead
 
 ## Design the layers
 
-- One concern per layer, ordered by dependency: shared types and schema at the
-  bottom, the code that uses them (API, then UI) above, tests with the layer they
-  test.
-- A layer may depend only on its own branch or lower ones. Each layer is reviewable,
-  builds and passes its checks on its own.
-- Keep stacks short: at most two PRs deep by default, and within the lead's open-PR
-  limit ([stack limits](../playbooks/build-while-waiting.md#stack-only-what-depends-on-n)).
-- Stacks are linear. Two pieces of work that both depend on the same base but not on
-  each other are two stacks, or one waits.
+- One concern per layer, ordered by dependency: shared types and schema lowest, the
+  code that uses them above, tests with the layer they test. A layer depends only on
+  its own branch or lower ones, and builds and passes its checks on its own.
+- At most two PRs open in a stack by default, within the lead's open-PR limit
+  ([stack limits](../playbooks/build-while-waiting.md#stack-only-what-depends-on-n)).
+  A third layer (schema, then API, then UI) waits until the bottom one lands, unless
+  the user raises the limit.
+- Stacks are linear. Two pieces that both depend on the same base but not on each
+  other are two stacks, or one waits.
 
 ## Choose the mechanism
 
 1. **GitHub native stacks, when available.** GitHub links the PRs as a stack, shows a
-   stack map, runs the trunk's required checks and branch rules on every layer, and
-   rebases the remaining layers after a lower one merges. All branches must be in the
-   same repository (no forks). Use the `gh stack` extension when it is already
-   installed; installing it (`gh extension install github/gh-stack`) is a tool
-   install, so ask the person first. Its non-interactive commands, exit codes and
-   recovery steps are in the pinned [gh-stack skill](upstream/gh-stack/SOURCE.md).
-   Exit code 9 means stacks are not enabled for the repository: tell the person.
-2. **Plain Git otherwise.** Cut each branch from the one below, open each PR with the
-   branch below as its base, and keep them current with
-   `git rebase --update-refs <trunk>` from the top branch (Git 2.38 or later), then
-   `git push --force-with-lease` for each changed branch. Name the base PR in each
-   description, since GitHub shows no stack map.
+   stack map, applies the trunk's required checks and branch rules to every layer,
+   and retargets the remaining layers after a lower one merges; sync the local
+   branches afterwards. All branches must be in the same repository. Use the
+   `gh stack` extension when it is already installed; installing it
+   (`gh extension install github/gh-stack`) is a tool install, so ask the person
+   first. Commands, exit codes and recovery are in the pinned
+   [gh-stack skill](upstream/gh-stack/SOURCE.md). Always use its non-interactive
+   forms (`view --json`, `submit --auto`, `merge <target> --yes`); never run
+   `modify` or `switch`, which wait for keyboard input. Exit code 9 means stacks are
+   not enabled for the repository: tell the person.
+2. **Plain Git otherwise.** Cut each branch from the one below and open each PR with
+   the branch below as its base; name the base PR in the description, since there is
+   no stack map. When the trunk moves, run `git rebase --update-refs <trunk>` from the
+   top branch (Git 2.38 or later), then `git push --force-with-lease` each changed
+   branch. `--update-refs` skips a branch checked out in another worktree: rebase
+   that one in its own worktree, bottom-up.
+3. **From a fork, neither works,** because a PR's base must be a branch in the
+   upstream repository. Wait for the base PR, or open the dependent PR against the
+   trunk as a draft that says it depends on the base PR.
 
 ## Authority
 
-- Opening a stack opens several PRs at once; it needs the same PR authority as one.
-  With `gh stack submit --auto`, new PRs open as drafts unless `--open` is passed.
-- **Merging a layer merges every unmerged layer below it** (native stacks merge from
-  the bottom up; merging a mid-stack PR takes the ones below with it). Check that
-  merge authority covers every PR that would land. In this skill library, no PR an
-  agent asked for may be merged by an agent, so a stack containing one waits for a
-  human.
-- With a merge queue, merging queues the stack instead; queued is pending, not landed.
-- Restructuring commands that rewrite or dissolve someone else's stack (`unstack`,
-  `modify`) need that stack owner's agreement.
+- Run `submit` only once every layer it would open has had its review; it opens a PR
+  for every branch, and drafts still count as opened PRs. Opening a stack needs the
+  same PR authority as opening one PR.
+- **Native stacks: merging a layer merges every unmerged layer below it.** Check that
+  merge authority covers every PR that would land, and pass the repository's merge
+  method explicitly (`gh stack merge` otherwise reuses the last one). In this skill
+  library, no PR an agent asked for may be merged by an agent, so a stack containing
+  one waits for a human.
+- **Plain Git: merging an upper PR merges it into the branch below,** not the trunk;
+  that is not delivery.
+- Stack merges are asynchronous, and with a merge queue they queue: read back the
+  merged state before reporting anything landed.
+- `unstack` without `--local` removes the stack on GitHub too; it, and any rewrite of
+  someone else's stack, needs that stack owner's agreement.
 
 ## Keep it current
 
-- After the trunk moves or a lower layer merges (often as a squash), sync or rebase
-  the stack (`gh stack sync`, or the plain-Git rebase with `--onto` for a squashed
-  parent), then repeat each moved layer's affected checks: earlier results no longer
+- Native: after the trunk moves or a lower layer merges, `gh stack sync`.
+- Plain Git, after a lower layer was squash-merged: from the top branch,
+  `git rebase --update-refs --onto <trunk> <old parent head SHA>` (the SHA recorded
+  when the child was cut), push with `--force-with-lease`, then retarget the child
+  PR's base to the trunk within your authority.
+- Either way, repeat each moved layer's affected checks; earlier results no longer
   apply ([dependent stacks](../playbooks/pr-iteration.md#dependent-stacks-and-current-context)).
-- A fix that belongs to a lower layer goes on that layer, then the layers above are
-  rebased. Never patch a lower concern on the top branch.
+  A fix that belongs to a lower layer goes on that layer.
 - Stack branches may live in separate worktrees; never steal another worktree's
   checkout ([orbyn-worktree](../../orbyn-worktree/SKILL.md)).
 
 ## Review
 
 Each layer gets its review before its PR opens, like any PR
-([review before the PR](lead-contract.md#review-before-the-pr)); the reviewer reads that
-layer's diff against the branch below, not against the trunk. Re-review a layer whose
-contents changed in a rebase beyond a clean replay.
+([review before the PR](lead-contract.md#review-before-the-pr)); the reviewer reads
+that layer's diff against the branch below, not against the trunk. Re-review a layer
+whose contents changed in a rebase beyond a clean replay.

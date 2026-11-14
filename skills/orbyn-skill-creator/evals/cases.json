@@ -14182,7 +14182,7 @@
         "orbyn-workflow"
       ],
       "forbidden_skills": [
-        "orbyn-data-migration"
+        "orbyn-ci-design"
       ],
       "forbidden_actions": [
         "publish",
@@ -14190,7 +14190,7 @@
         "merge",
         "message"
       ],
-      "excluded": "Do not put all three layers in one PR or build the UI before the layer it depends on."
+      "excluded": "Do not open more than two layers at once without the user raising the depth limit, and do not put the layers in one PR."
     },
     {
       "id": "stack-after-squash",
@@ -14228,7 +14228,7 @@
       "excluded": "Do not merge without checking that merge authority covers every PR below it, which lands too."
     },
     {
-      "id": "stack-not-for-independent",
+      "id": "stack-slow-ci-adjacent",
       "kind": "routing",
       "split": "development",
       "prompt": "CI on our stacked PRs takes 30 minutes per layer. Make the required checks faster.",
@@ -14245,6 +14245,23 @@
         "message"
       ],
       "excluded": "Do not restructure the stack to hide slow checks."
+    },
+    {
+      "id": "independent-not-stacked",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "I have two unrelated fixes ready. Should I stack them as PRs?",
+      "expected_skills": [
+        "orbyn-workflow"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not stack independent work; open each as its own PR from the trunk."
     }
   ]
 }
