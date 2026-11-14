@@ -15,9 +15,9 @@ concurrency:
 jobs:
   gate:
     name: PR gate
-    # Self-hosted only when CI_RUNNER is 'local' and the PR or triggering run is not from a
-    # fork; keep CI_RUNNER unset while this repository is public.
-    runs-on: ${{ vars.CI_RUNNER == 'local' && ((github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'workflow_run' && github.event.workflow_run.head_repository.full_name == github.repository)) && fromJSON('["self-hosted","orbyn-local"]') || 'ubuntu-24.04' }}
+    # Always hosted: it holds a write token and runs seconds, so it never shares a host with
+    # jobs that run PR code.
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
       contents: read
