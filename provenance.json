@@ -1984,6 +1984,11 @@
           "source": "https://github.com/flohoeller/affectui/tree/3c5df43893d870ee42d81fad4a4ba3ad72ba1b99",
           "revision": "3c5df43893d870ee42d81fad4a4ba3ad72ba1b99",
           "relationship": "reviewed-inspiration; MIT; independently written agent-run views, no upstream text imported"
+        },
+        {
+          "source": "https://github.com/luannn010/orbyn-designer/tree/b129ab293ba00487549baa5da2c0b6e83d7f4f10",
+          "revision": "b129ab293ba00487549baa5da2c0b6e83d7f4f10",
+          "relationship": "User-specified lifecycle contract and behavior reference; independently implemented Python and synthetic fixtures. No licensed source snapshot imported."
         }
       ],
       "authoring": [
@@ -2132,6 +2137,14 @@
           "effort": "medium",
           "date": "2026-11-15",
           "scope": "Designer handoff reference: branch, marker, record and PR convention for screens with an Orbyn Designer frame key; human requested and approved the design"
+        },
+        {
+          "tool": "Codex CLI",
+          "model": "gpt-6.1-sol (lead), gpt-6.1-terra (worker), gpt-6-luna (scout)",
+          "effort": "medium",
+          "date": "2026-11-16",
+          "human_role": "requested the change; lead session reviewed",
+          "scope": "Designer handoff: marker per screen, build.screens and release/deployment settings."
         }
       ]
     },
@@ -4392,6 +4405,21 @@
           "effort": "medium",
           "date": "2026-11-15",
           "scope": "New skill: entry, design_status.py (check, record, clear) with tests; human requested and approved the design"
+        },
+        {
+          "tool": "Codex CLI",
+          "model": "gpt-6.1-sol (lead), gpt-6.1-terra (worker), gpt-6-luna (scout)",
+          "effort": "medium",
+          "date": "2026-11-16",
+          "human_role": "requested the change; lead session reviewed",
+          "scope": "Designer lifecycle parity: pure shared rule cases, Git/GitHub evidence, migration, marker confirmation and Shipped checks; Python stdlib helper and regressions."
+        }
+      ],
+      "reviewed_inspiration": [
+        {
+          "source": "https://github.com/luannn010/orbyn-designer/tree/b129ab293ba00487549baa5da2c0b6e83d7f4f10",
+          "revision": "b129ab293ba00487549baa5da2c0b6e83d7f4f10",
+          "relationship": "User-specified lifecycle contract and behavior reference; independently implemented Python and synthetic fixtures. No licensed source snapshot imported."
         }
       ]
     }

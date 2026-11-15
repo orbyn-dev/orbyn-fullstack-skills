@@ -77,6 +77,7 @@ bundled, and they may carry other licences. Generated from `provenance.json` by
 | [Illyism/seo-skills](https://github.com/Illyism/seo-skills) | Ilias Ism | MIT (stated in README and plugin.json; the repository has no LICENSE file) | orbyn-seo |
 | [kevintngo/statechart-art](https://github.com/kevintngo/statechart-art) | Kevin Ngo | MIT | architect, technical-illustration |
 | [Lelekhoa1812/prompt-me](https://github.com/Lelekhoa1812/prompt-me) | Listed in provenance | See source | orbyn-plan |
+| [luannn010/orbyn-designer](https://github.com/luannn010/orbyn-designer) | Listed in provenance | See source | orbyn-design-status, orbyn-ui-design |
 | [macro-inc/macro](https://github.com/macro-inc/macro) | Macro contributors | See source | architect, language-best-practices, orbyn-ai-application, orbyn-backend-design, orbyn-ci-design, orbyn-content-design, orbyn-ui-design, orbyn-workflow, tdd |
 | [mattpocock/skills](https://github.com/mattpocock/skills) | Matt Pocock | See source | architect, how, interrogate, orbyn-plan, orbyn-workflow, tdd |
 | [microsoft/TokenEconomizer](https://github.com/microsoft/TokenEconomizer) | Microsoft Research and UC Berkeley (TokenEconomizer) | Apache-2.0 | orbyn-workflow, reflect |
