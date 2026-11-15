@@ -153,7 +153,7 @@ class ParityTests(Fixture):
         for tag in ("pre", "textarea", "script", "style"):
             self.assertNotEqual(ds.norm(f"<{tag}> a  b </{tag}>"), ds.norm(f"<{tag}> a b </{tag}>"))
         self.assertEqual(ds.norm('<section z="2" a="1"> a <!-- comment --> b </section>'),
-                         '<section a="1" z="2">ab</section>')
+                         '<section a="1" z="2">a  b</section>')
 
     def test_shared_styles_metadata(self):
         (self.file.parent / "style.css").write_text("body {}", encoding="utf-8")
@@ -188,6 +188,34 @@ class ParityTests(Fixture):
         self.assertTrue(facts["tip"])
         gh.prs = lambda *args, **kwargs: [{"number": 1, "branch": "renamed", "state": "open", "fork": True}]
         self.assertIsNone(ds.build_facts(ds.Git(), gh, self.app, {"branch": "old", "pr": 1})["tip"])
+
+    def test_record_fork_head_uses_pr_without_local_sha(self):
+        self.branch("feat/x")
+        git(self.app, "update-ref", "refs/remotes/origin/feat/x", "HEAD")
+        recorded = ds.record(self.root, "p/one", "alice:feat/x", pr="42")
+        self.assertEqual(recorded["build"]["branch"], "alice:feat/x")
+        self.assertEqual(recorded["build"]["pr"], "42")
+        self.assertNotIn("sha", recorded["build"])
+        calls = []
+        gh = FakeGh(True)
+        gh.prs = lambda repo, **kwargs: calls.append(kwargs) or [{"number": 42, "branch": "alice:feat/x", "state": "merged"}]
+        facts = ds.build_facts(ds.Git(), gh, self.app, recorded["build"])
+        self.assertEqual(calls, [{"pr": "42"}])
+        self.assertIsNone(facts["tip"])
+        self.assertEqual(ds.build_state({"build": recorded["build"]}, facts)["state"], "implemented")
+
+    def test_fork_head_without_pr_cannot_borrow_local_branch(self):
+        self.branch("feat/x")
+        with self.assertRaises(SystemExit):
+            ds.record(self.root, "p/one", "alice:feat/x")
+        recorded = ds.record(self.root, "p/one", "alice:feat/x", allow_missing=True)
+        self.assertNotIn("sha", recorded["build"])
+        self.assertIsNone(ds.Git().branch_tip(self.app, "alice:feat/x"))
+
+    def test_record_rejects_invalid_fork_owner_or_branch(self):
+        for head in (":feat/x", "alice:", "alice:bad branch", "a.b:feat/x", "alice:../x", "alice:b:c", "a/b:feat/x"):
+            with self.subTest(head=head), self.assertRaises(SystemExit):
+                ds.record(self.root, "p/one", head, pr="42")
 
 
 class GhAdapterTests(unittest.TestCase):

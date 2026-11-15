@@ -4413,6 +4413,14 @@
           "date": "2026-11-16",
           "human_role": "requested the change; lead session reviewed",
           "scope": "Designer lifecycle parity: pure shared rule cases, Git/GitHub evidence, migration, marker confirmation and Shipped checks; Python stdlib helper and regressions."
+        },
+        {
+          "tool": "Codex CLI",
+          "model": "gpt-6.1-sol",
+          "effort": "medium",
+          "date": "2026-11-16",
+          "human_role": "requested the three confirmed parity fixes and scoped both worktree commits",
+          "scope": "Fix colliding rename destinations, preserve inline whitespace in normalization, and accept fork-qualified build heads with PR evidence; add shared normalization and rename regression cases in Python and Designer."
         }
       ],
       "reviewed_inspiration": [

@@ -26,5 +26,163 @@
     {"name":"dirty branch does not imply pull match","section":"s","planned":false,"versions":{"work":{"s":"a"},"main":{},"pulls":[{"pr":{"number":2,"branch":"feature","state":"open"},"sections":{}}],"dirty":true,"behind":false,"branch":"feature"},"expected":{"state":"designed","branch":"feature","dirty":true}},
     {"name":"designed","section":"s","planned":false,"versions":{"work":{"s":"a"},"main":{},"pulls":[],"dirty":false,"behind":false},"expected":{"state":"designed"}},
     {"name":"shared styles metadata","section":"s","planned":true,"versions":{"work":{},"main":{},"pulls":[],"dirty":false,"behind":false,"sharedStylesChanged":true},"expected":{"state":"planned","sharedStylesChanged":true}}
-  ]
+  ],
+  "normalize": [
+  {
+    "name": "inline trailing space matters",
+    "left": "<span>Hello </span><em>world</em>",
+    "right": "<span>Hello</span><em>world</em>",
+    "equal": false
+  },
+  {
+    "name": "inline leading space matters",
+    "left": "<span>Hello</span> <em>world</em>",
+    "right": "<span>Hello</span><em>world</em>",
+    "equal": false
+  },
+  {
+    "name": "inline whitespace collapses",
+    "left": "<span>Hello  \n</span><em>world</em>",
+    "right": "<span>Hello </span><em>world</em>",
+    "equal": true
+  },
+  {
+    "name": "comments ignored",
+    "left": "<p>Hello<!-- note --> world</p>",
+    "right": "<p>Hello world</p>",
+    "equal": true
+  },
+  {
+    "name": "comment beside inline space",
+    "left": "<span>Hello </span><!-- note --><em>world</em>",
+    "right": "<span>Hello </span><em>world</em>",
+    "equal": true
+  },
+  {
+    "name": "attribute order and quotes",
+    "left": "<SECTION z=\"2\" id=\"s\" a=one>Hi</SECTION>",
+    "right": "<section a='one' id='s' z='2'>Hi</section>",
+    "equal": true
+  },
+  {
+    "name": "block indentation ignored",
+    "left": "<section>\n <p> Hello   world </p>\n</section>",
+    "right": "<section><p>Hello world</p></section>",
+    "equal": true
+  },
+  {
+    "name": "pre spaces significant",
+    "left": "<pre> a  b </pre>",
+    "right": "<pre> a b </pre>",
+    "equal": false
+  },
+  {
+    "name": "pre line endings normalised",
+    "left": "<pre>a\r\nb</pre>",
+    "right": "<pre>a\nb</pre>",
+    "equal": true
+  },
+  {
+    "name": "script content preserved",
+    "left": "<script> a  b </script>",
+    "right": "<script> a b </script>",
+    "equal": false
+  },
+  {
+    "name": "style content preserved",
+    "left": "<style> a  b </style>",
+    "right": "<style> a b </style>",
+    "equal": false
+  },
+  {
+    "name": "textarea content preserved",
+    "left": "<textarea> a  b </textarea>",
+    "right": "<textarea> a b </textarea>",
+    "equal": false
+  }
+],
+  "renames": [
+  {
+    "name": "single alias carries",
+    "html": "<section id=\"new\" data-was=\"old\"></section>",
+    "saved": [
+      "old"
+    ],
+    "expected": [
+      "new"
+    ]
+  },
+  {
+    "name": "colliding destinations preserve both old entries",
+    "html": "<section id=\"new\" data-was=\"old-a\"></section><section id=\"new\" data-was=\"old-b\"></section>",
+    "saved": [
+      "old-a",
+      "old-b"
+    ],
+    "expected": [
+      "old-a",
+      "old-b"
+    ]
+  },
+  {
+    "name": "multiple aliases from old preserve old",
+    "html": "<section id=\"new-a\" data-was=\"old\"></section><section id=\"new-b\" data-was=\"old\"></section>",
+    "saved": [
+      "old"
+    ],
+    "expected": [
+      "old"
+    ]
+  },
+  {
+    "name": "live old key wins",
+    "html": "<section id=\"old\"></section><section id=\"new\" data-was=\"old\"></section>",
+    "saved": [
+      "old"
+    ],
+    "expected": [
+      "old"
+    ]
+  },
+  {
+    "name": "saved destination wins",
+    "html": "<section id=\"new\" data-was=\"old\"></section>",
+    "saved": [
+      "old",
+      "new"
+    ],
+    "expected": [
+      "old",
+      "new"
+    ]
+  },
+  {
+    "name": "missing old entry does not carry",
+    "html": "<section id=\"new\" data-was=\"old\"></section>",
+    "saved": [],
+    "expected": []
+  },
+  {
+    "name": "independent aliases carry",
+    "html": "<section id=\"new-a\" data-was=\"old-a\"></section><section id=\"new-b\" data-was=\"old-b\"></section>",
+    "saved": [
+      "old-a",
+      "old-b"
+    ],
+    "expected": [
+      "new-a",
+      "new-b"
+    ]
+  },
+  {
+    "name": "duplicate same alias is ambiguous",
+    "html": "<section id=\"new\" data-was=\"old\"></section><section id=\"new\" data-was=\"old\"></section>",
+    "saved": [
+      "old"
+    ],
+    "expected": [
+      "old"
+    ]
+  }
+]
 }

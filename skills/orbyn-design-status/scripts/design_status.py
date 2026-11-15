@@ -81,14 +81,23 @@ def norm(text: str) -> str:
         attrs.sort(key=lambda a: a[0])
         return "<" + opening[1].lower() + "".join(" " + k + "=" + json.dumps(v, ensure_ascii=False) for k, v in attrs) + ">"
     pattern = r'''<!--[\s\S]*?(?:-->|$)|<(script|style|pre|textarea)\b(?:"[^"]*"|'[^']*'|[^'">])*?>[\s\S]*?</\1\s*>|</?[a-z][\w:-]*\b(?:"[^"]*"|'[^']*'|[^'">])*?>|[^<]+|<'''
+    visible = [m[0] for m in re.finditer(pattern, text.replace("\r\n", "\n"), re.I)
+               if not m[0].startswith("<!--")]
+    block = re.compile(r"^</?(?:address|article|aside|blockquote|div|dl|dt|dd|fieldset|figcaption|figure|footer|form|h[1-6]|header|hr|li|main|nav|ol|p|pre|section|table|tbody|td|th|thead|tr|ul)\b", re.I)
     out = []
-    for m in re.finditer(pattern, text.replace("\r\n", "\n"), re.I):
-        token = m[0]
-        if token.startswith("<!--"):
-            continue
+    for index, token in enumerate(visible):
         raw = re.fullmatch(r'''(<(script|style|pre|textarea)\b(?:"[^"]*"|'[^']*'|[^'">])*?>)([\s\S]*?)(</\2\s*>)''', token, re.I)
-        out.append(tag(raw[1]) + raw[3] + tag(raw[4]) if raw else
-                   tag(token) if token.startswith("<") else re.sub(r"\s+", " ", token).strip())
+        if raw:
+            out.append(tag(raw[1]) + raw[3] + tag(raw[4]))
+        elif token.startswith("<"):
+            out.append(tag(token))
+        else:
+            value = re.sub(r"\s+", " ", token)
+            if index == 0 or block.match(visible[index - 1]):
+                value = value.lstrip()
+            if index == len(visible) - 1 or block.match(visible[index + 1]):
+                value = value.rstrip()
+            out.append(value)
     return "".join(out)
 
 
@@ -164,6 +173,16 @@ class Git:
 def valid_branch(branch: str) -> bool:
     return bool(re.fullmatch(r"[\w./-]+", branch, re.ASCII)) and not (
         branch.startswith(("-", "/")) or branch.endswith("/") or ".." in branch)
+
+
+def split_head(head: str) -> dict | None:
+    """Designer splitHead: validate the optional fork owner independently."""
+    parts = head.split(":")
+    if len(parts) == 1:
+        return {"branch": head} if valid_branch(head) else None
+    if len(parts) == 2 and re.fullmatch(r"[\w-]+", parts[0], re.ASCII) and valid_branch(parts[1]):
+        return {"owner": parts[0], "branch": parts[1]}
+    return None
 
 
 def github_origin(url: str) -> str | None:
@@ -377,7 +396,8 @@ def carry_renames(saved: dict, frames: list[Frame]) -> dict:
     live = {f.key for f in frames}
     aliases = [(f.key, f.key.rsplit("#", 1)[0] + "#" + f.was) for f in frames if f.was]
     for key, old in aliases:
-        if old in live or key in saved or old not in saved or sum(o == old for _, o in aliases) != 1:
+        if (old in live or key in saved or old not in saved
+                or sum(o == old for _, o in aliases) != 1 or sum(k == key for k, _ in aliases) != 1):
             continue
         result[key] = saved[old]
         result.pop(old, None)
@@ -450,7 +470,8 @@ def build_facts(git: Git, gh, repo: Path, build: dict, default_branch=None) -> d
         pulls = gh.prs(repo, head=branch, state="all") if gh.available else None
     pulls = [pull_ref(p) for p in pulls] if pulls is not None else None
     current = pulls[0]["branch"] if build.get("pr") is not None and pulls else branch
-    tip = git.branch_tip(repo, current) if not (pulls and pulls[0].get("fork")) else None
+    head = split_head(current)
+    tip = git.branch_tip(repo, current) if head and not head.get("owner") and not (pulls and pulls[0].get("fork")) else None
     base = git.default_ref(repo, default_branch, gh)
     sha = build.get("sha", "")
     commits = git.run(repo, "rev-list", f"{sha}..{tip}")[1] if tip and base and re.fullmatch(r"[0-9a-f]{7,40}", sha, re.I) else ""
@@ -744,7 +765,8 @@ def record(root: Path, ident: str, branch: str, repo: str | None = None, pr: str
            git: Git | None = None, now: str | None = None, allow_missing: bool = False,
            screens: list[str] | None = None) -> dict:
     git = git or Git()
-    if not valid_branch(branch):
+    head = split_head(branch)
+    if not head:
         raise SystemExit(f"Bad branch name: {branch!r}")
     if pr is not None:
         try:
@@ -761,10 +783,10 @@ def record(root: Path, ident: str, branch: str, repo: str | None = None, pr: str
     if repo != project.get("appRepo"):
         raise SystemExit("--repo must equal the project's appRepo")
     build: dict = {"repo": repo, "branch": branch}
-    sha = git.branch_tip((root / repo).resolve(), branch)
+    sha = git.branch_tip((root / repo).resolve(), branch) if not head.get("owner") else None
     if sha:
         build["sha"] = sha
-    elif not allow_missing:
+    elif not allow_missing and not (head.get("owner") and pr is not None):
         raise SystemExit(f"Branch {branch!r} does not exist; use --allow-missing to record it anyway")
     if pr:
         build["pr"] = pr
