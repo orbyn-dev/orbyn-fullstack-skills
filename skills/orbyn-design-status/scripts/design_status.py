@@ -17,6 +17,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from urllib.parse import urlparse
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -47,6 +48,9 @@ def section_ranges(html: str) -> list[dict]:
             sid = (idm.group(1) or idm.group(2) or idm.group(3) or "") if idm else ""
             if sid and not any(stack):
                 open_ = {"id": sid, "start": m.start(), "from": m.end()}
+                was = re.search(r'''\sdata-was\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))''', m[2], re.I)
+                if was:
+                    open_["was"] = next(v for v in was.groups() if v is not None)
             stack.append(bool(sid))
         elif stack:
             had_id = stack.pop()
@@ -56,13 +60,36 @@ def section_ranges(html: str) -> list[dict]:
                 if h2:
                     title = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", "", h2.group(1)))).strip()
                 out.append({"section": open_["id"], "title": title or open_["id"],
+                            **({"was": open_["was"]} if open_.get("was") else {}),
                             "start": open_["start"], "end": m.end()})
                 open_ = None
     return out
 
 
 def norm(text: str) -> str:
-    return text.replace("\r\n", "\n").strip()
+    """Designer normalizeSection: canonical tags, significant raw/pre contents."""
+    def tag(raw):
+        if raw.startswith("</"):
+            return re.sub(r"\s+>", ">", raw.lower())
+        opening = re.match(r"<([\w:-]+)", raw)
+        if not opening:
+            return raw
+        inside = re.sub(r"/?\s*>$", "", raw[opening.end():])
+        attrs = []
+        for m in re.finditer(r'''([^\s=/>]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+)))?''', inside):
+            attrs.append((m[1].lower(), next((v for v in m.groups()[1:] if v is not None), "")))
+        attrs.sort(key=lambda a: a[0])
+        return "<" + opening[1].lower() + "".join(" " + k + "=" + json.dumps(v, ensure_ascii=False) for k, v in attrs) + ">"
+    pattern = r'''<!--[\s\S]*?(?:-->|$)|<(script|style|pre|textarea)\b(?:"[^"]*"|'[^']*'|[^'">])*?>[\s\S]*?</\1\s*>|</?[a-z][\w:-]*\b(?:"[^"]*"|'[^']*'|[^'">])*?>|[^<]+|<'''
+    out = []
+    for m in re.finditer(pattern, text.replace("\r\n", "\n"), re.I):
+        token = m[0]
+        if token.startswith("<!--"):
+            continue
+        raw = re.fullmatch(r'''(<(script|style|pre|textarea)\b(?:"[^"]*"|'[^']*'|[^'">])*?>)([\s\S]*?)(</\2\s*>)''', token, re.I)
+        out.append(tag(raw[1]) + raw[3] + tag(raw[4]) if raw else
+                   tag(token) if token.startswith("<") else re.sub(r"\s+", " ", token).strip())
+    return "".join(out)
 
 
 def section_html(html: str, section: str) -> str | None:
@@ -83,7 +110,7 @@ class Git:
     def run(self, repo, *args: str) -> tuple[int, str]:
         key = (str(repo), *args)
         if key not in self.cache:
-            env = dict(os.environ, GIT_TERMINAL_PROMPT="0")
+            env = dict(os.environ, GIT_TERMINAL_PROMPT="0", GIT_OPTIONAL_LOCKS="0", GH_PROMPT_DISABLED="1")
             try:
                 p = subprocess.run(["git", "-C", str(repo), *args], capture_output=True, env=env, timeout=60)
                 self.cache[key] = (p.returncode, p.stdout.decode("utf-8", "replace"))
@@ -102,18 +129,27 @@ class Git:
         rc, out = self.run(repo, "show", f"{ref}:{file}")
         return out if rc == 0 else None
 
-    def default_ref(self, repo) -> str | None:
+    def default_ref(self, repo, branch=None, gh=None) -> str | None:
+        _, listing = self.run(repo, "for-each-ref", "--format=%(refname)", "refs/remotes/origin/")
+        available = listing.splitlines()
+        configured = "refs/remotes/origin/" + branch if branch and valid_branch(branch) else None
+        if configured in available:
+            return configured
         rc, out = self.run(repo, "symbolic-ref", "-q", "refs/remotes/origin/HEAD")
-        if rc == 0 and out.strip():
-            ref = out.strip().replace("refs/remotes/", "", 1)
-            if self.rev(repo, ref):
-                return ref
-        for ref in ("origin/main", "origin/master"):
-            if self.rev(repo, ref):
+        ref = out.strip()
+        if rc == 0 and ref.startswith("refs/remotes/origin/") and valid_branch(ref[20:]) and ref in available:
+            return ref
+        name = gh.default_branch(repo) if gh else None
+        if name and valid_branch(name) and "refs/remotes/origin/" + name in available:
+            return "refs/remotes/origin/" + name
+        for ref in ("refs/remotes/origin/main", "refs/remotes/origin/master"):
+            if ref in available:
                 return ref
         return None
 
     def branch_tip(self, repo, branch: str) -> str | None:
+        if not valid_branch(branch):
+            return None
         return self.rev(repo, "refs/heads/" + branch) or self.rev(repo, "refs/remotes/origin/" + branch)
 
     def current_branch(self, repo) -> str | None:
@@ -123,6 +159,30 @@ class Git:
     def file_clean(self, repo, file: str) -> bool:
         rc, out = self.run(repo, "status", "--porcelain", "--", file)
         return rc == 0 and not out.strip()
+
+
+def valid_branch(branch: str) -> bool:
+    return bool(re.fullmatch(r"[\w./-]+", branch, re.ASCII)) and not (
+        branch.startswith(("-", "/")) or branch.endswith("/") or ".." in branch)
+
+
+def github_origin(url: str) -> str | None:
+    m = re.fullmatch(r"(?:https://github\.com/|git@github\.com:|ssh://git@github\.com(?::\d+)?/)([\w.-]+)/([\w.-]+?)(?:\.git)?/?", url.strip(), re.I)
+    return f"{m[1]}/{m[2]}" if m else None
+
+
+def pull_ref(raw: dict) -> dict:
+    if "branch" in raw:
+        return raw
+    out = {"number": raw.get("number", 0), "url": raw.get("url", ""), "title": raw.get("title", ""),
+           "branch": raw.get("headRefName", ""), "state": raw.get("state", "OPEN").lower()}
+    if raw.get("isCrossRepository"):
+        out.update(branch=f"{raw.get('headRepositoryOwner', {}).get('login', '')}:{out['branch']}", fork=True)
+    if raw.get("mergeCommit"):
+        out["mergeCommit"] = raw["mergeCommit"]["oid"]
+    if raw.get("mergedAt"):
+        out["mergedAt"] = raw["mergedAt"]
+    return out
 
 
 class Gh:
@@ -142,18 +202,63 @@ class Gh:
                 self._ok = False
         return self._ok
 
-    def prs(self, repo, head: str | None = None, state: str = "all") -> list[dict] | None:
-        """Pull requests as {state, url, headRefName}, or None when unavailable or failed."""
+    def query(self, repo, *args):
         if not self.available:
             return None
-        cmd = [self._exe, "pr", "list", "--state", state, "--json", "state,url,headRefName", "--limit", "100"]
-        if head:
-            cmd += ["--head", head]
         try:
-            p = subprocess.run(cmd, capture_output=True, cwd=str(repo), timeout=60)
+            p = subprocess.run([self._exe, *args], capture_output=True, cwd=str(repo), timeout=60,
+                               env=dict(os.environ, GH_PROMPT_DISABLED="1"))
             return json.loads(p.stdout.decode("utf-8", "replace")) if p.returncode == 0 else None
         except (OSError, subprocess.SubprocessError, ValueError):
             return None
+
+    def origin(self, repo):
+        return github_origin(Git().run(repo, "remote", "get-url", "origin")[1])
+
+    def default_branch(self, repo):
+        origin = self.origin(repo)
+        value = self.query(repo, "repo", "view", origin, "--json", "defaultBranchRef") if origin else None
+        ref = value.get("defaultBranchRef") if isinstance(value, dict) else None
+        return ref.get("name") if isinstance(ref, dict) else None
+
+    def prs(self, repo, head=None, state="all", pr=None):
+        origin = self.origin(repo)
+        if not origin:
+            return None
+        fields = "number,url,title,headRefName,state,mergedAt,mergeCommit,isCrossRepository,headRepositoryOwner"
+        if pr is not None:
+            number = str(pr) if re.fullmatch(r"\d+", str(pr)) else (re.search(r"/pull/(\d+)/?$", str(pr)) or [None, None])[1]
+            if not number or not re.fullmatch(r"[1-9]\d*", number):
+                return None
+            if str(pr).startswith("https:") and not str(pr).lower().startswith(f"https://github.com/{origin}/pull/".lower()):
+                return None
+            raw = self.query(repo, "pr", "view", number, "--repo", origin, "--json", fields)
+            return [pull_ref(raw)] if isinstance(raw, dict) else None
+        if state == "open":
+            result = []
+            page = 1
+            while True:
+                raw = self.query(repo, "api", f"repos/{origin}/pulls?state=open&per_page=100&page={page}")
+                if not isinstance(raw, list):
+                    return None
+                for p in raw:
+                    fork = not p["head"].get("repo") or p["head"]["repo"]["full_name"].lower() != p["base"]["repo"]["full_name"].lower()
+                    result.append(pull_ref({"number": p["number"], "url": p["html_url"], "title": p["title"],
+                        "headRefName": p["head"]["ref"], "state": p["state"].upper(), "isCrossRepository": fork,
+                        "headRepositoryOwner": p["head"]["user"], "mergedAt": p.get("merged_at"),
+                        "mergeCommit": {"oid": p["merge_commit_sha"]} if p.get("merge_commit_sha") else None}))
+                if len(raw) < 100:
+                    return result
+                page += 1
+        args = ["pr", "list", "--state", state, "--repo", origin, "--json", fields, "--limit", "100"]
+        if head:
+            args += ["--head", head]
+        raw = self.query(repo, *args)
+        return [pull_ref(p) for p in raw if not head or pull_ref(p)["branch"] == head] if isinstance(raw, list) else None
+
+    def runs(self, repo, workflow, branch):
+        return self.query(repo, "run", "list", "--workflow", workflow, "--branch", branch,
+                          "--status", "success", "--json", "headSha", "--limit", "100")
 
 
 # ---------------------------------------------------------------- projects and frames
@@ -166,6 +271,7 @@ class Frame:
     title: str
     file: str
     repo: Path  # resolved source repo
+    was: str | None = None
 
 
 def load_projects(root: Path) -> list[dict]:
@@ -188,13 +294,43 @@ def status_path(root: Path, key: str) -> Path:
     return root / "workspace" / "status" / f"{key}.json"
 
 
+def migrate_frame(raw) -> dict:
+    if not isinstance(raw, dict):
+        return {}
+    out = {}
+    if isinstance(raw.get("group"), str):
+        out["group"] = raw["group"]
+    if raw.get("planned") is True or raw.get("status") == "planned":
+        out["planned"] = True
+    b = raw.get("build")
+    if isinstance(b, dict) and isinstance(b.get("repo"), str) and isinstance(b.get("branch"), str):
+        out["build"] = {"repo": b["repo"], "branch": b["branch"],
+                        "recorded": b.get("recorded") if isinstance(b.get("recorded"), str) else ""}
+        for key in ("sha", "pr"):
+            if isinstance(b.get(key), str) or (key == "pr" and type(b.get(key)) in (int, float)):
+                out["build"][key] = b[key]
+        if isinstance(b.get("screens"), list):
+            out["build"]["screens"] = [s for s in b["screens"] if isinstance(s, str)]
+    evidence = raw.get("evidence")
+    markers = raw.get("markers") if isinstance(raw.get("markers"), list) else evidence.get("paths", []) if isinstance(evidence, dict) else []
+    clean = [m for m in markers if isinstance(m, str)] if isinstance(markers, list) else []
+    if clean:
+        out["markers"] = clean
+    legacy = raw.get("legacy") if raw.get("legacy") is not None else raw.get("status")
+    if "build" not in out and legacy in ("building", "implemented"):
+        out["legacy"] = legacy
+    return out
+
+
 def load_status(root: Path, key: str) -> dict:
     path = status_path(root, key)
     if not path.is_file():
         return {"groups": [], "frames": {}}
     data = json.loads(path.read_text(encoding="utf-8"))
-    data.setdefault("frames", {})
-    return data
+    data = data if isinstance(data, dict) else {}
+    frames = data.get("frames") if isinstance(data.get("frames"), dict) else {}
+    return {"groups": data.get("groups") if isinstance(data.get("groups"), list) else [],
+            "frames": {k: entry for k, v in frames.items() if (entry := migrate_frame(v))}}
 
 
 def write_status(root: Path, key: str, data: dict) -> None:
@@ -232,8 +368,20 @@ def frames_of(root: Path, project: dict) -> list[Frame]:
             html = path.read_text(encoding="utf-8", errors="replace")
             for r in section_ranges(html):
                 out.append(Frame(f"{repo.name}:{file}#{r['section']}", project["key"], r["section"],
-                                 r["title"], file, repo))
+                                 r["title"], file, repo, r.get("was")))
     return out
+
+
+def carry_renames(saved: dict, frames: list[Frame]) -> dict:
+    result = dict(saved)
+    live = {f.key for f in frames}
+    aliases = [(f.key, f.key.rsplit("#", 1)[0] + "#" + f.was) for f in frames if f.was]
+    for key, old in aliases:
+        if old in live or key in saved or old not in saved or sum(o == old for _, o in aliases) != 1:
+            continue
+        result[key] = saved[old]
+        result.pop(old, None)
+    return result
 
 
 def resolve_frame(root: Path, ident: str) -> tuple[dict, Frame]:
@@ -262,80 +410,135 @@ def resolve_frame(root: Path, ident: str) -> tuple[dict, Frame]:
 
 # ---------------------------------------------------------------- build state
 
-def build_state(git: Git, gh, repo: Path, build: dict | None, legacy: str | None) -> tuple[str, str]:
-    """Rules 1 to 6 of the contract. Returns (state, short evidence text)."""
+def build_state(frame: dict, facts: dict | None = None) -> dict:
+    """Pure Designer buildState rules 1 to 6; null pulls mean unverified."""
+    build = frame.get("build")
     if not build:
-        return ("check", f"hand tag '{legacy}' with no branch recorded") if legacy else ("none", "")
+        return {"state": "check", "reason": f"Tagged {'Implemented' if frame['legacy'] == 'implemented' else 'Building'} by hand, with no branch. Record a branch or clear it."} if frame.get("legacy") else {"state": "none"}
+    facts = facts or {}
+    pulls = facts.get("pulls")
+    merged = next((p for p in pulls or [] if p["state"] == "merged"), None)
+    opened = next((p for p in pulls or [] if p["state"] == "open"), None)
+    tip, sha = facts.get("tip"), build.get("sha")
+    own = tip and sha and not (tip.startswith(sha) or sha.startswith(tip)) and facts.get("onDefault") and facts.get("ownCommits")
+    if own or merged:
+        out = {"state": "implemented", "reason": "Branch merged into main" if own else "Pull request merged"}
+        if merged:
+            out["pr"] = merged
+            if merged.get("mergedAt"):
+                out["merged"] = merged["mergedAt"]
+        return out
+    if opened:
+        return {"state": "building", "reason": "Pull request open", "pr": opened}
+    if tip:
+        return {"state": "building", "reason": "Branch not merged yet"}
+    closed = next((p for p in pulls or [] if p["state"] == "closed"), None)
+    if closed:
+        return {"state": "check", "reason": f"Branch gone and pull request #{closed['number']} closed without a merge", "pr": closed}
+    return {"state": "check", "reason": "unverified" if pulls is None else "Branch deleted without a merge"}
+
+
+def has_own_commits(commits: str, first_parent: str) -> bool:
+    return bool(commits.strip() and first_parent.strip() and set(commits.split()) - set(first_parent.split()))
+
+
+def build_facts(git: Git, gh, repo: Path, build: dict, default_branch=None) -> dict:
     branch = build["branch"]
-    if not repo.is_dir():
-        return "check", f"app repo not found: {build.get('repo', repo)}"
-    default = git.default_ref(repo)
-    tip = git.branch_tip(repo, branch)
-    exists = tip is not None
-    # A freshly cut branch is also an ancestor of main, so rule 3 needs a recorded sha the tip has moved past.
-    if tip and build.get("sha") and tip != build["sha"] and default and git.is_ancestor(repo, tip, default):
-        return "implemented", f"{branch} merged into {default}"
-    prs = gh.prs(repo, head=branch, state="all") if gh.available else None
-    mine = [pr for pr in prs or [] if pr.get("headRefName", branch) == branch]
-    for pr in mine:
-        if pr.get("state") == "MERGED":
-            return "implemented", f"{branch} merged by pull request {pr.get('url', '')}".strip()
-    for pr in mine:
-        if pr.get("state") == "OPEN":
-            return "building", f"{branch} has open pull request {pr.get('url', '')}".strip()
-    if exists:
-        return "building", f"{branch} exists, not merged"
-    return "check", f"{branch} is gone and no merged pull request was found"
+    if build.get("pr") is not None:
+        pulls = gh.prs(repo, pr=build["pr"]) if gh.available else None
+    else:
+        pulls = gh.prs(repo, head=branch, state="all") if gh.available else None
+    pulls = [pull_ref(p) for p in pulls] if pulls is not None else None
+    current = pulls[0]["branch"] if build.get("pr") is not None and pulls else branch
+    tip = git.branch_tip(repo, current) if not (pulls and pulls[0].get("fork")) else None
+    base = git.default_ref(repo, default_branch, gh)
+    sha = build.get("sha", "")
+    commits = git.run(repo, "rev-list", f"{sha}..{tip}")[1] if tip and base and re.fullmatch(r"[0-9a-f]{7,40}", sha, re.I) else ""
+    first = git.run(repo, "rev-list", "--first-parent", base)[1] if sha and tip and base else ""
+    return {"tip": tip, "onDefault": bool(tip and base and git.is_ancestor(repo, tip, base)),
+            "ownCommits": has_own_commits(commits, first), "pulls": pulls,
+            **({"renamedBranch": current} if current != branch else {})}
 
 
-# ---------------------------------------------------------------- design state
-
-def design_state(git: Git, repo: Path, file: str, section: str, planned: bool,
-                 open_branches: list[str]) -> str:
-    """Rules 1 to 5 of the contract for one frame (rule 5's extra frames are found separately)."""
+def design_state(section: str, planned: bool, versions: dict) -> dict:
+    """Pure Designer designState rules 1 to 5; maps are JSON objects."""
+    v = versions
+    extra = {"sharedStylesChanged": True} if v.get("sharedStylesChanged") else {}
     if planned:
-        return "planned"
+        return {"state": "planned", **extra}
+    work = v["work"].get(section)
+    if (work is not None and v["main"].get(section) == work) or (not v["dirty"] and v["behind"] and section in v["main"]):
+        return {"state": "published", **({"sha": v["mainSha"]} if v.get("mainSha") else {}),
+                **({"date": v["mainDate"]} if v.get("mainDate") else {}), **extra}
+    match = next((p for p in v["pulls"] if work is not None and p["sections"].get(section) == work), None)
+    if match is None and not v["dirty"]:
+        match = next((p for p in v["pulls"] if p["pr"]["branch"] == v.get("branch")), None)
+    where = {"dirty": True} if v["dirty"] else {}
+    if match:
+        return {"state": "publishing", "branch": match["pr"]["branch"], "pr": match["pr"], **where, **extra}
+    return {"state": "designed", **({"branch": v["branch"]} if v.get("branch") else {}), **where, **extra}
+
+
+def section_map(html: str | None) -> dict:
+    return {r["section"]: norm(html[r["start"]:r["end"]]) for r in section_ranges(html or "")}
+
+
+def gather_design(git: Git, gh, repo: Path, file: str, section: str, planned: bool,
+                  pulls: list[dict], default_branch=None) -> dict:
     path = repo / file
-    working = section_html(path.read_text(encoding="utf-8", errors="replace"), section) if path.is_file() else None
-    default = git.default_ref(repo)
-    if default:
-        remote = git.show(repo, default, file)
-        if working is not None and remote is not None and section_html(remote, section) == working:
-            return "published"
-        if git.file_clean(repo, file) and git.rev(repo, "HEAD") and git.is_ancestor(repo, "HEAD", default):
-            return "published"
-    for branch in open_branches:
-        ref = f"origin/{branch}" if git.rev(repo, f"origin/{branch}") else branch
-        theirs = git.show(repo, ref, file)
-        if working is not None and theirs is not None and section_html(theirs, section) == working:
-            return "publishing"
-        if git.current_branch(repo) == branch and git.file_clean(repo, file):
-            return "publishing"
-    return "designed"
+    work = section_map(path.read_text(encoding="utf-8", errors="replace") if path.is_file() else None)
+    base = git.default_ref(repo, default_branch, gh)
+    main = section_map(git.show(repo, base, file) if base else None)
+    versions = {"work": work, "main": main, "pulls": [], "dirty": not git.file_clean(repo, file),
+                "behind": bool(base and git.is_ancestor(repo, "HEAD", base)), "branch": git.current_branch(repo)}
+    if base:
+        log = git.run(repo, "log", "-1", "--format=%h %cI", base, "--", file)[1].strip().split()
+        if len(log) == 2:
+            versions.update(mainSha=log[0], mainDate=log[1])
+        folder = str(Path(file).parent).replace("\\", "/")
+        changed = git.run(repo, "diff", "--name-only", "-z", base, "--", folder)[1]
+        changed += "\0" + git.run(repo, "ls-files", "--others", "--exclude-standard", "-z", "--", folder)[1]
+        versions["sharedStylesChanged"] = any(Path(p).suffix.lower() in (".css", ".js") and str(Path(p).parent).replace("\\", "/") == folder for p in changed.split("\0") if p)
+    for raw in pulls:
+        pr = pull_ref(raw)
+        if pr.get("fork") or not valid_branch(pr["branch"]):
+            continue
+        ref = "refs/remotes/origin/" + pr["branch"]
+        changed = git.run(repo, "diff", "--name-only", "-z", f"{base}...{ref}", "--")[1] if base else ""
+        if file not in changed.split("\0"):
+            continue
+        html = git.show(repo, ref, file)
+        if html is not None:
+            versions["pulls"].append({"pr": pr, "sections": section_map(html)})
+    return design_state(section, planned, versions)
 
 
-def extra_frames(git: Git, root: Path, project: dict, known: set[str], prs_by_repo: dict) -> list[dict]:
+def extra_frames(git: Git, root: Path, project: dict, known: set[str], prs_by_repo: dict, gh=None) -> list[dict]:
     """Sections that exist only on an open pull request branch."""
     out: dict[str, dict] = {}
     for source in project.get("sources", []):
         repo = (root / source["repo"]).resolve()
         for pr in prs_by_repo.get(str(repo), []):
-            branch = pr.get("headRefName")
-            if not branch:
+            pr = pull_ref(pr)
+            branch = pr.get("branch")
+            if not branch or pr.get("fork") or not valid_branch(branch):
                 continue
-            ref = f"origin/{branch}" if git.rev(repo, f"origin/{branch}") else branch
+            ref = "refs/remotes/origin/" + branch
             if not git.rev(repo, ref):
                 continue
+            base = git.default_ref(repo, project.get("defaultBranch"), gh)
+            changed = git.run(repo, "diff", "--name-only", "-z", f"{base}...{ref}", "--")[1].split("\0") if base else []
             files = []
             if source.get("artifact"):
                 files.append(source["artifact"])
             if source.get("dir"):
                 d = source["dir"].rstrip("/")
-                rc, listing = git.run(repo, "ls-tree", "--name-only", ref, d + "/")
+                rc, listing = git.run(repo, "ls-tree", "--name-only", "-r", ref, "--", d + "/")
                 if rc == 0:
-                    files += [f for f in listing.split("\n") if f.lower().endswith(".html")
-                              and "/" not in f[len(d) + 1:]]
+                    files += [f for f in listing.split("\n") if f.lower().endswith(".html")]
             for file in files:
+                if file not in changed:
+                    continue
                 for r in section_ranges(git.show(repo, ref, file) or ""):
                     key = f"{repo.name}:{file}#{r['section']}"
                     if key not in known and key not in out:
@@ -380,6 +583,58 @@ def scan_markers(git: Git, repo: Path) -> list[tuple[str, str]]:
     return found
 
 
+def confirmed_markers(git: Git, repo: Path, sha: str, key: str, short: str | None) -> list[str]:
+    needles = [key] + (["design: " + short] if short else [])
+    args = [a for needle in needles for a in ("-e", needle)]
+    _, output = git.run(repo, "grep", "-n", "-I", "-F", *args, sha, "--")
+    found = []
+    for line in output.splitlines():
+        m = re.match(r"^(.*?):(\d+):(.*)$", line[len(sha) + 1:])
+        if m and any(re.search(r'''(?:^|[\s'"`*(>])''' + re.escape(n) + r'''(?=$|[\s'"`*<>),;])''', m[3]) for n in needles):
+            found.append(f"{m[1]}:{m[2]}")
+    return list(dict.fromkeys(found))
+
+
+def matches_tag(tag: str, pattern: str) -> bool:
+    """Designer shell-style tag globs, including invalid-class failure."""
+    source, i = "^", 0
+    while i < len(pattern):
+        c = pattern[i]
+        end = pattern.find("]", i + 1)
+        if c == "*":
+            source += ".*"
+        elif c == "?":
+            source += "."
+        elif c == "[" and end > i + 1:
+            chars = pattern[i + 1:end]
+            chars = "^" + chars[1:] if chars.startswith("!") else "\\^" + chars[1:] if chars.startswith("^") else chars
+            source += "[" + chars.replace("\\", "\\\\") + "]"
+            i = end
+        else:
+            source += re.escape(c)
+        i += 1
+    try:
+        return bool(re.fullmatch(source + "$", tag))
+    except re.error:
+        return False
+
+
+def shipped(git: Git, gh, repo: Path, merge: str, project: dict, base: str | None) -> bool:
+    pattern = project.get("releaseTagPattern")
+    if pattern:
+        tags = git.run(repo, "tag", "--contains", merge)[1]
+        if any(matches_tag(t, pattern) for t in tags.splitlines() if t):
+            return True
+    if project.get("deployWorkflow") and base:
+        branch = re.sub(r"^refs/(remotes/origin|heads)/", "", base)
+        runs = gh.runs(repo, project["deployWorkflow"], branch)
+        for run in runs or []:
+            sha = run.get("headSha")
+            if isinstance(sha, str) and re.fullmatch(r"[0-9a-f]{40}", sha, re.I) and git.is_ancestor(repo, merge, sha):
+                return True
+    return False
+
+
 # ---------------------------------------------------------------- check
 
 def check(root: Path, project_key: str | None = None, git: Git | None = None, gh=None) -> dict:
@@ -391,39 +646,64 @@ def check(root: Path, project_key: str | None = None, git: Git | None = None, gh
         notes.append(GH_MISSING)
     result = {"designer": str(root), "projects": [], "notes": notes}
     for project in projects:
-        saved = load_status(root, project["key"])["frames"]
         frames = frames_of(root, project)
-        prs_by_repo: dict[str, list[dict]] = {}
+        saved = carry_renames(load_status(root, project["key"])["frames"], frames)
+        prs_by_repo = {}
         for source in project.get("sources", []):
             repo = (root / source["repo"]).resolve()
             if str(repo) not in prs_by_repo:
                 prs = gh.prs(repo, state="open") if gh.available else None
-                prs_by_repo[str(repo)] = [p for p in prs or [] if p.get("state", "OPEN") == "OPEN"]
+                if prs is None:
+                    notes.append(f"{project['key']}: pull request lookup unverified for {repo}")
+                prs_by_repo[str(repo)] = [pull_ref(p) for p in prs or [] if pull_ref(p)["state"] == "open"]
         app = (root / project["appRepo"]).resolve() if project.get("appRepo") else None
-        markers = scan_markers(git, app) if app and app.is_dir() else []
-        counts: dict[str, int] = {}
+        base = git.default_ref(app, project.get("defaultBranch"), gh) if app else None
+        default_sha = git.rev(app, base) if base else None
+        suggestions = scan_markers(git, app) if app and app.is_dir() else []
+        counts = {}
         for f in frames:
-            counts[f.section] = counts.get(f.section, 0) + 1
+            counts.setdefault(f.section, set()).add(f.key)
+        # A short marker must be unique across local and PR-only frames.
+        extra = extra_frames(git, root, project, {f.key for f in frames}, prs_by_repo, gh)
+        for f in extra:
+            counts.setdefault(f["key"].rsplit("#", 1)[1], set()).add(f["key"])
         rows = []
         for f in frames:
             entry = saved.get(f.key, {})
-            branches = [p["headRefName"] for p in prs_by_repo.get(str(f.repo), []) if p.get("headRefName")]
-            design = design_state(git, f.repo, f.file, f.section, bool(entry.get("planned")), branches)
-            build, evidence = "none", ""
-            if app:
-                build, evidence = build_state(git, gh, app, entry.get("build"), entry.get("legacy"))
+            design = gather_design(git, gh, f.repo, f.file, f.section, bool(entry.get("planned")),
+                                   prs_by_repo.get(str(f.repo), []), project.get("defaultBranch"))
+            facts = None
+            build = entry.get("build")
+            if build and build["repo"] == project.get("appRepo"):
+                # Never substitute the project's repo for the one the record names.
+                facts = build_facts(git, gh, (root / build["repo"]).resolve(), build, project.get("defaultBranch"))
+            info = build_state(entry, facts)
+            if build and (facts is None or facts["pulls"] is None):
+                notes.append(f"{project['key']}/{f.section}: GitHub merge evidence unverified")
+            if facts and facts.get("renamedBranch"):
+                info["renamedBranch"] = facts["renamedBranch"]
             ident = f"{project['key']}/{f.section}"
-            mine = sorted({loc for tok, loc in markers if tok in (ident, f.key)})
-            rows.append({"key": f.key, "id": ident if counts[f.section] == 1 else f.key, "title": f.title,
-                         "design": design, "build": build, "evidence": evidence,
-                         "buildEvidence": entry.get("build"), "markers": mine})
-        extra = extra_frames(git, root, project, {f.key for f in frames}, prs_by_repo)
+            short = ident if len(counts[f.section]) == 1 else None
+            markers = confirmed_markers(git, app, default_sha, f.key, short) if info["state"] == "implemented" and app and default_sha else []
+            if info["state"] == "implemented":
+                info["unconfirmed"] = not markers
+                merged = next((p for p in (facts or {}).get("pulls") or [] if p["state"] == "merged"), {})
+                merge = merged.get("mergeCommit") or (facts.get("tip") if facts and facts["onDefault"] else None)
+                if app and merge and shipped(git, gh, app, merge, project, base):
+                    info["state"] = "shipped"
+            mine = sorted({loc for tok, loc in suggestions if tok == f.key or (short and tok == short)})
+            rows.append({"key": f.key, "id": short or f.key, "title": f.title,
+                         "design": design["state"], "designInfo": design,
+                         "build": info["state"], "buildInfo": info, "evidence": info.get("reason", ""),
+                         "buildEvidence": build, "screens": build.get("screens", []) if build else [],
+                         "markers": markers, "suggestedMarkers": mine,
+                         **({"unconfirmed": info["unconfirmed"]} if "unconfirmed" in info else {})})
         if app is None:
             notes.append(f"{project['key']}: no appRepo, build state not tracked")
         elif not app.is_dir():
             notes.append(f"{project['key']}: app repo not found at {project['appRepo']}")
-        elif not git.default_ref(app):
-            notes.append(f"{project['key']}: no origin/HEAD, origin/main or origin/master in {project['appRepo']}")
+        elif not base:
+            notes.append(f"{project['key']}: app default branch not found")
         result["projects"].append({"key": project["key"], "appRepo": project.get("appRepo"),
                                    "frames": rows, "extra": extra})
     return result
@@ -441,8 +721,14 @@ def render_markdown(result: dict) -> str:
                   "| Frame | Design | Build | Evidence |", "| --- | --- | --- | --- |"]
         for r in p["frames"]:
             ev = r["evidence"]
+            if r.get("unconfirmed"):
+                ev += "; unconfirmed: no marker on default branch"
+            if r.get("screens"):
+                ev += "; screens: " + ", ".join(r["screens"])
             if r["markers"]:
-                ev = (ev + "; " if ev else "") + "suggested markers: " + ", ".join(r["markers"])
+                ev = (ev + "; " if ev else "") + "markers: " + ", ".join(r["markers"])
+            if r.get("suggestedMarkers") and not r["markers"]:
+                ev = (ev + "; " if ev else "") + "suggested markers: " + ", ".join(r["suggestedMarkers"])
             lines.append(f"| {r['id']} | {r['design']} | {r['build'] if r['build'] != 'none' else ''} | {ev} |")
         for r in p["extra"]:
             lines.append(f"| {r['id']} (on branch only) | publishing | | {r['branch']} {r['pr'] or ''} |")
@@ -455,22 +741,38 @@ def render_markdown(result: dict) -> str:
 # ---------------------------------------------------------------- record and clear
 
 def record(root: Path, ident: str, branch: str, repo: str | None = None, pr: str | None = None,
-           git: Git | None = None, now: str | None = None) -> dict:
+           git: Git | None = None, now: str | None = None, allow_missing: bool = False,
+           screens: list[str] | None = None) -> dict:
     git = git or Git()
-    if not branch.strip() or branch.startswith("-"):
+    if not valid_branch(branch):
         raise SystemExit(f"Bad branch name: {branch!r}")
+    if pr is not None:
+        try:
+            url = urlparse(str(pr))
+            valid_pr = re.fullmatch(r"\d+", str(pr)) or (url.scheme == "https" and url.netloc)
+        except ValueError:
+            valid_pr = False
+        if not valid_pr:
+            raise SystemExit("--pr must be an https URL or a number")
     project, frame = resolve_frame(root, ident)
     repo = repo or project.get("appRepo")
     if not repo:
-        raise SystemExit(f"Project {project['key']} has no appRepo; pass --repo")
+        raise SystemExit(f"Project {project['key']} has no appRepo")
+    if repo != project.get("appRepo"):
+        raise SystemExit("--repo must equal the project's appRepo")
     build: dict = {"repo": repo, "branch": branch}
     sha = git.branch_tip((root / repo).resolve(), branch)
     if sha:
         build["sha"] = sha
+    elif not allow_missing:
+        raise SystemExit(f"Branch {branch!r} does not exist; use --allow-missing to record it anyway")
     if pr:
         build["pr"] = pr
+    if screens is not None:
+        build["screens"] = screens
     build["recorded"] = now or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     data = load_status(root, project["key"])
+    data["frames"] = carry_renames(data["frames"], frames_of(root, project))
     entry = data["frames"].setdefault(frame.key, {})
     entry["build"] = build
     entry.pop("legacy", None)
@@ -481,12 +783,12 @@ def record(root: Path, ident: str, branch: str, repo: str | None = None, pr: str
 def clear(root: Path, ident: str) -> dict:
     project, frame = resolve_frame(root, ident)
     data = load_status(root, project["key"])
+    data["frames"] = carry_renames(data["frames"], frames_of(root, project))
     entry = data["frames"].get(frame.key, {})
     removed = [k for k in ("build", "legacy") if entry.pop(k, None) is not None]
     if not entry:
         data["frames"].pop(frame.key, None)
-    if removed:
-        write_status(root, project["key"], data)
+    write_status(root, project["key"], data)
     return {"project": project["key"], "key": frame.key, "removed": removed}
 
 
@@ -505,6 +807,8 @@ def main(argv: list[str] | None = None, gh=None) -> int:
     r.add_argument("--branch", required=True)
     r.add_argument("--repo")
     r.add_argument("--pr")
+    r.add_argument("--allow-missing", action="store_true")
+    r.add_argument("--screens", nargs="+", help="frame keys or short ids implemented by this branch")
     x = sub.add_parser("clear", help="remove recorded build evidence and legacy tag for a frame")
     x.add_argument("--designer", required=True, type=Path)
     x.add_argument("--frame", required=True)
@@ -515,7 +819,8 @@ def main(argv: list[str] | None = None, gh=None) -> int:
         sys.stdout.write(json.dumps(result, indent=2, ensure_ascii=False) + "\n" if args.json
                          else render_markdown(result))
     elif args.cmd == "record":
-        out = record(root, args.frame, args.branch, args.repo, args.pr)
+        out = record(root, args.frame, args.branch, args.repo, args.pr,
+                     allow_missing=args.allow_missing, screens=args.screens)
         print(f"Recorded {out['build']['branch']} for {out['key']} in workspace/status/{out['project']}.json")
     else:
         out = clear(root, args.frame)

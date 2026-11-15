@@ -42,10 +42,18 @@ class FakeGh:
         self.available = available
         self._prs = prs or []
 
-    def prs(self, repo, head=None, state="all"):
+    def default_branch(self, repo):
+        return None
+
+    def runs(self, repo, workflow, branch):
+        return [] if self.available else None
+
+    def prs(self, repo, head=None, state="all", pr=None):
         if not self.available:
             return None
         out = [p for p in self._prs if head is None or p["headRefName"] == head]
+        if pr is not None:
+            out = [p for p in out if str(p.get("number")) == str(pr) or p.get("url") == pr]
         return [p for p in out if state == "all" or p["state"].lower() == state]
 
 
@@ -148,12 +156,28 @@ class BuildStateTests(Fixture):
     def test_branch_merged_into_default_is_implemented(self):
         base = git(self.app, "rev-parse", "main")
         self.branch("feat/p-one")
-        git(self.app, "merge", "-q", "--ff-only", "feat/p-one")
+        git(self.app, "merge", "-q", "--no-ff", "feat/p-one", "-m", "Merge feature")
         set_origin_main(self.app)
         self.set_status({self.key(): {"build": self.build(sha=base)}})
         row = self.frame()[0]
         self.assertEqual(row["build"], "implemented")
-        self.assertIn("merged into origin/main", row["evidence"])
+        self.assertIn("Branch merged into main", row["evidence"])
+
+    def test_branch_only_updated_from_main_stays_building(self):
+        base = git(self.app, "rev-parse", "main")
+        git(self.app, "branch", "feat/p-one")
+        (self.app / "main-only.txt").write_text("main", encoding="utf-8")
+        commit_all(self.app, "main-only")
+        git(self.app, "branch", "-f", "feat/p-one", "main")
+        set_origin_main(self.app)
+        self.set_status({self.key(): {"build": self.build(sha=base)}})
+        self.assertEqual(self.frame()[0]["build"], "building")
+
+    def test_recorded_sha_prefix_equal_to_tip_stays_building(self):
+        git(self.app, "branch", "feat/p-one")
+        sha = git(self.app, "rev-parse", "feat/p-one")
+        self.set_status({self.key(): {"build": self.build(sha=sha[:7])}})
+        self.assertEqual(self.frame()[0]["build"], "building")
 
     def test_missing_sha_never_counts_as_merged(self):
         self.branch("feat/p-one")
@@ -193,8 +217,8 @@ class BuildStateTests(Fixture):
 
     def test_markers_are_suggested(self):
         row, _ = self.frame("one")
-        self.assertEqual(row["markers"], ["src/a.ts:1"])
-        self.assertEqual(self.frame("two")[0]["markers"], [])
+        self.assertEqual(row["suggestedMarkers"], ["src/a.ts:1"])
+        self.assertEqual(self.frame("two")[0]["suggestedMarkers"], [])
 
 
 class DesignStateTests(Fixture):
@@ -244,6 +268,7 @@ class DesignStateTests(Fixture):
         git(self.designs, "checkout", "-q", "-b", "design/y")
         self.edit("y")
         commit_all(self.designs, "y")
+        git(self.designs, "update-ref", "refs/remotes/origin/design/y", "design/y")
         prs = [{"headRefName": "design/y", "state": "OPEN", "url": "u"}]
         self.assertEqual(self.state(gh=FakeGh(True, prs)), "publishing")
 
@@ -251,6 +276,7 @@ class DesignStateTests(Fixture):
         git(self.designs, "checkout", "-q", "-b", "design/z")
         self.file.write_text(page(("one", "One"), ("two", "Two"), ("three", "Three")), encoding="utf-8", newline="\n")
         commit_all(self.designs, "three")
+        git(self.designs, "update-ref", "refs/remotes/origin/design/z", "design/z")
         git(self.designs, "checkout", "-q", "main")
         prs = [{"headRefName": "design/z", "state": "OPEN", "url": "https://example.test/pr/3"}]
         _, result = self.frame(gh=FakeGh(True, prs))
@@ -287,9 +313,28 @@ class RecordClearTests(Fixture):
         self.assertEqual(data["frames"][self.key("two")], before["frames"][self.key("two")])
 
     def test_record_without_existing_branch_omits_sha_and_creates_the_file(self):
-        ds.record(self.root, "p/two", "feat/not-yet", now="2026-11-15T10:00:00Z")
+        ds.record(self.root, "p/two", "feat/not-yet", now="2026-11-15T10:00:00Z", allow_missing=True)
         entry = json.loads(self.status.read_text(encoding="utf-8"))["frames"][self.key("two")]
         self.assertEqual(entry["build"], {"repo": "../app", "branch": "feat/not-yet", "recorded": "2026-11-15T10:00:00Z"})
+
+    def test_record_refuses_missing_branch(self):
+        with self.assertRaisesRegex(SystemExit, "does not exist"):
+            ds.record(self.root, "p/one", "feat/missing")
+        self.assertFalse(self.status.exists())
+
+    def test_record_rejects_invalid_branch_and_pr(self):
+        for branch in ("-bad", "feature/../other", "bad branch", "bad;cmd"):
+            with self.subTest(branch=branch), self.assertRaises(SystemExit):
+                ds.record(self.root, "p/one", branch, allow_missing=True)
+        for pr in ("http://example.test/1", "file:///tmp/pr", "abc"):
+            with self.subTest(pr=pr), self.assertRaises(SystemExit):
+                ds.record(self.root, "p/one", "feat/p-one", pr=pr, allow_missing=True)
+        self.assertFalse(self.status.exists())
+
+    def test_record_rejects_repo_other_than_app_repo(self):
+        with self.assertRaisesRegex(SystemExit, "appRepo"):
+            ds.record(self.root, "p/one", "feat/p-one", repo="../designs", allow_missing=True)
+        self.assertFalse(self.status.exists())
 
     def test_clear_removes_empty_entry_and_legacy(self):
         self.set_status({self.key(): {"legacy": "implemented"}})
@@ -297,7 +342,7 @@ class RecordClearTests(Fixture):
         self.assertEqual(json.loads(self.status.read_text(encoding="utf-8"))["frames"], {})
 
     def test_full_key_works(self):
-        ds.record(self.root, self.key("two"), "feat/q")
+        ds.record(self.root, self.key("two"), "feat/q", allow_missing=True)
         self.assertIn(self.key("two"), json.loads(self.status.read_text(encoding="utf-8"))["frames"])
 
     def test_ambiguous_short_id_lists_candidates(self):
@@ -314,7 +359,7 @@ class RecordClearTests(Fixture):
         self.assertIn("designs:artifacts/p.html#one", msg)
         self.assertIn("more:a/q.html#one", msg)
         self.assertFalse(self.status.exists())
-        ds.record(self.root, "more:a/q.html#one", "feat/x")  # full key resolves it
+        ds.record(self.root, "more:a/q.html#one", "feat/x", allow_missing=True)  # full key resolves it
         self.assertIn("more:a/q.html#one", json.loads(self.status.read_text(encoding="utf-8"))["frames"])
 
     def test_unknown_frame_lists_candidates(self):
