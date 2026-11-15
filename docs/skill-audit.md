@@ -407,6 +407,7 @@ to their owner instead of duplicating a complete workflow.
 | [orbyn-mcp-builder](../skills/orbyn-mcp-builder/SKILL.md) | New; bundled pinned Anthropic source | Service, tools and language → MCP server, tool contracts and evaluation questions | Paid evaluations need approval; no live host trial |
 | [orbyn-astryx](../skills/orbyn-astryx/SKILL.md) | New; bundled pinned Astryx agent docs | Astryx project, page or theme request → Template-based page, token theme and render check | Live CLI runs need an installed project; no host trial |
 | [orbyn-affectui](../skills/orbyn-affectui/SKILL.md) | New; bundled pinned affectUI free items | React agent UI need → Reviewed component copied, restyled to tokens, fed real state | No live render trial; Pro items not available |
+| [orbyn-design-status](../skills/orbyn-design-status/SKILL.md) | New; original method | Orbyn Designer frame, design and build status question → Read-only check, then record or clear after a yes | Real GitHub CLI and Designer app not exercised; fixtures use temporary git repos |
 | [orbyn-seo](../skills/orbyn-seo/SKILL.md) | New; original method with reviewed seo-skills ideas | Site, money pages and the visibility question → Audit with evidence, link graph, redirect check and fixes | No live crawl or search-console trial; rankings unverified |
 
 The consumer integration check also caught two new links to a public-only root
