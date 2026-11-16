@@ -17,6 +17,7 @@ from pathlib import Path, PurePosixPath
 import re
 import subprocess
 import sys
+import time
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from pr_gate import ALLOWED_LICENCE, OTHER_LICENCE
@@ -37,6 +38,9 @@ COMPARE_FILE_LIMIT = 300  # The API lists at most this many, on the first page o
 SHOWN_FILES = 100
 BODY_LIMIT = 60000  # GitHub refuses issue bodies over 65536 characters.
 HTTP_STATUS = re.compile(r'\(HTTP (\d{3})\)')
+# Rate limits, server errors and failures without a status are worth another try; a 404 is an answer.
+RETRY_STATUS = {0, 403, 429, 500, 502, 503, 504}
+RETRY_DELAYS = tuple(float(os.environ.get('ORBYN_UPSTREAM_RETRY_DELAY', 5)) * step for step in (1, 3))
 SAFE_TEXT = re.compile(r'[^A-Za-z0-9._/+=,~()\[\] -]')
 REVIEW_LISTS = ('reviewed_sources', 'reviewed_guidance', 'reviewed_inspiration')
 
@@ -138,11 +142,22 @@ class GitHub:
         self.trees = {}
 
     def api(self, path):
-        result = subprocess.run(['gh', 'api', path], capture_output=True, text=True, timeout=60)
-        if result.returncode:
-            status = HTTP_STATUS.search(result.stderr)
-            raise ApiError(int(status[1]) if status else 0, f'GitHub API call failed: {clean(path, 200)}')
-        return json.loads(result.stdout)
+        for delay in (*RETRY_DELAYS, None):
+            try:
+                result = subprocess.run(['gh', 'api', path], capture_output=True, text=True, timeout=60)
+            except subprocess.TimeoutExpired:
+                status, detail = 0, 'timed out after 60s'
+            else:
+                if not result.returncode:
+                    return json.loads(result.stdout)
+                found = HTTP_STATUS.search(result.stderr)
+                status = int(found[1]) if found else 0
+                detail = ' '.join(result.stderr.split()) or f'exit {result.returncode}'
+            if delay is None or status not in RETRY_STATUS:
+                break
+            time.sleep(delay)
+        tries = len(RETRY_DELAYS) + 1 if status in RETRY_STATUS else 1
+        raise ApiError(status, f'GitHub API call failed after {tries} tries: {clean(path, 200)}: {clean(detail, 200)}')
 
     def listing(self, slug, tree):
         """Name to (type, id) for one tree, or for a commit's root tree."""
