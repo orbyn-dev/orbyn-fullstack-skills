@@ -19,8 +19,8 @@ Orbyn's decision examples, authority boundaries and integration changes do not
 remove the original author's credit. Full upstream source is not bundled here.
 
 The optional statechart compiler additionally redistributes 26 unmodified runtime
-TypeScript files from revision `1ba91fc25c0977741dd0e267849e6234b037ed0a`
-(pstack 0.15.36), with the [exact source/hash map and original notice](../skills/architect/references/upstream/pstack-statechart/snapshot.json).
+TypeScript files from revision `bf0c7cd80abdbf7fe47b634978a7d1b4071f71a7`
+(pstack 0.15.42), with the [exact source/hash map and original notice](../skills/architect/references/upstream/pstack-statechart/snapshot.json).
 The adapter, ESM boundary, conservative visibility guard and synthetic sample are
 Orbyn-authored. No bootstrap wrapper, upstream active skill, test corpus or external
 runtime binary is bundled. Historical adaptation pins above remain unchanged.
@@ -65,16 +65,18 @@ are maintained separately under Orbyn ownership. No upstream skill entry point
 or workflow text is bundled.
 
 Threat-model mode in `orbyn-security-audit` adapts selected material from
-[Grim Prompter](https://github.com/jmanico/grim-prompter) by Jim Manico, MIT, at commit
-`14d7292ad60434f5bf96f1792412f07e1b7531ed`: the read-only operating boundary, evidence and
-selection helpers, challenger and change reviewer, artifact contract, tool-credential
-boundaries and twelve architecture checks, condensed with per-file original and maintained
+[Grim Prompter](https://github.com/jmanico/grim-prompter), copyright Manicode Security, MIT,
+at commit `2a94457c7bc63ffbc4a44ea50ae645ab8cee26bf`: the read-only operating boundary,
+evidence and selection helpers, challenger and change reviewer, artifact contract,
+tool-credential boundaries, twelve architecture checks, and the privacy review scope with
+condensed GDPR and CCPA/CPRA profiles, condensed with per-file original and maintained
 hashes. The [source record](../skills/orbyn-security-audit/references/upstream/grim-prompter/SOURCE.md)
 lists what was kept, changed and excluded, and the
 [MIT notice](../skills/orbyn-security-audit/references/upstream/grim-prompter/LICENSE) travels
 with the skill. No method prompts or method-source text are bundled. STRIDE, LINDDUN, MITRE
 ATT&CK, CAPEC, ATLAS, the Cyber Kill Chain, CVSS and similar names belong to their owners;
-this library describes how to apply questions from them and implies no endorsement.
+this library describes how to apply questions from them and implies no endorsement. The GDPR
+and CCPA/CPRA profiles point to the legal texts; they are not legal advice.
 
 ## Reviewed engineering ideas
 
