@@ -47,13 +47,6 @@
           "credit": "Adam Lewis (Three-Tier Hoisting)",
           "source": "https://dev.to/nark3d/a-three-tier-folder-structure-for-long-lived-codebases-3a3l",
           "relationship": "reviewed-inspiration observed 2026-11-09; independently written, no text imported"
-        },
-        {
-          "credit": "Lauren Tan (pstack)",
-          "source": "https://github.com/cursor/plugins/tree/bf0c7cd80abdbf7fe47b634978a7d1b4071f71a7/pstack",
-          "revision": "bf0c7cd80abdbf7fe47b634978a7d1b4071f71a7",
-          "license": "MIT",
-          "relationship": "reviewed-inspiration; reviewed 2026-11-16 against pin 74dd229: design red flags adopted as an independently written screen in design-review.md; design-it-twice-always, arena runner model lines and how/why/interrogate/reflect rewrites not adopted (ours are independently structured); no upstream text imported"
         }
       ],
       "incorporated_material": [
@@ -211,6 +204,18 @@
           "license_file": "skills/architect/references/principles/LICENSE.txt",
           "license_sha256": "9c31ea886ff0fdc36aab948579bbb74a2e44bcb5a9c8a165cabc1b38e24175d4",
           "changes": "Short method rewritten with a synthetic status-flag example and links to existing vertical-code and statechart owners. Reviewed at candidate ae5650f only; earlier pins for other material are unchanged and this is not an advance of the whole upstream."
+        },
+        {
+          "relationship": "adapted",
+          "credit": "Lauren Tan (pstack); Orbyn adaptations by Anh Dang and contributors",
+          "copyright": "Copyright (c) 2026 Lauren Tan",
+          "license": "MIT",
+          "source": "https://github.com/cursor/plugins/blob/bf0c7cd80abdbf7fe47b634978a7d1b4071f71a7/pstack/skills/architect/references/design-red-flags.md",
+          "revision": "bf0c7cd80abdbf7fe47b634978a7d1b4071f71a7",
+          "changes": "Red-flag screen condensed into design-review.md; shallow module defers to maintainable-modules.md; pass-through dropped; Orbyn worked example added.",
+          "local_path": "skills/architect/references/design-review.md",
+          "license_file": "skills/architect/references/principles/LICENSE.txt",
+          "license_sha256": "9c31ea886ff0fdc36aab948579bbb74a2e44bcb5a9c8a165cabc1b38e24175d4"
         }
       ],
       "reviewed_sources": [
@@ -3024,13 +3029,18 @@
           "relationship": "reviewed; version bump and a cross-reference to a skill we do not carry; no source text imported; not an advance of the pin"
         }
       ],
-      "reviewed_inspiration": [
+      "incorporated_material": [
         {
+          "relationship": "adapted",
           "credit": "Corey Haines (marketingskills)",
-          "source": "https://github.com/coreyhaines31/marketingskills/tree/1f837447b20bb6f0e72d87b80ece1c221c362c7d/skills/social",
-          "revision": "1f837447b20bb6f0e72d87b80ece1c221c362c7d",
+          "copyright": "Copyright (c) 2025 Corey Haines",
           "license": "MIT",
-          "relationship": "reviewed-inspiration; ship-post method independently written in references/ship-post.md; no upstream text imported"
+          "source": "https://github.com/coreyhaines31/marketingskills/blob/1f837447b20bb6f0e72d87b80ece1c221c362c7d/skills/social/references/ship-post.md",
+          "revision": "1f837447b20bb6f0e72d87b80ece1c221c362c7d",
+          "changes": "Ship-post method adapted: platform list generalised, Orbyn evidence rules and an original worked failure; X/Reddit specifics and tracking tags dropped.",
+          "local_path": "skills/social-content/references/ship-post.md",
+          "license_file": "skills/social-content/references/upstream/marketingskills-social/LICENSE",
+          "license_sha256": "b70d71e24e40fce5da8f4b6f9cd862096a048e433db7f3c8cac5e348e6d34591"
         }
       ]
     },

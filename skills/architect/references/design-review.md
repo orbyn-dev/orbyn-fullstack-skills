@@ -70,9 +70,7 @@ next contributor will: an agent that sees only the files it opened, copies the
 nearest example and takes the shortest path that compiles. Prefer the shape where an
 edit that looks right from one file is right for the whole repository.
 
-- **Shallow module:** callers coordinate several calls for one operation, or options
-  expose internal stages. Hide more behind a smaller surface; a deep module is not a
-  deep call chain.
+- **Shallow module:** see [maintainable modules](maintainable-modules.md).
 - **Information leakage:** a representation, policy or wire format appears in more
   than one module, so changing it needs coordinated edits. Parse external data into
   domain types at the boundary and keep transport types private.
@@ -105,9 +103,9 @@ already gives retries with backoff. Implementation readiness asks which owner re
 the delivered event ID. The revised design reuses the queue, names the dedupe owner
 and states the retry limit before any code exists.
 
-Red-flag screen: reviewed inspiration from pstack's design red flags
-([cursor/plugins](https://github.com/cursor/plugins/blob/bf0c7cd80abdbf7fe47b634978a7d1b4071f71a7/pstack/skills/architect/references/design-red-flags.md),
-MIT), observed 16 November 2026; independently written.
+Red-flag screen adapted from Lauren Tan's pstack
+[design red flags](https://github.com/cursor/plugins/blob/bf0c7cd80abdbf7fe47b634978a7d1b4071f71a7/pstack/skills/architect/references/design-red-flags.md)
+(MIT), revision `bf0c7cd`; see the [MIT notice](principles/LICENSE.txt).
 
 Reviewed inspiration, observed 9 November 2026:
 [Elephant-Goldfish Model](https://github.com/google/elephant-goldfish-model/tree/e9e1f06aa4e26e95cd4ed37210a0632202c429e9)
