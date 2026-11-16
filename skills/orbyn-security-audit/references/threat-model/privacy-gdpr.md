@@ -6,7 +6,7 @@ The questions help engineers gather evidence for the owner's privacy and legal r
 
 ## Topics
 
-Write one coverage row per topic and processing activity. A row may cover several activities only when its reason names them and their common basis.
+Write coverage rows per topic and processing activity; the checker accepts only the topic ids below. A row may cover several activities only when its reason names them and their common basis.
 
 | Topic | Questions for the evidence | A `not_run` check to propose |
 | --- | --- | --- |
@@ -29,4 +29,4 @@ Write one coverage row per topic and processing activity. A row may cover severa
 
 ## Limits
 
-Every topic needs a row, even when it is `not_assessed` with a reason. A finished row says what the evidence shows; whether that meets the regulation is the owner's counsel's call. DPIA material here supports a formal assessment and never replaces one.
+Write at least the `applicability` row, citing the claim or document that put the profile in scope. List each topic you did not examine as `not_assessed` with a reason. Every other status cites evidence. A finished row says what the evidence shows; whether that meets the regulation is the owner's counsel's call. DPIA material here supports a formal assessment and never replaces one.

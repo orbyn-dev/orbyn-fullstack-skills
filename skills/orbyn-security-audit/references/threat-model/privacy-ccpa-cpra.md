@@ -6,7 +6,7 @@ The questions help engineers gather evidence for the owner's privacy and legal r
 
 ## Topics
 
-Write one coverage row per topic and processing activity.
+Write coverage rows per topic and processing activity; the checker accepts only the topic ids below.
 
 | Topic | Questions for the evidence | A `not_run` check to propose |
 | --- | --- | --- |
@@ -27,4 +27,4 @@ Write one coverage row per topic and processing activity.
 
 ## Limits
 
-A supported engineering concern is not a statutory violation, and a future compliance date does not remove the harm to people. The Delete Act, data-broker rules and other California sector laws are outside this profile; name them as a gap when the scope suggests them. Every conclusion that depends on law goes to the owner's counsel.
+Write at least the `applicability` row, citing the claim or document that put the profile in scope. List each topic you did not examine as `not_assessed` with a reason. Every other status cites evidence. A supported engineering concern is not a statutory violation, and a future compliance date does not remove the harm to people. The Delete Act, data-broker rules and other California sector laws are outside this profile; name them as a gap when the scope suggests them. Every conclusion that depends on law goes to the owner's counsel.

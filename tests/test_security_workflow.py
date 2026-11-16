@@ -383,16 +383,17 @@ class CheckerTests(unittest.TestCase):
         model = json.loads(json.dumps(self.example))
         model['evidence'].append({'id': 'E3', 'kind': 'caller_claim', 'locator': 'session:chat',
                                   'summary': 'The owner says the customers are in the EU.'})
-        model['privacy'] = {'review_scope': 'privacy', 'profiles': ['gdpr'], 'coverage': [
-            {'lens': 'privacy:gdpr:rights', 'target': 'A1', 'status': 'partial', 'reason': 'Applicability: unknown; Follow-up: G1'}]}
-        model['limitations'].append('Privacy-only scope: no security analysis ran.')
+        model['privacy'] = {'review_scope': 'privacy', 'security_analysis': 'not_run', 'profiles': ['gdpr'], 'coverage': [
+            {'lens': 'privacy:gdpr:applicability', 'target': None, 'status': 'partial', 'evidence_refs': ['E3'],
+             'reason': 'Applicability: unknown; Basis: E3'},
+            {'lens': 'privacy:gdpr:rights', 'target': 'A1', 'status': 'partial', 'evidence_refs': ['E1'],
+             'reason': 'Applicability: unknown; Follow-up: G1'}]}
         return model
 
     def test_a_privacy_model_is_valid(self):
         self.assertEqual(self.faults(self.privacy_model()), [])
         combined = self.privacy_model()
-        combined['privacy'].update(review_scope='security-and-privacy', profiles=[], coverage=[])
-        combined['limitations'] = ['Quick run: no separate challenge pass.']
+        combined['privacy'] = {'review_scope': 'security-and-privacy', 'profiles': [], 'coverage': []}
         self.assertEqual(self.faults(combined), [])
 
     def test_privacy_faults_are_caught(self):
@@ -401,16 +402,23 @@ class CheckerTests(unittest.TestCase):
             'unknown scope': lambda m: m['privacy'].update(review_scope='legal'),
             'unknown profile': lambda m: m['privacy'].update(profiles=['gdpr', 'lgpd']),
             'profile twice': lambda m: m['privacy'].update(profiles=['gdpr', 'gdpr']),
-            'unselected profile row': lambda m: m['privacy']['coverage'][0].update(lens='privacy:ccpa-cpra:notice'),
-            'malformed lens': lambda m: m['privacy']['coverage'][0].update(lens='gdpr-rights'),
+            'unselected profile row': lambda m: m['privacy']['coverage'][1].update(lens='privacy:ccpa-cpra:notice'),
+            'malformed lens': lambda m: m['privacy']['coverage'][1].update(lens='gdpr-rights'),
+            'unknown topic': lambda m: m['privacy']['coverage'][1].update(lens='privacy:gdpr:compliance'),
+            'topic from the other profile': lambda m: m['privacy']['coverage'][1].update(lens='privacy:gdpr:sale-sharing'),
+            'partial without evidence': lambda m: m['privacy']['coverage'][1].pop('evidence_refs'),
+            'assessed without evidence': lambda m: m['privacy']['coverage'][1].update(status='assessed', evidence_refs=[]),
+            'no applicability row': lambda m: m['privacy']['coverage'].pop(0),
+            'applicability on code alone': lambda m: m['privacy']['coverage'][0].update(evidence_refs=['E1']),
             'selected profile without rows': lambda m: m['privacy'].update(coverage=[]),
             'compliance status': lambda m: m['privacy']['coverage'][0].update(status='compliant'),
             'no reason': lambda m: m['privacy']['coverage'][0].update(reason=''),
             'target is not an asset': lambda m: m['privacy']['coverage'][0].update(target='P1'),
-            'not applicable without evidence': lambda m: m['privacy']['coverage'][0].update(status='not_applicable'),
+            'not applicable without evidence': lambda m: m['privacy']['coverage'][1].update(status='not_applicable', evidence_refs=[]),
             'dangling evidence': lambda m: m['privacy']['coverage'][0].update(evidence_refs=['E9']),
             'rated coverage': lambda m: m['privacy']['coverage'][0].update(Severity='high'),
-            'privacy only without a security limitation': lambda m: m.update(limitations=['Quick run.']),
+            'privacy only without security_analysis': lambda m: m['privacy'].pop('security_analysis'),
+            'privacy only claiming security ran': lambda m: m['privacy'].update(security_analysis='done'),
         }
         for label, change in plants.items():
             with self.subTest(label):
@@ -420,8 +428,21 @@ class CheckerTests(unittest.TestCase):
 
     def test_not_applicable_with_evidence_passes(self):
         model = self.privacy_model()
-        model['privacy']['coverage'][0].update(status='not_applicable', evidence_refs=['E3'])
+        model['privacy']['coverage'][1].update(status='not_applicable', evidence_refs=['E3'])
         self.assertEqual(self.faults(model), [])
+
+    def test_unexamined_topics_need_no_evidence(self):
+        model = self.privacy_model()
+        model['privacy']['coverage'].append({'lens': 'privacy:gdpr:transfers', 'target': None, 'status': 'not_assessed',
+                                             'reason': 'Not examined in this quick run.'})
+        self.assertEqual(self.faults(model), [])
+
+    def test_topic_table_matches_the_profile_files(self):
+        for profile in ('gdpr', 'ccpa-cpra'):
+            text = (BUNDLE/f'privacy-{profile}.md').read_text()
+            listed = set(re.findall(r'^\| `([a-z0-9-]+)`(?:, `([a-z0-9-]+)`)?', text, re.M))
+            topics = {name for pair in listed for name in pair if name}
+            self.assertEqual(topics, self.checker.TOPICS[profile], profile)
 
     def test_rating_is_allowed_only_with_a_supplied_rubric(self):
         self.model['threats'][0]['severity'] = 'high'

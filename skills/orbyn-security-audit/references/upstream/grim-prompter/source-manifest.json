@@ -97,7 +97,7 @@
       "relationship": "maintained-adaptation"
     },
     "references/threat-model/artifact-contract.md": {
-      "sha256": "900ff5559805a98cf09d24d2d24afdb6095d4cd07d13c6c98cbd1dcd1ae5407d",
+      "sha256": "2f23bcb8f90350bd70b493c14650c6e71a83d1026ae6b2d0a140d67df521ce06",
       "source_path": "reference/artifact-contract.md",
       "original_sha256": "b5e44f3f85e96db7b7f51aa7afcb97e12664447569d426891b7148b7d88923d5",
       "relationship": "maintained-adaptation",
@@ -145,7 +145,7 @@
       "relationship": "maintained-adaptation"
     },
     "references/threat-model/privacy-ccpa-cpra.md": {
-      "sha256": "85cc3845c30f1e5f3e4ff0f721b72b903f0f114a8b418baeecef6db69d2d8502",
+      "sha256": "ba6845747f2171c4adcf73d97564fa35c2e749b4356ec6a6419d364595ec74b0",
       "source_path": "privacy/profiles/ccpa-cpra.md",
       "original_sha256": "83459661b3a2c9120256a034e0648688b9bbb158cc1472c96e609f45b5d9b103",
       "relationship": "maintained-adaptation",
@@ -157,7 +157,7 @@
       ]
     },
     "references/threat-model/privacy-gdpr.md": {
-      "sha256": "0dd278290e19d24e0ee7663bf0e0523a1c618dbc029befd2ec2789fc5d1956b2",
+      "sha256": "e95e95e7b177588e566d0ed275ac499a70ff5f5f446c9b05b7456fe529980b64",
       "source_path": "privacy/profiles/gdpr.md",
       "original_sha256": "37928386d94a3d5e342007b2f66b77914f30e76e3fdf2e11760b69727286dee3",
       "relationship": "maintained-adaptation",
@@ -169,7 +169,7 @@
       ]
     },
     "references/threat-model/privacy.md": {
-      "sha256": "107d3389827580c0b50dd3ac0cd568105e8632e13522bd4c944a33d6b889d6df",
+      "sha256": "183109f0c4c3d6e8474b41eb6af9e0d3f2a506dfcb1037eca420cd10563fb7a9",
       "source_path": "privacy/README.md",
       "original_sha256": "3ebcf04d5f679b23bc813dd4afa25587b80c0c2c19736cfe938edf15310d3971",
       "relationship": "maintained-adaptation",
@@ -203,7 +203,7 @@
       "relationship": "maintained-adaptation"
     },
     "scripts/check_threat_model.py": {
-      "sha256": "d0278867ff373e6303f6969150a5f4d76234ec45f0038b905ae7c182f1fb3f94",
+      "sha256": "fb011eaa3e5ce9972b34308deab6d6f976ee46a1b5cc19b73ab8b130e526c0a1",
       "source_path": "Orbyn-authored maintained support record/helper",
       "original_sha256": null,
       "relationship": "original-helper-or-record"

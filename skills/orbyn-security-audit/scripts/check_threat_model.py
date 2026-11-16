@@ -44,7 +44,18 @@ NESTED = ('handoff', 'resolution', 'retired')
 PRIVACY_SCOPES = {'privacy', 'security-and-privacy'}
 PROFILES = {'gdpr', 'ccpa-cpra'}
 COVERAGE = {'assessed', 'partial', 'not_assessed', 'not_applicable'}
-LENS = re.compile(r'privacy:(?P<profile>[a-z0-9-]+):[a-z0-9-]+(?::[a-z0-9-]+)*')
+LENS = re.compile(r'privacy:(?P<profile>[a-z0-9-]+):(?P<topic>[a-z0-9-]+)')
+# Topic ids from the profile tables in references/threat-model/privacy-*.md.
+TOPICS = {
+    'gdpr': {'applicability', 'lawful-basis', 'consent', 'sensitive-children', 'purpose-minimization', 'accuracy',
+             'retention', 'transparency', 'rights', 'automated-decisions', 'design-defaults', 'processors',
+             'accountability', 'security-breach', 'dpia', 'transfers'},
+    'ccpa-cpra': {'applicability', 'notice', 'access-correction-deletion', 'sale-sharing', 'sensitive-information',
+                  'nondiscrimination', 'purpose-retention', 'choice-request-handling', 'recipient-contracts',
+                  'security-breach', 'california-security-screening', 'california-breach-screening',
+                  'risk-assessment', 'cybersecurity-audit', 'admt'},
+}
+APPLICABILITY_KINDS = {'caller_claim', 'documentation'}
 SURROGATE = re.compile('[\ud800-\udfff]')
 SECRET_FILE = re.compile(r'\.env(?!\.(?:example|sample|template)$)(?:\..*)?|.*\.(?:pem|key|p12|pfx|jks|keystore)'
                          r'|id_(?:rsa|dsa|ecdsa|ed25519)|(?:credentials|secrets?)(?:\.(?:json|ya?ml|toml|ini|txt|env))?'
@@ -351,12 +362,12 @@ def check(model, root=None, guide=None, run=None):
     if not isinstance(model.get('limitations'), list) or not model['limitations']:
         errors.append('limitations must say what this run did not do')
     if 'privacy' in model:
-        errors += privacy_faults(model, ids)
+        errors += privacy_faults(model, ids, by_id)
     return errors
 
 
-def privacy_faults(model, ids):
-    """Faults in the privacy object: scope, selected profiles and one coverage row per profile at least."""
+def privacy_faults(model, ids, by_id):
+    """Faults in the privacy object: scope, selected profiles, known topics, evidence and an applicability row."""
     privacy = model['privacy']
     if not isinstance(privacy, dict):
         return ['privacy must be an object']
@@ -375,7 +386,7 @@ def privacy_faults(model, ids):
     coverage = privacy.get('coverage', [])
     if not isinstance(coverage, list):
         return errors + ['privacy.coverage must be a list']
-    covered = set()
+    grounded = set()
     for number, row in enumerate(coverage):
         where = f'privacy.coverage[{number}]'
         if not isinstance(row, dict):
@@ -387,8 +398,8 @@ def privacy_faults(model, ids):
             errors.append(f'{where}: lens must look like privacy:<profile>:<topic>')
         elif match['profile'] not in profiles:
             errors.append(f'{where}: profile {match["profile"]!r} was not selected')
-        else:
-            covered.add(match['profile'])
+        elif match['topic'] not in TOPICS.get(match['profile'], set()):
+            errors.append(f'{where}: {match["topic"]!r} is not a {match["profile"]} topic')
         if row.get('status') not in COVERAGE:
             errors.append(f'{where}: status must be one of {sorted(COVERAGE)}')
         if not text(row.get('reason')):
@@ -403,16 +414,18 @@ def privacy_faults(model, ids):
         for item in refs:
             if ids.get(item) != 'evidence':
                 errors.append(f'{where}: {item!r} is not an evidence id')
-        if row.get('status') == 'not_applicable' and not refs:
-            errors.append(f'{where}: not_applicable needs evidence_refs')
+        if row.get('status') in COVERAGE - {'not_assessed'} and not refs:
+            errors.append(f'{where}: {row.get("status")} needs evidence_refs')
+        if match and match['topic'] == 'applicability' and \
+                any(by_id.get(item, {}).get('kind') in APPLICABILITY_KINDS for item in refs if ids.get(item) == 'evidence'):
+            grounded.add(match['profile'])
         if RATING_KEYS & {str(key).lower() for key in row}:
             errors.append(f'{where}: coverage carries no rating')
-    for item in sorted(set(profiles) & PROFILES - covered):
-        errors.append(f'privacy: selected profile {item!r} has no coverage row')
-    limitations = model.get('limitations') if isinstance(model.get('limitations'), list) else []
-    if privacy.get('review_scope') == 'privacy' and not any(
-            isinstance(item, str) and 'security' in item.lower() for item in limitations):
-        errors.append('a privacy-only model says in limitations that no security analysis ran')
+    for item in sorted(set(profiles) & PROFILES - grounded):
+        errors.append(f'privacy: selected profile {item!r} needs a privacy:{item}:applicability row citing '
+                      'caller_claim or documentation evidence')
+    if privacy.get('review_scope') == 'privacy' and privacy.get('security_analysis') != 'not_run':
+        errors.append('a privacy-only model sets privacy.security_analysis to "not_run"')
     return errors
 
 

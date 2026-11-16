@@ -6,7 +6,7 @@ Read this when the person asks for a privacy review, asks what personal-data har
 
 | Request | `privacy.review_scope` | What runs |
 | --- | --- | --- |
-| "Privacy review of the export feature" | `privacy` | The privacy questions below in place of the six security questions. Choose the real architecture for topology, and say no security analysis ran. |
+| "Privacy review of the export feature" | `privacy` | The privacy questions below in place of the six security questions. Choose the real architecture for topology, and set `privacy.security_analysis` to `not_run`. |
 | "Threat model the export feature, privacy included" | `security-and-privacy` | Both question sets on one model, one `threat-model.json`. |
 | Anything else | no `privacy` object | The ordinary security model. |
 
@@ -60,7 +60,7 @@ Use the records the checker already reads, plus one `privacy` object. The full s
 - **Affected people and recipients** are `actors` with a stated `capability`.
 - **Flows** list the personal data they carry. Map each privacy boundary to a guide row; most fit "Resource and data lifecycle" or "Jobs, queues and external providers".
 - **Privacy threats** use the normal status words and handoffs. An unconfirmed deletion path is a `design_hypothesis` with a gap.
-- **Profile coverage** goes in `privacy.coverage`: one row per selected profile topic and processing activity, with status `assessed`, `partial`, `not_assessed` or `not_applicable`. `assessed` means the question was examined, not that the system complies. `not_applicable` needs evidence. Missing organizational facts keep a row `partial` and add a gap.
+- **Profile coverage** goes in `privacy.coverage`: an `applicability` row citing the claim or document that selected the profile, then rows per topic and processing activity, with status `assessed`, `partial`, `not_assessed` or `not_applicable`. `assessed` means the question was examined, not that the system complies. `not_applicable` needs evidence. Missing organizational facts keep a row `partial` and add a gap.
 
 `report.md` adds a processing inventory (data, people, purposes, recipients, flows, retention, deletion, unknowns) and, only for selected profiles, a coverage table, both derived from the JSON. It ends with the questions for the owner's privacy and legal reviewers, and says plainly that it is not legal advice and supports, but is not, a DPIA or privacy risk assessment.
 
