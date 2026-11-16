@@ -10,6 +10,7 @@ every path:start-end locator must name a regular file inside TARGET and a line r
 that exists, and an optional excerpt must appear in the cited lines. An execution
 locator may instead name a file in the model's own folder. A secret-looking file is
 never opened: its range goes unchecked and an excerpt on it is a fault whatever it says.
+A privacy object is checked against its selected profiles and coverage statuses.
 --baseline refuses a threat id the previous revision had and this one dropped. --ledger
 and --findings refuse a finished tm: unit whose id did not reach a finding fingerprint.
 Nothing in the target is executed. Exits 1 and names each fault; exits 2 on unreadable
@@ -40,6 +41,10 @@ SCALARS = {'kind', 'locator', 'excerpt', 'basis', 'objective', 'actor', 'boundar
            'threat_ref', 'limits', 'confidence', 'to'}
 REF_LISTS = {'evidence_refs', 'existing_controls', 'gap_refs', 'verification_refs'}
 NESTED = ('handoff', 'resolution', 'retired')
+PRIVACY_SCOPES = {'privacy', 'security-and-privacy'}
+PROFILES = {'gdpr', 'ccpa-cpra'}
+COVERAGE = {'assessed', 'partial', 'not_assessed', 'not_applicable'}
+LENS = re.compile(r'privacy:(?P<profile>[a-z0-9-]+):[a-z0-9-]+(?::[a-z0-9-]+)*')
 SURROGATE = re.compile('[\ud800-\udfff]')
 SECRET_FILE = re.compile(r'\.env(?!\.(?:example|sample|template)$)(?:\..*)?|.*\.(?:pem|key|p12|pfx|jks|keystore)'
                          r'|id_(?:rsa|dsa|ecdsa|ed25519)|(?:credentials|secrets?)(?:\.(?:json|ya?ml|toml|ini|txt|env))?'
@@ -345,6 +350,69 @@ def check(model, root=None, guide=None, run=None):
             ref(record['limits'], 'boundaries', f'{where}.limits')
     if not isinstance(model.get('limitations'), list) or not model['limitations']:
         errors.append('limitations must say what this run did not do')
+    if 'privacy' in model:
+        errors += privacy_faults(model, ids)
+    return errors
+
+
+def privacy_faults(model, ids):
+    """Faults in the privacy object: scope, selected profiles and one coverage row per profile at least."""
+    privacy = model['privacy']
+    if not isinstance(privacy, dict):
+        return ['privacy must be an object']
+    errors = []
+    if privacy.get('review_scope') not in PRIVACY_SCOPES:
+        errors.append(f'privacy.review_scope must be one of {sorted(PRIVACY_SCOPES)}')
+    profiles = privacy.get('profiles')
+    if not isinstance(profiles, list) or not all(isinstance(item, str) for item in profiles):
+        errors.append('privacy.profiles must be a list of profile ids')
+        profiles = []
+    for item in profiles:
+        if item not in PROFILES:
+            errors.append(f'privacy.profiles: {item!r} is not one of {sorted(PROFILES)}')
+    if len(profiles) != len(set(profiles)):
+        errors.append('privacy.profiles lists a profile twice')
+    coverage = privacy.get('coverage', [])
+    if not isinstance(coverage, list):
+        return errors + ['privacy.coverage must be a list']
+    covered = set()
+    for number, row in enumerate(coverage):
+        where = f'privacy.coverage[{number}]'
+        if not isinstance(row, dict):
+            errors.append(f'{where} must be an object')
+            continue
+        lens = row.get('lens')
+        match = LENS.fullmatch(lens) if isinstance(lens, str) else None
+        if not match:
+            errors.append(f'{where}: lens must look like privacy:<profile>:<topic>')
+        elif match['profile'] not in profiles:
+            errors.append(f'{where}: profile {match["profile"]!r} was not selected')
+        else:
+            covered.add(match['profile'])
+        if row.get('status') not in COVERAGE:
+            errors.append(f'{where}: status must be one of {sorted(COVERAGE)}')
+        if not text(row.get('reason')):
+            errors.append(f'{where}: reason is required')
+        target = row.get('target')
+        if target is not None and ids.get(target) != 'assets':
+            errors.append(f'{where}: target {target!r} is not an assets id')
+        refs = row.get('evidence_refs', [])
+        if not isinstance(refs, list) or not all(isinstance(item, str) for item in refs):
+            errors.append(f'{where}: evidence_refs must be a list of strings')
+            refs = []
+        for item in refs:
+            if ids.get(item) != 'evidence':
+                errors.append(f'{where}: {item!r} is not an evidence id')
+        if row.get('status') == 'not_applicable' and not refs:
+            errors.append(f'{where}: not_applicable needs evidence_refs')
+        if RATING_KEYS & {str(key).lower() for key in row}:
+            errors.append(f'{where}: coverage carries no rating')
+    for item in sorted(set(profiles) & PROFILES - covered):
+        errors.append(f'privacy: selected profile {item!r} has no coverage row')
+    limitations = model.get('limitations') if isinstance(model.get('limitations'), list) else []
+    if privacy.get('review_scope') == 'privacy' and not any(
+            isinstance(item, str) and 'security' in item.lower() for item in limitations):
+        errors.append('a privacy-only model says in limitations that no security analysis ran')
     return errors
 
 
