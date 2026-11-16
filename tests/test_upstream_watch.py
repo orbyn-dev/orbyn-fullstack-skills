@@ -223,15 +223,27 @@ class RetryTests(WatcherCase):
         result = self.run_watch(answers)
         self.assertEqual(result.returncode, 1)
         self.assertIn('UNVERIFIED', result.stdout)
-        self.assertIn('after 3 tries', result.stdout)
-        self.assertIn('HTTP 502', result.stdout)
+        self.assertIn('(HTTP 502) after 3 tries', result.stdout)
+        self.assertEqual(len(self.ref_calls()), 3)
+
+    def test_retries_stop_when_the_run_budget_is_spent(self):
+        self.state.write_text(json.dumps({'api': api(**{self.REF: {'json': {}, 'fail': 99}}), 'issues': []}))
+        self.log.write_text('')
+        probe = (f'import sys; sys.path.insert(0, {str(SCRIPT.parent)!r}); import upstream_watch as u\n'
+                 'client = u.GitHub(); client.retries_left = 1\n'
+                 'for _ in range(2):\n'
+                 '    try: client.api(sys.argv[1])\n'
+                 '    except u.ApiError as error: print(error)\n')
+        result = subprocess.run([sys.executable, '-B', '-c', probe, self.REF], capture_output=True, text=True, env=self.env)
+        self.assertEqual(result.stdout.count('after 2 tries'), 1, result.stdout + result.stderr)
+        self.assertEqual(result.stdout.count('after 1 try'), 1, result.stdout)
         self.assertEqual(len(self.ref_calls()), 3)
 
     def test_a_not_found_is_an_answer_and_is_not_retried(self):
         answers = api(**{self.REF: None})
         result = self.run_watch(answers)
         self.assertIn('HTTP 404', result.stdout)
-        self.assertIn('after 1 tries', result.stdout)
+        self.assertIn('(HTTP 404) after 1 try', result.stdout)
         self.assertEqual(len(self.ref_calls()), 1)
 
 

@@ -39,7 +39,8 @@ SHOWN_FILES = 100
 BODY_LIMIT = 60000  # GitHub refuses issue bodies over 65536 characters.
 HTTP_STATUS = re.compile(r'\(HTTP (\d{3})\)')
 # Rate limits, server errors and failures without a status are worth another try; a 404 is an answer.
-RETRY_STATUS = {0, 403, 429, 500, 502, 503, 504}
+RETRY_STATUS = {0, 429, 500, 502, 503, 504}
+RETRY_BUDGET = 10  # retries per run, so a lasting outage cannot outrun the job's timeout
 RETRY_DELAYS = tuple(float(os.environ.get('ORBYN_UPSTREAM_RETRY_DELAY', 5)) * step for step in (1, 3))
 SAFE_TEXT = re.compile(r'[^A-Za-z0-9._/+=,~()\[\] -]')
 REVIEW_LISTS = ('reviewed_sources', 'reviewed_guidance', 'reviewed_inspiration')
@@ -140,8 +141,10 @@ class GitHub:
     """Read-only API calls, cached because many pins share the same trees."""
     def __init__(self):
         self.trees = {}
+        self.retries_left = RETRY_BUDGET
 
     def api(self, path):
+        tries = 1
         for delay in (*RETRY_DELAYS, None):
             try:
                 result = subprocess.run(['gh', 'api', path], capture_output=True, text=True, timeout=60)
@@ -153,11 +156,15 @@ class GitHub:
                 found = HTTP_STATUS.search(result.stderr)
                 status = int(found[1]) if found else 0
                 detail = ' '.join(result.stderr.split()) or f'exit {result.returncode}'
-            if delay is None or status not in RETRY_STATUS:
+            rate_limited = status == 403 and 'rate limit' in detail.lower()
+            if delay is None or not (status in RETRY_STATUS or rate_limited) or self.retries_left <= 0:
                 break
+            self.retries_left -= 1
+            tries += 1
             time.sleep(delay)
-        tries = len(RETRY_DELAYS) + 1 if status in RETRY_STATUS else 1
-        raise ApiError(status, f'GitHub API call failed after {tries} tries: {clean(path, 200)}: {clean(detail, 200)}')
+        attempts = '1 try' if tries == 1 else f'{tries} tries'
+        raise ApiError(status, f'GitHub API call failed (HTTP {status or "none"}) after {attempts}: '
+                               f'{clean(path, 200)}: {clean(detail, 300)}')
 
     def listing(self, slug, tree):
         """Name to (type, id) for one tree, or for a commit's root tree."""
