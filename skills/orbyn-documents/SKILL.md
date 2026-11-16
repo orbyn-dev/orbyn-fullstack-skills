@@ -27,8 +27,8 @@ folder (paths in it such as `scripts/office/soffice.py` are relative to it):
 The sources were written for Claude's own sandbox. On any host:
 
 1. **Nothing is preinstalled.** Where a source says a package is preinstalled
-   (`docx`, `pptxgenjs`, `openpyxl`, `pandas`, `markitdown`, `python-pptx`, `pypdf`), check whether
-   it is available. Ask the user before installing a package or LibreOffice, and
+   (`docx`, `pptxgenjs`, `openpyxl`, `pandas`, `markitdown`, `pypdf`), check whether
+   it is available; `slide_text.py` also needs `python-pptx`. Ask the user before installing a package or LibreOffice, and
    prefer the project's own environment. If something is missing and the user
    declines, say which step cannot run. Sentences about "this sandbox" (a bare
    `soffice` hanging, LibreOffice being auto-configured) describe Claude's sandbox;
