@@ -142,7 +142,7 @@
       "relationship": "maintained-adaptation"
     },
     "references/kubernetes.md": {
-      "sha256": "00a124a78063f7676424614d3a9f02623386f42cca22f82ade365d73ddfa2ff8",
+      "sha256": "23914b565b385bc61e5f25fc7ba3eb78b06b99d99ca84ec4afa51d17802aaa25",
       "source_path": "skills/stack-diagram/SKILL.md",
       "original_sha256": "b32b05b7eeb0f93fcc297fa1e1d8e56a7306b6b7c989c4ed4f8522a996a9086e",
       "relationship": "maintained-adaptation"
@@ -166,7 +166,7 @@
       "relationship": "original-helper-or-record"
     },
     "references/upstream/stack-diagram/SOURCE.md": {
-      "sha256": "51a85784915dd2a3e51c96e0b64bf6e1baacbe85d3326388432a071333c115fe",
+      "sha256": "34c439fb42378f49129c0dde584d03d0e75ba4cb73f4279d8d53e10b7b066d30",
       "source_path": "Orbyn-authored maintained support record/helper",
       "original_sha256": null,
       "relationship": "original-helper-or-record"
@@ -178,7 +178,7 @@
       "relationship": "maintained-adaptation"
     },
     "scripts/fetch_icons.py": {
-      "sha256": "c6899a64ea63e0713d8b6dbe777806c2bc9a2c0b330cd7c5a4785e95b6e9f3e4",
+      "sha256": "015d7cad5c96bf597652c4a7ceeb2211de731b2fa19b4331bd0fc665be202255",
       "source_path": "skills/stack-diagram/scripts/fetch_icons.py",
       "original_sha256": "7d33945bd80aebef01d601295347021a2b74dc3c6772b86be0cf2fb0da74730a",
       "relationship": "maintained-adaptation"

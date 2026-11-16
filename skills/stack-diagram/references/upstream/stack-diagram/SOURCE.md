@@ -57,7 +57,7 @@ The pin above did not move. Two later upstream changes were adapted selectively:
 - `9175bde8449cc8f5390d6eb72ecc2e1f5bfe21f3` (MIT, caru-ini, "k8s icon support"): Kubernetes
   icon support. The `k8s/` spec form, the icon table and aliases in `scripts/fetch_icons.py`,
   and the pinned kubernetes/community commit `307ae50e8e4246de172f195c73e3f026b4f0c7ff` that
-  upstream uses. The icons (Apache-2.0) are read at run time from `raw.githubusercontent.com`
+  upstream uses. The icons (Apache-2.0 or CC-BY-4.0) are read at run time from `raw.githubusercontent.com`
   and are never copied here. Guidance is in `references/kubernetes.md` and `references/icons.md`.
   The `k8s-*` and `kubernetes-*` slug forms are not adopted, so a product such as
   `kubernetes-dashboard` stays on the usual chain.

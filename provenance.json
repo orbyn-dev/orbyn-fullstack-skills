@@ -4115,7 +4115,7 @@
           "relationship": "adapted-selected-changes",
           "copyright": "Copyright (c) 2026 caru-ini",
           "license_sha256": "7b153fc3f5f1ccce2b9ac98a35301c666c025db85d6c44565e13304774d144a9",
-          "changes": "Kubernetes icon support: k8s/ spec form with the icon table and aliases and the kubernetes/community commit upstream pins, rewritten into this skill's package class, limits, fallback and manifest rules; reads are restricted to raw.githubusercontent.com, that pinned commit and table-derived icons/svg paths. Guidance in references/kubernetes.md and references/icons.md. Gallery sharing (share.py) and the 12px tile radius not adopted; k8s-* and kubernetes-* slug forms not adopted."
+          "changes": "Kubernetes icon support: k8s/ spec form with the icon table and aliases and the kubernetes/community commit upstream pins, rewritten into this skill's package class, limits, fallback and manifest rules; reads, including redirects, are restricted to raw.githubusercontent.com, that pinned commit and table-derived icons/svg paths. Guidance in references/kubernetes.md and references/icons.md. Gallery sharing (share.py) and the 12px tile radius not adopted; k8s-* and kubernetes-* slug forms not adopted."
         }
       ],
       "authoring": [

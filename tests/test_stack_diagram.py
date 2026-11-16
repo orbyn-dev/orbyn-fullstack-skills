@@ -705,6 +705,13 @@ class KubernetesIcons(unittest.TestCase):
         for slug, path in wanted.items():
             self.assertEqual(fetch.sources(slug), [('k8s', f'k8s:{path}', None)], slug)
 
+    def test_a_redirect_away_from_the_pinned_icons_is_refused(self):
+        elsewhere = 'https://cdn.example/pod.svg'
+        with stub({self.POD: (302, {'Location': elsewhere}, b''), elsewhere: (200, {}, LOGO)}) as handler, \
+                self.assertRaises(fetch.FetchRefused):
+            fetch.get(self.POD)
+        self.assertNotIn(elsewhere, handler.requested)
+
     def test_every_table_entry_maps_to_a_path_under_the_pinned_folders(self):
         paths = set(fetch.k8s_index().values())
         self.assertEqual(len(paths), len(fetch.K8S_RESOURCES) + len(fetch.K8S_INFRASTRUCTURE) + 6)

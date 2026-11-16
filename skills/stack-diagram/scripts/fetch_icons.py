@@ -280,6 +280,8 @@ class HttpsRedirects(urllib.request.HTTPRedirectHandler):
 
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         require_https(newurl)
+        if req.full_url.startswith(K8S_ICON_BASE) and not newurl.startswith(K8S_ICON_BASE):
+            raise FetchRefused(f'refused redirect away from the pinned Kubernetes icons: {newurl}')
         return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
