@@ -1281,7 +1281,7 @@
           "credit": "SSW Rules (Eddie Kranz, Daniel MacKay, Gordon Beeming, Michael Qiu)",
           "source": "https://www.ssw.com.au/rules/write-agents-md",
           "revision": "observed 2026-11-17 (page updated 2026-11-16)",
-          "relationship": "reviewed-inspiration; ideas only for references/agent-instructions.md (per-level content, what stays out, hard-won facts, pointer files); independently written, no text copied; examples are our own"
+          "relationship": "reviewed-inspiration; ideas adapted for references/agent-instructions.md (subtree files, what stays out, multi-attempt facts, pointer files); wording, structure and examples are our own; no text copied"
         }
       ]
     },
