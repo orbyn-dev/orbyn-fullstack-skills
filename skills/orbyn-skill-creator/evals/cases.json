@@ -14380,6 +14380,50 @@
         "scope": "One change, one short post, draft only.",
         "fail": "Invented pain, demand or numbers fails the case."
       }
+    },
+    {
+      "id": "split-monorepo-agents-md",
+      "kind": "outcome",
+      "split": "development",
+      "prompt": "Synthetic monorepo with apps/web (TypeScript, vitest) and services/api (Python, pytest). The root AGENTS.md is 2,800 lines mixing both stacks, the PR template, an API key placeholder note and one engineer's editor preferences. Propose how to restructure our agent instruction files. Do not edit anything.",
+      "expected_skills": [
+        "orbyn-setup"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write",
+        "write_product",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Synthetic proposal only; no file edits.",
+      "rubric": {
+        "levels": "Root keeps the package map, whole-repo commands and rules every change needs; apps/web and services/api each get their own AGENTS.md with their own test command.",
+        "out": "Moves the PR format to the pull request template and personal preferences to user-level instructions; removes anything secret-like; drops what linters enforce.",
+        "agree": "Nested files narrow the root without contradicting it, and never relax safety or review rules; host pointer files (e.g. CLAUDE.md importing AGENTS.md) instead of copies; does not claim a fixed precedence order."
+      }
+    },
+    {
+      "id": "agents-md-adjacent-personal-preference",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Remember that I personally prefer pnpm over npm in every project I work on.",
+      "expected_skills": [
+        "reflect"
+      ],
+      "forbidden_skills": [
+        "orbyn-setup"
+      ],
+      "forbidden_actions": [
+        "write_product",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "A personal preference goes to the user's own memory or instructions, not into a project's AGENTS.md."
     }
   ]
 }
