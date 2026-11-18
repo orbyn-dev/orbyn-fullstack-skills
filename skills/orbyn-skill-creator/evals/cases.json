@@ -14429,7 +14429,7 @@
       "id": "port-untested-module-record-replay",
       "kind": "routing",
       "split": "development",
-      "prompt": "We're authorised to port our untested TypeScript CSV parser and its three callers to Rust. Do it, and prove the Rust version behaves exactly like the old one.",
+      "prompt": "We're authorised to move our whole untested Python CLI, about forty modules, to Rust module by module while it stays in use. Run the migration and prove every step behaves exactly like the old tool.",
       "expected_skills": [
         "figure-it-out"
       ],

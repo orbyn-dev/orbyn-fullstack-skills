@@ -59,22 +59,31 @@ When code moves into Rust from another language, prove each unit against the
 original's recorded behaviour ([rewrite parity](../../figure-it-out/references/rewrite-parity.md)),
 and check these first:
 
-- **Profile before porting for speed.** One call across FFI costs more than a small
-  function's work, and V8, the JVM and Go already run small functions fast. Move the
-  loop with its callers, or pass the items once and run the whole batch in Rust.
-  Code already compiled to machine code (numba `@njit`, Cython) gains little.
-- **String offsets.** JavaScript, Java and C# index UTF-16 code units; Rust indexes
-  UTF-8 bytes. Convert at the boundary wherever an offset or length crosses it.
-- **Regex classes.** `\w`, `\b`, `\d` and case-insensitive matching are Unicode-aware
-  in the `regex` crate but ASCII-only in JavaScript without `u` and in Java by default.
-  Spell out `[A-Za-z0-9_]` or turn Unicode off where the original was ASCII. Record
-  non-ASCII inputs such as the Turkish dotless i and the Kelvin sign. Lookaround and
-  backreferences need `fancy-regex`.
-- **Numbers.** A Python or Ruby int passed through must come back an int, not a float.
-  Port with checked arithmetic where the original had big integers. Ported float code is
-  rarely bit-identical (operation order, fused multiply-add, the math library), so agree
-  a tolerance with the user instead of chasing bits.
-- **Map order.** Use `indexmap` wherever the original's insertion order reaches output.
+- **Profile before porting for speed.** Crossing FFI has a fixed cost per call, often
+  larger than a small function's whole body, and V8, the JVM and Go already make small
+  functions cheap. Port the loop together with its callers, or hand Rust the whole
+  item list in one call. Python already compiled by numba or Cython has little left
+  to gain.
+- **String offsets.** JavaScript, Java and C# count UTF-16 code units, Python counts
+  code points, Rust counts UTF-8 bytes. Convert wherever an offset or length crosses
+  the boundary; slicing a `&str` inside a character panics.
+- **Regex classes.** The `regex` crate makes `\w`, `\d` and `\b` Unicode-aware by
+  default. In JavaScript they stay ASCII with or without the `u` flag, and Java's are
+  ASCII unless `UNICODE_CHARACTER_CLASS` is set. Write `[A-Za-z0-9_]` or disable
+  Unicode in the pattern where the original was ASCII. Case-insensitive JavaScript
+  without `u` also skips folds such as the Kelvin sign to `k`. Record non-ASCII inputs
+  (Turkish dotless i, Kelvin sign, non-ASCII digits). Lookaround and backreferences
+  need `fancy-regex`.
+- **Integers.** A Python or Ruby int that passes through comes back an int, not a
+  float. Unbounded integers need `i128` or `num-bigint`; checked arithmetic only
+  reports the overflow. JavaScript numbers are f64, exact only up to 2^53. Python's
+  `//` and `%` floor while Rust's truncate, and `rem_euclid` still differs from Python
+  when the divisor is negative.
+- **Floats.** Expect last-bit differences once code is ported: evaluation order, fused
+  multiply-add and each platform's math library all move them. Agree a tolerance with
+  the user rather than chasing identical bits.
+- **Map order.** Use `indexmap` wherever insertion order reaches output.
+  `serde_json::Map` sorts its keys unless the `preserve_order` feature is on.
 - **Errors.** Where the original throws or returns an error, return `Err` that maps
   back to the same error type; `unwrap` or `panic!` there replaces a catchable error
   with a crash.
