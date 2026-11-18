@@ -53,6 +53,32 @@ against allocation.
 - `Vec` capacity is not initialized length. Prefer push/extend/resize; unsafe `set_len(n)` requires n within capacity and every newly exposed element initialized.
 - Keep public types and dependency exposure intentional, and avoid generic layers without real callers. Debug output must not reveal secrets.
 
+## Porting into Rust
+
+When code moves into Rust from another language, prove each unit against the
+original's recorded behaviour ([rewrite parity](../../figure-it-out/references/rewrite-parity.md)),
+and check these first:
+
+- **Profile before porting for speed.** One call across FFI costs more than a small
+  function's work, and V8, the JVM and Go already run small functions fast. Move the
+  loop with its callers, or pass the items once and run the whole batch in Rust.
+  Code already compiled to machine code (numba `@njit`, Cython) gains little.
+- **String offsets.** JavaScript, Java and C# index UTF-16 code units; Rust indexes
+  UTF-8 bytes. Convert at the boundary wherever an offset or length crosses it.
+- **Regex classes.** `\w`, `\b`, `\d` and case-insensitive matching are Unicode-aware
+  in the `regex` crate but ASCII-only in JavaScript without `u` and in Java by default.
+  Spell out `[A-Za-z0-9_]` or turn Unicode off where the original was ASCII. Record
+  non-ASCII inputs such as the Turkish dotless i and the Kelvin sign. Lookaround and
+  backreferences need `fancy-regex`.
+- **Numbers.** A Python or Ruby int passed through must come back an int, not a float.
+  Port with checked arithmetic where the original had big integers. Ported float code is
+  rarely bit-identical (operation order, fused multiply-add, the math library), so agree
+  a tolerance with the user instead of chasing bits.
+- **Map order.** Use `indexmap` wherever the original's insertion order reaches output.
+- **Errors.** Where the original throws or returns an error, return `Err` that maps
+  back to the same error type; `unwrap` or `panic!` there replaces a catchable error
+  with a crash.
+
 ## Evidence to report
 
 Use configured cargo check/test, formatting and Clippy within authorized scope. Compilation proves neither unsafe-code soundness nor transactional cancellation safety. Test in release mode when overflow behavior matters.
