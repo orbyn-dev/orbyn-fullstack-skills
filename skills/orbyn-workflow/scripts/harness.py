@@ -66,7 +66,32 @@ def child_cap(delegation):
 CLEANUP_RANGES = {'cache_idle_days': (1, 3650), 'worktree_idle_days': (1, 3650), 'output_idle_days': (1, 3650),
                   'archive_max_days': (1, 3650), 'archive_max_mb': (1, 10_000_000), 'references_idle_days': (1, 3650),
                   'low_disk_free_percent': (1, 50)}
-CLEANUP_KEYS = (*CLEANUP_RANGES, 'enabled')
+CACHE_PROFILES = ('off', 'safe', 'moderate', 'aggressive')
+SCAN_DEPTHS = ('standard', 'deep')
+CLEANUP_KEYS = (*CLEANUP_RANGES, 'enabled', 'cache_profile', 'output_profile', 'scan_depth')
+
+
+def restrict_cache_profile(owner, target):
+    """Apply a target's restriction to the owner/user profile."""
+    if owner == 'off' or target == 'off':
+        value = 'off'
+    elif target == 'legacy':
+        value = 'legacy' if owner == 'legacy' else 'off'
+    elif owner == 'legacy':
+        value = 'legacy'
+    else:
+        value = min((owner, target), key=CACHE_PROFILES.index)
+    notice = (f'target cache profile {target} restricts owner profile {owner} to {value}'
+              if value != target or value != owner else None)
+    return value, notice
+def restrict_scan_depth(owner, target):
+    """A repository may lower, but never increase, owner inspection cost."""
+    value = 'standard' if 'standard' in (owner, target) else 'deep'
+    notice = (f'target scan depth {target} restricts owner scan depth {owner} to {value}'
+              if value != target or value != owner else None)
+    return value, notice
+
+
 EVALS_RANGES = {'max_runs_per_pr': (1, 1000)}  # unset by default: with no cap the agent asks before spending
 WORK_MODES = ('simple', 'isolated', 'parallel')  # cheapest first
 WORK_MAX_ACTIVE = (1, 32)
@@ -151,8 +176,8 @@ def read_file(path, label, required=False):
             raise Invalid(f'{label}: {part} is not a directory')
         except OSError as error:
             raise CannotRun(f'{label}: cannot inspect {part}: {error.strerror}')
-        if stat.S_ISLNK(info.st_mode):
-            raise Invalid(f'{label}: refusing symbolic link {part}')
+        if stat.S_ISLNK(info.st_mode) or getattr(info, 'st_file_attributes', 0) & getattr(stat, 'FILE_ATTRIBUTE_REPARSE_POINT', 0):
+            raise Invalid(f'{label}: refusing symbolic link or reparse point {part}')
     if not stat.S_ISREG(info.st_mode):
         raise Invalid(f'{label}: not a regular file')
     if info.st_size > MAX_BYTES:
@@ -340,6 +365,11 @@ def validate_layer(data, human_only=(), complete=False, allowed=None, is_file=Fa
                 errors.append(f'cleanup: unknown key {key!r}')
             if 'enabled' in cleanup and type(cleanup['enabled']) is not bool:
                 errors.append('cleanup.enabled must be true or false')
+            for key in ('cache_profile', 'output_profile'):
+                if key in cleanup and cleanup[key] not in ('legacy', *CACHE_PROFILES):
+                    errors.append(f'cleanup.{key} must be one of legacy, ' + ', '.join(CACHE_PROFILES))
+            if 'scan_depth' in cleanup and cleanup['scan_depth'] not in SCAN_DEPTHS:
+                errors.append('cleanup.scan_depth must be one of ' + ', '.join(SCAN_DEPTHS))
             for key, (low, high) in CLEANUP_RANGES.items():
                 if key in cleanup:
                     value = cleanup[key]
@@ -641,11 +671,11 @@ def target_slug(primary, workspace, explicit):
     except ValueError:
         return None
     if explicit is not None:
-        return explicit if parts else None
+        return explicit if parts and explicit.lower() != '_defaults' else None
     if not parts or not all(SLUG_PATTERN.fullmatch(p) and not re.search(r'--|\.\.|-$', p) for p in parts):
         return None
     slug = '--'.join(parts)
-    return slug if SLUG_PATTERN.fullmatch(slug) else None
+    return slug if SLUG_PATTERN.fullmatch(slug) and slug.lower() != '_defaults' else None
 
 
 def parse_sets(items):
@@ -797,7 +827,36 @@ def resolve(target, hosts, sets=(), workspace=None, slug=None, defaults_path=DEF
     defaults_flat = flatten(defaults)
     layers = [('library default', 'references/harness-defaults.json', defaults_flat, 'used')]
     notices, warnings = [], []
+    if ws is None:
+        layers.append(('workspace defaults', 'no workspace found', {}, 'not configured'))
+    else:
+        where = 'repo/.harness/_defaults.json'
+        path = ws / where
+        # The owner layer may not be supplied by a tracked workspace file or linked parent.
+        repo = ws / 'repo'
+        try:
+            repo_info = os.lstat(repo)
+        except FileNotFoundError:
+            repo_info = None
+        if repo_info and (not stat.S_ISDIR(repo_info.st_mode) or stat.S_ISLNK(repo_info.st_mode) or
+                          getattr(repo_info, 'st_file_attributes', 0) & getattr(stat, 'FILE_ATTRIBUTE_REPARSE_POINT', 0)):
+            raise Invalid(f'workspace defaults {where}: repo is not a plain directory')
+        data = read_file(path, f'workspace defaults {where}')
+        if data is not None and tracked(path, ws):
+            raise Invalid(f'workspace defaults {where}: refusing tracked file')
+        if data is not None:
+            extra = set(data) - {'schema_version', 'cleanup'}
+            if extra:
+                raise Invalid(f'workspace defaults {where}: only schema_version and cleanup are allowed')
+            flat = file_layer(data, f'workspace defaults {where}', human, allowed, caps, defaults,
+                              defaults_flat, False, notices)
+        else:
+            flat = {}
+        layers.append(('workspace defaults', where, flat, 'absent' if data is None else 'used'))
     local_name = target_slug(primary, ws, slug) if ws is not None else None
+    if ws is not None and under_repo(primary, ws) and (primary.name.lower() == '_defaults' or
+                                                         (slug and slug.lower() == '_defaults')):
+        notices.append('local per-target file skipped: _defaults is a reserved slug')
     if ws is None:
         layers.append(('local file', 'no workspace found', {}, 'not configured'))
     elif local_name is None:
@@ -849,6 +908,31 @@ def resolve(target, hosts, sets=(), workspace=None, slug=None, defaults_path=DEF
         winner = chain[-1]
         effective[key] = {'value': winner['value'], 'source': winner['source'],
                           'overridden': [{'source': c['source'], 'value': c['value']} for c in reversed(chain[:-1])]}
+    for profile_key in ('cleanup.cache_profile', 'cleanup.output_profile'):
+        profile_chain = chains[profile_key]
+        target_profile = next((c for c in profile_chain if c['layer'] == 'target file'), None)
+        if target_profile:
+            owner_chain = [c for c in profile_chain if c['layer'] != 'target file']
+            owner = owner_chain[-1]
+            value, notice = restrict_cache_profile(owner['value'], target_profile['value'])
+            if notice:
+                notices.append(notice.replace('cache profile', profile_key.removeprefix('cleanup.').replace('_', ' ')))
+            if value != owner['value'] or value != target_profile['value']:
+                effective[profile_key] = {
+                    'value': value, 'source': target_profile['source'],
+                    'overridden': [{'source': c['source'], 'value': c['value']} for c in reversed(owner_chain)]}
+    depth_chain = chains['cleanup.scan_depth']
+    target_depth = next((c for c in depth_chain if c['layer'] == 'target file'), None)
+    if target_depth:
+        owner_chain = [c for c in depth_chain if c['layer'] != 'target file']
+        owner = owner_chain[-1]
+        value, notice = restrict_scan_depth(owner['value'], target_depth['value'])
+        if notice:
+            notices.append(notice)
+        if value != owner['value'] or value != target_depth['value']:
+            effective['cleanup.scan_depth'] = {
+                'value': value, 'source': target_depth['source'],
+                'overridden': [{'source': c['source'], 'value': c['value']} for c in reversed(owner_chain)]}
     off = next((c for c in chains.get('cleanup.enabled', []) if c['value'] is False), None)
     if off and not effective['cleanup.enabled']['source'].startswith('user instruction'):
         # Any file that opts a repository out of cleanup wins over another file that turns it back on.
@@ -1246,11 +1330,23 @@ def owner_file(root, workspace, slug):
 
 def command_setup(args):
     """Save the work mode atomically to the owner's file in the workspace; the only write this tool makes."""
-    if args.max_active is not None and args.mode != 'parallel':
+    cleanup_setup = args.command == 'setup-cleanup'
+    if cleanup_setup and not (args.profile or args.scan_depth):
+        raise CannotRun('setup-cleanup needs --profile or --scan-depth')
+    if cleanup_setup and args.cleanup_class is not None and args.profile is None:
+        raise CannotRun('--class requires --profile')
+    if not cleanup_setup and args.max_active is not None and args.mode != 'parallel':
         raise CannotRun('--max-active applies only to --mode parallel')
     defaults = load_defaults(args.defaults)
     root = git_root(args.target)
-    ws, filename, label = owner_file(root, args.workspace, args.slug)
+    if cleanup_setup and args.scope == 'workspace':
+        ws = find_workspace(primary_clone(root), args.workspace, root)
+        if ws is None:
+            raise CannotRun('no workspace found; pass --workspace')
+        check_workspace(ws, root)
+        filename, label = '_defaults.json', 'workspace defaults repo/.harness/_defaults.json'
+    else:
+        ws, filename, label = owner_file(root, args.workspace, args.slug)
     with ExitStack() as stack:
         windows = os.name == 'nt'
 
@@ -1284,11 +1380,29 @@ def command_setup(args):
         if folder_handle is not None:
             existing = read_windows_setup_file(destination, label) if windows else read_in(folder_handle, filename, label)
         data = existing if existing is not None else {'schema_version': 1}
-        work = dict(data.get('work', {})) if isinstance(data.get('work', {}), dict) else {}
-        work['mode'] = args.mode
-        if args.max_active is not None:
-            work['max_active'] = args.max_active
-        data = {**data, 'work': work}
+        if cleanup_setup:
+            human = [m for p in PROVIDERS for m in defaults['human_only'][p]]
+            existing_errors = validate_layer(data, human, allowed=model_allowlist(defaults), is_file=True) + cap_errors(
+                data, expanded_caps(defaults), defaults['tiers'])
+            if existing_errors:
+                raise Invalid([f'{label}: {e}' for e in existing_errors])
+            if args.scope == 'workspace' and set(data) - {'schema_version', 'cleanup'}:
+                raise Invalid(f'{label}: only schema_version and cleanup are allowed')
+            cleanup = dict(data.get('cleanup', {})) if isinstance(data.get('cleanup', {}), dict) else data.get('cleanup')
+            if not isinstance(cleanup, dict):
+                raise Invalid(f'{label}: cleanup must be an object')
+            if args.profile is not None:
+                for name in ('cache', 'output') if args.cleanup_class == 'all' else (args.cleanup_class or 'cache',):
+                    cleanup[f'{name}_profile'] = args.profile
+            if args.scan_depth is not None:
+                cleanup['scan_depth'] = args.scan_depth
+            data = {**data, 'cleanup': cleanup}
+        else:
+            work = dict(data.get('work', {})) if isinstance(data.get('work', {}), dict) else {}
+            work['mode'] = args.mode
+            if args.max_active is not None:
+                work['max_active'] = args.max_active
+            data = {**data, 'work': work}
         human = [m for p in PROVIDERS for m in defaults['human_only'][p]]
         errors = validate_layer(data, human, allowed=model_allowlist(defaults), is_file=True) + cap_errors(
             data, expanded_caps(defaults), defaults['tiers'])
@@ -1297,6 +1411,14 @@ def command_setup(args):
         text = json.dumps(data, indent=2) + '\n'
         if len(text.encode()) > MAX_BYTES:
             raise Invalid(f'{label}: larger than {MAX_BYTES} bytes')
+        if cleanup_setup and args.dry_run:
+            fields = ('cache', 'output') if args.cleanup_class == 'all' else (args.cleanup_class or 'cache',)
+            settings = [f'cleanup.{name}_profile={args.profile}' for name in fields] if args.profile else []
+            if args.scan_depth:
+                settings.append(f'cleanup.scan_depth={args.scan_depth}')
+            setting = ' '.join(settings)
+            print(f'Dry run: would save {setting} to {label}. Nothing was written.')
+            return 0
         if folder_handle is None:
             if windows:
                 folder.mkdir(mode=0o755)
@@ -1324,8 +1446,16 @@ def command_setup(args):
             except OSError:
                 pass
             raise
-    print(f'OK: saved work.mode={args.mode}' + (f' work.max_active={args.max_active}' if args.max_active is not None else '')
-          + f' to {label}. Nothing else was written.')
+    if cleanup_setup:
+        fields = ('cache', 'output') if args.cleanup_class == 'all' else (args.cleanup_class or 'cache',)
+        settings = [f'cleanup.{name}_profile={args.profile}' for name in fields] if args.profile else []
+        if args.scan_depth:
+            settings.append(f'cleanup.scan_depth={args.scan_depth}')
+        setting = ' '.join(settings)
+        print(f'OK: saved {setting} to {label}. Nothing else was written.')
+    else:
+        print(f'OK: saved work.mode={args.mode}' + (f' work.max_active={args.max_active}' if args.max_active is not None else '')
+              + f' to {label}. Nothing else was written.')
     return 0
 
 
@@ -1370,6 +1500,16 @@ def build_parser():
     setup.add_argument('--workspace', help='outer workspace holding repo/.harness (default: found from the target)')
     setup.add_argument('--slug', help='local file name without .json (default: derived from the target)')
     setup.add_argument('--defaults', default=DEFAULTS_PATH, help=argparse.SUPPRESS)
+    cleanup = sub.add_parser('setup-cleanup', help='save an owner cleanup profile')
+    cleanup.add_argument('--target', required=True)
+    cleanup.add_argument('--scope', required=True, choices=('repo', 'workspace'))
+    cleanup.add_argument('--class', dest='cleanup_class', choices=('cache', 'output', 'all'))
+    cleanup.add_argument('--profile', choices=('legacy', *CACHE_PROFILES))
+    cleanup.add_argument('--scan-depth', choices=SCAN_DEPTHS)
+    cleanup.add_argument('--workspace')
+    cleanup.add_argument('--slug')
+    cleanup.add_argument('--dry-run', action='store_true')
+    cleanup.add_argument('--defaults', default=DEFAULTS_PATH, help=argparse.SUPPRESS)
     val = sub.add_parser('validate', help='validate one harness file')
     val.add_argument('file')
     val.add_argument('--defaults', default=DEFAULTS_PATH, help=argparse.SUPPRESS)
@@ -1391,7 +1531,7 @@ def primary_script():
     # Hand over only when this copy is a past version of the main checkout's file. A copy carrying new,
     # unmerged work (committed on a branch or edited in place) keeps running, so it can be tested.
     try:  # without Git there is no way to tell, so this copy keeps running
-        blob = subprocess.run(['git', 'hash-object', str(SCRIPT)], capture_output=True, text=True)
+        blob = subprocess.run(['git', '-C', str(main), 'hash-object', str(SCRIPT)], capture_output=True, text=True)
         if blob.returncode or not blob.stdout.strip():
             return None
         seen = subprocess.run(['git', '-C', str(main), 'log', '-1', '--format=%H', f'--find-object={blob.stdout.strip()}',
@@ -1410,7 +1550,7 @@ def main(argv=None):
                   {**os.environ, 'ORBYN_HARNESS_PRIMARY': '1'})
     args = build_parser().parse_args(argv)
     try:
-        return {'resolve': command_resolve, 'setup': command_setup, 'validate': command_validate, 'check': command_check}[args.command](args)
+        return {'resolve': command_resolve, 'setup': command_setup, 'setup-cleanup': command_setup, 'validate': command_validate, 'check': command_check}[args.command](args)
     except Invalid as error:
         for item in error.errors:
             print(f'invalid: {item}', file=sys.stderr)

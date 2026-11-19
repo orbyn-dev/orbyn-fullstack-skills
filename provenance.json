@@ -1511,6 +1511,27 @@
           "effort": "medium (author/scout); coordinator effort not exposed by host",
           "date": "2026-11-14",
           "scope": "Two additive synthetic development cases for native-stack stale-head async decisions and ordinary status-only scope; frozen holdouts unchanged."
+        },
+        {
+          "tool": "Codex desktop (native subagents and shell)",
+          "model": "gpt-6.1-sol (lead and case author)",
+          "effort": "medium",
+          "date": "2026-11-14",
+          "scope": "Issue 188 synthetic development cache-only safety outcome case and static suite validation; frozen holdouts unchanged. No live model trial established by the case definition."
+        },
+        {
+          "tool": "Codex desktop (native subagents and shell)",
+          "model": "gpt-6.1-sol (lead), gpt-6.1-terra (worker)",
+          "effort": "medium",
+          "date": "2026-11-15",
+          "scope": "Add a synthetic development outcome case for preserving source and emulator output; no live model trial."
+        },
+        {
+          "tool": "Codex desktop (native subagents and shell)",
+          "model": "gpt-6.1-sol (lead, engine/platform implementation and independent review); gpt-6.1-terra (harness and documentation)",
+          "effort": "medium",
+          "date": "2026-11-15",
+          "scope": "Synthetic development outcome case for deeper inspection preserving safety and finite budgets."
         }
       ],
       "reviewed_inspiration": [
@@ -2736,6 +2757,34 @@
           "effort": "medium",
           "date": "2026-11-14",
           "scope": "Maintainer review fixes on PR 187: async merge targets only the lowest open layer, gh stack merge not used for merging, 200/409 handling, owner-bypass alignment, gh stack sync restored."
+        },
+        {
+          "tool": "Codex desktop (native subagents and shell)",
+          "model": "gpt-6.1-sol (lead and independent reviewer), gpt-6.1-terra (harness author)",
+          "effort": "medium",
+          "date": "2026-11-14",
+          "scope": "Issue 188 cleanup profiles, owner-local workspace defaults, restrict-only target policies and setup-cleanup configuration; focused validation and independent Codex review. No source text or code imported."
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5",
+          "effort": "medium",
+          "date": "2026-11-14",
+          "scope": "Issue 188 early requirements, design and plan only, before the user switched execution to Codex-only; no Claude implementation or review claimed."
+        },
+        {
+          "tool": "Codex desktop (native subagents and shell)",
+          "model": "gpt-6.1-sol (lead), gpt-6.1-terra (worker)",
+          "effort": "medium",
+          "date": "2026-11-15",
+          "scope": "Independent output profile and setup selector by worker; integration and design by lead."
+        },
+        {
+          "tool": "Codex desktop (native subagents and shell)",
+          "model": "gpt-6.1-sol (lead, engine/platform implementation and independent review); gpt-6.1-terra (harness and documentation)",
+          "effort": "medium",
+          "date": "2026-11-15",
+          "scope": "Owner per-repository and workspace scan-depth selection with tracked policy cost ceilings and atomic setup preservation."
         }
       ]
     },
@@ -3535,6 +3584,48 @@
           "effort": "medium",
           "date": "2026-11-12",
           "scope": "Slimmed SKILL.md entry: detail moved to references, no rule changed"
+        },
+        {
+          "tool": "Codex desktop (native subagents and shell)",
+          "model": "gpt-6.1-sol (lead, engine author and independent reviewer)",
+          "effort": "medium",
+          "date": "2026-11-14",
+          "scope": "Issue 188 cache-only profiles: bounded compiler/dependency proof, source quiescence, native probes, fresh rechecks, receipts, read-only Docker/shared storage and synthetic/native verification; independent Codex review and repairs. No source text or code imported."
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5",
+          "effort": "medium",
+          "date": "2026-11-14",
+          "scope": "Issue 188 early requirements, design and plan only, before the user switched execution to Codex-only; no Claude implementation or review claimed."
+        },
+        {
+          "tool": "Codex desktop (native subagents and shell)",
+          "model": "gpt-6.1-sol (lead), gpt-6.1-terra (worker)",
+          "effort": "medium",
+          "date": "2026-11-15",
+          "scope": "Output-unit cleanup design and engine by lead; output cleanup documentation by worker. Independent review evidence is tracked separately."
+        },
+        {
+          "tool": "Codex desktop (native subagents and shell)",
+          "model": "gpt-6.1-sol (lead, platform implementation, review); gpt-6.1-terra (capacity module and documentation); gpt-6-luna (read-only inventory)",
+          "effort": "medium",
+          "date": "2026-11-15",
+          "scope": "Truthful free-space and Recycle Bin accounting, diagnostic reclaim goal, detailed bounded Windows usage reasons, duplicate-stat reduction preserving identity checks and safety budgets, synthetic tests and documentation. No permanent deletion or Bin emptying capability."
+        },
+        {
+          "tool": "Codex desktop (native subagents and shell)",
+          "model": "gpt-6.1-sol (lead, engine/platform implementation and independent review); gpt-6.1-terra (harness and documentation)",
+          "effort": "medium",
+          "date": "2026-11-15",
+          "scope": "Explicit bounded Standard/Deep inspection presets across discovery, source and metadata scans, usage, fresh rechecks and final native recycle callbacks; per-repository policy isolation and exact-scope scan optimization; preserve all disposal guards."
+        },
+        {
+          "tool": "Codex desktop (native subagents and shell)",
+          "model": "gpt-6.1-sol (lead integration, junction implementation, lifecycle and separate same-family review); gpt-6.1-terra (usage access contract and verification)",
+          "effort": "medium",
+          "date": "2026-11-20",
+          "scope": "Metadata-only Windows usage probing with share-conflict preservation; handle-based directory enumeration; explicit whole-worktree junction-object escrow with recovery journal and unchanged shared targets; source-policy integration, synthetic/native contracts and documentation. Local runtime evidence and separate review are recorded outside Git."
         }
       ],
       "reviewed_inspiration": [
@@ -3573,6 +3664,66 @@
           "relationship": "reviewed-inspiration observed 2026-11-10; independently written API integration; no implementation or documentation text copied",
           "credit": "Microsoft Learn (Windows API documentation)",
           "license": "CC-BY-4.0"
+        },
+        {
+          "credit": "Cargo documentation contributors",
+          "source": "https://doc.rust-lang.org/cargo/reference/build-cache.html",
+          "revision": "observed 2026-11-14",
+          "relationship": "reviewed for ideas only; independently authored cache ownership and reporting contract; no source text or code copied; source license not verified"
+        },
+        {
+          "credit": "npm documentation contributors",
+          "source": "https://docs.npmjs.com/cli/cache/",
+          "revision": "observed 2026-11-14",
+          "relationship": "reviewed for ideas only; independently authored cache ownership and reporting contract; no source text or code copied; source license not verified"
+        },
+        {
+          "credit": "Astral uv documentation contributors",
+          "source": "https://docs.astral.sh/uv/concepts/cache/",
+          "revision": "observed 2026-11-14",
+          "relationship": "reviewed for ideas only; independently authored cache ownership and reporting contract; no source text or code copied; source license not verified"
+        },
+        {
+          "source": "https://docs.github.com/en/rest/pulls/pulls#get-a-pull-request",
+          "revision": "observed 2026-11-15",
+          "relationship": "API contract reviewed as inspiration; no source text or code copied; see source for terms",
+          "credit": "GitHub documentation contributors"
+        },
+        {
+          "source": "https://docs.gitlab.com/api/merge_requests/#get-single-mr",
+          "revision": "observed 2026-11-15",
+          "relationship": "API contract reviewed as inspiration; no source text or code copied; see source for terms",
+          "credit": "GitLab documentation contributors"
+        },
+        {
+          "credit": "Microsoft documentation contributors",
+          "source": "https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shqueryrecyclebinw",
+          "revision": "observed 2026-11-15",
+          "relationship": "API contract reviewed only; no source text or code copied; licence not verified, see source terms"
+        },
+        {
+          "credit": "Microsoft documentation contributors",
+          "source": "https://learn.microsoft.com/en-us/windows/win32/api/winbase/ns-winbase-file_rename_info",
+          "revision": "observed 2026-11-20",
+          "relationship": "API contract reviewed for independently authored Windows metadata inspection and no-follow reference preservation; no source code or prose copied; licence not verified, see source terms"
+        },
+        {
+          "credit": "Microsoft documentation contributors",
+          "source": "https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getfileinformationbyhandleex",
+          "revision": "observed 2026-11-20",
+          "relationship": "API contract reviewed for independently authored Windows metadata inspection and no-follow reference preservation; no source code or prose copied; licence not verified, see source terms"
+        },
+        {
+          "credit": "Microsoft documentation contributors",
+          "source": "https://learn.microsoft.com/en-us/windows/win32/api/winbase/ns-winbase-file_full_dir_info",
+          "revision": "observed 2026-11-20",
+          "relationship": "API contract reviewed for independently authored Windows metadata inspection and no-follow reference preservation; no source code or prose copied; licence not verified, see source terms"
+        },
+        {
+          "credit": "Microsoft documentation contributors",
+          "source": "https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fsa/4aeefef8-92c3-4abc-af7a-a610caf8a165",
+          "revision": "observed 2026-11-20",
+          "relationship": "API contract reviewed for independently authored Windows metadata inspection and no-follow reference preservation; no source code or prose copied; licence not verified, see source terms"
         }
       ]
     },
@@ -3826,12 +3977,12 @@
           "relationship": "reviewed-inspiration; independently authored local synthesis, no source text imported"
         },
         {
-          "credit": "Anthropic \u2014 effective agents",
+          "credit": "Anthropic — effective agents",
           "source": "https://www.anthropic.com/research/building-effective-agents",
           "relationship": "reviewed-inspiration; independently authored local synthesis, no source text imported"
         },
         {
-          "credit": "Anthropic \u2014 context engineering",
+          "credit": "Anthropic — context engineering",
           "source": "https://www.anthropic.com/research/effective-context-engineering-for-ai-agents",
           "relationship": "reviewed-inspiration; independently authored local synthesis, no source text imported"
         },
@@ -3841,12 +3992,12 @@
           "relationship": "reviewed-inspiration; independently authored local synthesis, no source text imported"
         },
         {
-          "credit": "Microsoft \u2014 Azure search security-filter limitations",
+          "credit": "Microsoft — Azure search security-filter limitations",
           "source": "https://learn.microsoft.com/en-us/azure/search/search-security-trimming-for-azure-search",
           "relationship": "reviewed-inspiration; independently authored local synthesis, no source text imported"
         },
         {
-          "credit": "Anthropic \u2014 tool design",
+          "credit": "Anthropic — tool design",
           "source": "https://www.anthropic.com/research/writing-tools-for-agents",
           "relationship": "reviewed-inspiration; independently authored local synthesis, no source text imported"
         },
@@ -3861,7 +4012,7 @@
           "relationship": "reviewed-inspiration; independently authored local synthesis, no source text imported"
         },
         {
-          "credit": "Anthropic \u2014 agent evaluations, January 2026",
+          "credit": "Anthropic — agent evaluations, January 2026",
           "source": "https://www.anthropic.com/research/demystifying-evals-for-ai-agents",
           "relationship": "reviewed-inspiration; independently authored local synthesis, no source text imported"
         },
@@ -3974,7 +4125,7 @@
       "license": "MIT",
       "source": "https://github.com/wheresryan22/anatomy/tree/1482e8469b0a9e0d8cc18ea2740a01423d29ae80",
       "revision": "1482e8469b0a9e0d8cc18ea2740a01423d29ae80",
-      "changes": "Orbyn-authored guidance adapting Anatomy\u2019s model-driven illustration methods, with conditional output references. Selected licensed runtime/tests/fixtures adapted with explicit failure-sensitive browser, output preservation, resource ownership and packaging contracts; no active upstream skill, publisher, session harvesting or experimental renderers. Original and maintained fingerprints retained separately. Runtime qualification is finite and separately reported. Added independently authored spatial review adapter, original synthetic V12/timeline sources, strict schema-2 model and shared trusted save-bridge reuse, focused fixtures and development cases. Prepared packages reuse existing pinned Anatomy MIT support with notices; no duplicate upstream renderer is tracked. Reviewed Scenario motion method as inspiration only; no source code, fonts, media, runtime or provider imported. Added independently authored authorable motion-film specs, fourteen deterministic DOM/SVG/CSS-3D primitives, original generated raster studies, shared preview/export renderer, bounded MP4/audio/caption/effects pipeline and failure/qualification tests. No reviewed Scenario ZIP code, fonts or media copied; existing Anatomy lineage retained. Replaced active local-kinetic wording with motion films. Added independently authored code-driven motion composition/time/track/component/inspector contracts, rational film compatibility, source-bound motion review profile and development controls. Reviewed external methods inform the design; no Remotion skills, OBS/LosslessCut implementation, external authored assets or model weights imported. Optional runtime dependency profiles retain their own licenses/notices and qualify separately. Added independently authored lyric-performance guidance and synthetic development cases covering representative previews, bounded local puppeting, registered blink review, motion pacing, actual typography raster checks and cadence/mux evidence. No consumer scripts, media, lyrics or reports imported; historical source lineage is unchanged. Added an independently authored code-only rule, character animation and 3D world methods, a dependency-free rig kit with a procedural film and a source check; five public music videos were reviewed for timing and technique only, with no frames, art, audio or characters copied.",
+      "changes": "Orbyn-authored guidance adapting Anatomy’s model-driven illustration methods, with conditional output references. Selected licensed runtime/tests/fixtures adapted with explicit failure-sensitive browser, output preservation, resource ownership and packaging contracts; no active upstream skill, publisher, session harvesting or experimental renderers. Original and maintained fingerprints retained separately. Runtime qualification is finite and separately reported. Added independently authored spatial review adapter, original synthetic V12/timeline sources, strict schema-2 model and shared trusted save-bridge reuse, focused fixtures and development cases. Prepared packages reuse existing pinned Anatomy MIT support with notices; no duplicate upstream renderer is tracked. Reviewed Scenario motion method as inspiration only; no source code, fonts, media, runtime or provider imported. Added independently authored authorable motion-film specs, fourteen deterministic DOM/SVG/CSS-3D primitives, original generated raster studies, shared preview/export renderer, bounded MP4/audio/caption/effects pipeline and failure/qualification tests. No reviewed Scenario ZIP code, fonts or media copied; existing Anatomy lineage retained. Replaced active local-kinetic wording with motion films. Added independently authored code-driven motion composition/time/track/component/inspector contracts, rational film compatibility, source-bound motion review profile and development controls. Reviewed external methods inform the design; no Remotion skills, OBS/LosslessCut implementation, external authored assets or model weights imported. Optional runtime dependency profiles retain their own licenses/notices and qualify separately. Added independently authored lyric-performance guidance and synthetic development cases covering representative previews, bounded local puppeting, registered blink review, motion pacing, actual typography raster checks and cadence/mux evidence. No consumer scripts, media, lyrics or reports imported; historical source lineage is unchanged. Added an independently authored code-only rule, character animation and 3D world methods, a dependency-free rig kit with a procedural film and a source check; five public music videos were reviewed for timing and technique only, with no frames, art, audio or characters copied.",
       "incorporated_material": [
         {
           "source": "https://github.com/wheresryan22/anatomy/tree/1482e8469b0a9e0d8cc18ea2740a01423d29ae80",
@@ -4327,8 +4478,8 @@
       "changes": "Orbyn skill for using affectUI's free React components: copy the reviewed pinned file, restyle through its CSS variables, drive it from real state, verify; updates only through upstream review. Bundles the unmodified free items as a pinned, hash-checked snapshot under references/upstream/affectui/.",
       "reviewed_sources": [
         {
-          "credit": "Florian H\u00f6ller (adfects), affectUI",
-          "copyright": "Copyright (c) 2026 Florian H\u00f6ller (adfects)",
+          "credit": "Florian Höller (adfects), affectUI",
+          "copyright": "Copyright (c) 2026 Florian Höller (adfects)",
           "source": "https://github.com/flohoeller/affectui/tree/3c5df43893d870ee42d81fad4a4ba3ad72ba1b99",
           "revision": "3c5df43893d870ee42d81fad4a4ba3ad72ba1b99",
           "license": "MIT",

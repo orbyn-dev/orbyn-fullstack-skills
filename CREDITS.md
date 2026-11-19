@@ -48,19 +48,28 @@ bundled, and they may carry other licences. Generated from `provenance.json` by
 | https://aclanthology.org/2024.eacl-demo.16/ | RAGAs, EACL 2024 | See source | orbyn-ai-application |
 | https://dev.to/nark3d/a-three-tier-folder-structure-for-long-lived-codebases-3a3l | Adam Lewis (Three-Tier Hoisting) | See source | architect, language-best-practices |
 | https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage | MDN Web Docs and Playwright documentation | See source | orbyn-ui-design |
+| https://doc.rust-lang.org/cargo/reference/build-cache.html | Cargo documentation contributors | See source | orbyn-worktree |
+| https://docs.astral.sh/uv/concepts/cache/ | Astral uv documentation contributors | See source | orbyn-worktree |
 | https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/merging-stacked-pull-requests | GitHub documentation contributors | CC-BY-4.0 | orbyn-skill-creator, orbyn-workflow |
-| https://docs.github.com/en/rest/pulls/pulls | GitHub documentation contributors | CC-BY-4.0 | orbyn-skill-creator, orbyn-workflow |
+| https://docs.github.com/en/rest/pulls/pulls | GitHub documentation contributors | CC-BY-4.0 | orbyn-skill-creator, orbyn-workflow, orbyn-worktree |
 | https://docs.github.com/en/rest/pulls/stacks | GitHub documentation contributors | CC-BY-4.0 | orbyn-skill-creator, orbyn-workflow |
+| https://docs.gitlab.com/api/merge_requests/ | GitLab documentation contributors | See source | orbyn-worktree |
+| https://docs.npmjs.com/cli/cache/ | npm documentation contributors | See source | orbyn-worktree |
 | https://doi.org/10.6028/NIST.AI.600-1 | NIST AI 600-1, July 2024 | See source | orbyn-ai-application |
 | https://genai.owasp.org/llmrisk/llm01-prompt-injection/ | OWASP LLM01:2025 | See source | orbyn-ai-application |
 | https://genai.owasp.org/llmrisk/llm062025-excessive-agency/ | OWASP LLM06:2025 | See source | orbyn-ai-application |
 | https://githubnext.com/projects/pdd-kit/ | GitHub Next and Microsoft Research | See source | tdd |
 | https://learn.microsoft.com/en-us/azure/search/search-security-trimming-for-azure-search | Microsoft — Azure search security-filter limitations | See source | orbyn-ai-application |
+| https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fsa/4aeefef8-92c3-4abc-af7a-a610caf8a165 | Microsoft documentation contributors | See source | orbyn-worktree |
 | https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-lockfileex | Microsoft Learn (Windows API documentation) | CC-BY-4.0 | orbyn-worktree |
+| https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shqueryrecyclebinw | Microsoft documentation contributors | See source | orbyn-worktree |
 | https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/ne-shobjidl_core-_transfer_source_flags | Microsoft Learn (Windows API documentation) | CC-BY-4.0 | orbyn-worktree |
 | https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifileoperation-setoperationflags | Microsoft Learn (Windows API documentation) | CC-BY-4.0 | orbyn-worktree |
 | https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifileoperationprogresssink-postdeleteitem | Microsoft Learn (Windows API documentation) | CC-BY-4.0 | orbyn-worktree |
 | https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifileoperationprogresssink-predeleteitem | Microsoft Learn (Windows API documentation) | CC-BY-4.0 | orbyn-worktree |
+| https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getfileinformationbyhandleex | Microsoft documentation contributors | See source | orbyn-worktree |
+| https://learn.microsoft.com/en-us/windows/win32/api/winbase/ns-winbase-file_full_dir_info | Microsoft documentation contributors | See source | orbyn-worktree |
+| https://learn.microsoft.com/en-us/windows/win32/api/winbase/ns-winbase-file_rename_info | Microsoft documentation contributors | See source | orbyn-worktree |
 | https://learn.microsoft.com/en-us/windows/win32/fileio/creating-and-opening-files | Microsoft Learn (Windows API documentation) | CC-BY-4.0 | orbyn-worktree |
 | https://pair.withgoogle.com/chapter/feedback-controls/ | Google PAIR feedback/control | See source | orbyn-ai-application |
 | https://pair.withgoogle.com/chapter/user-needs/ | Google PAIR user needs | See source | orbyn-ai-application |

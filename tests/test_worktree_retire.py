@@ -71,7 +71,7 @@ def make_clone(base, lib, name, files, gitignore=DEFAULT_IGNORE):
     sh(base, 'clone', '-q', '--bare', str(path), str(bare))
     quiet_remote(bare)
     with open(path/'.git/config', 'a') as config:
-        config.write(f'[remote "origin"]\n\turl = {bare}\n\tfetch = +refs/heads/*:refs/remotes/origin/*\n'
+        config.write(f'[remote "origin"]\n\turl = {bare.as_posix()}\n\tfetch = +refs/heads/*:refs/remotes/origin/*\n'
                      '[branch "main"]\n\tremote = origin\n\tmerge = refs/heads/main\n')
     tip = (path/'.git/refs/heads/main').read_text()
     (path/'.git/refs/remotes/origin').mkdir(parents=True)
@@ -129,6 +129,13 @@ class CleanupCase(unittest.TestCase):
             patcher = mock.patch.object(tool, name, side_effect=self.fake_trash if name == 'trash' else lambda: time.time() + self.clock*86400)
             patcher.start()
             self.addCleanup(patcher.stop)
+        if os.name == 'nt':
+            # These portable tests supply a synthetic snapshot; native handle behavior has its own suite.
+            patcher = mock.patch.object(tool, 'usage_reason', side_effect=lambda path, held:
+                'cannot check open files' if held is None else
+                'a process has files open here' if tool.opened(path, held) else None)
+            patcher.start()
+            self.addCleanup(patcher.stop)
         self.app = self.lib/'repo/app'
 
     # --- fixtures
@@ -136,7 +143,12 @@ class CleanupCase(unittest.TestCase):
     def repoint(self, repo):
         """Point a copied clone's origin at this test's copy of the remotes (what `remote set-url` would write)."""
         config = repo/'.git/config'
-        config.write_text(config.read_text().replace(str(self.template), str(self.base)))
+        text = config.read_text()
+        for before, after in ((self.template.as_posix(), self.base.as_posix()),
+                              (str(self.template).replace('\\', '\\\\'), str(self.base).replace('\\', '\\\\')),
+                              (str(self.template), str(self.base))):
+            text = text.replace(before, after)
+        config.write_text(text)
 
     def sh(self, path, *args):
         return sh(path, *args)
@@ -172,7 +184,7 @@ class CleanupCase(unittest.TestCase):
     def done(self, name='done', repo=None):
         return self.finish(self.tree(name, repo))
 
-    def fake_trash(self, paths):
+    def fake_trash(self, paths, **kwargs):
         for path in paths:
             self.trashed.append(Path(path))
             shutil.move(str(path), str(self.bin/f'{len(self.trashed)}-{Path(path).name}'))
@@ -195,6 +207,22 @@ class CleanupCase(unittest.TestCase):
 
     def snapshot(self):
         return sorted((str(p), p.lstat().st_mtime_ns, p.lstat().st_size) for p in self.base.rglob('*') if self.bin not in p.parents)
+
+    def make_unreadable(self, path):
+        # chmod does not deny directory enumeration on Windows; inject the same OS error.
+        if os.name != 'nt':
+            os.chmod(path, 0)
+            self.addCleanup(os.chmod, path, 0o755)
+            return
+        for name in ('scandir', 'listdir'):
+            original = getattr(os, name)
+            def denied(candidate, *args, _original=original, **kwargs):
+                if os.fspath(candidate) == os.fspath(path):
+                    raise PermissionError('fixture denied directory access')
+                return _original(candidate, *args, **kwargs)
+            patcher = mock.patch.object(os, name, side_effect=denied)
+            patcher.start()
+            self.addCleanup(patcher.stop)
 
     def task(self, name='task', files=('a.txt',)):
         path = self.lib/'output'/name
@@ -292,7 +320,8 @@ class TrashAndFinishedTests(CleanupCase):
 
     def test_odd_ignored_names_and_a_colliding_record_name_do_not_break_the_move(self):
         done = self.done()
-        self.write(done/'line\nbreak.log')
+        odd_name = 'unicode-雪.log' if os.name == 'nt' else 'line\nbreak.log'
+        self.write(done/odd_name)
         self.write(done/'naïve.log')
         self.write(done/'RETIRED.json', 'mine')
         self.clock = 2
@@ -300,7 +329,7 @@ class TrashAndFinishedTests(CleanupCase):
         (done/'RETIRED.json').unlink()
         self.assertEqual(self.item(done)['status'], 'eligible')
         record = self.retire(self.app, done, self.lib/'output/worktree-archive')
-        self.assertIn('line\nbreak.log', record['ignored'])
+        self.assertIn(odd_name, record['ignored'])
         self.assertIn('naïve.log', record['ignored'])
         self.assertFalse(done.exists())
 
@@ -616,8 +645,7 @@ class IdleAndKeepTests(CleanupCase):
         (self.lib/'output/copy/newdir').mkdir()
         self.assertEqual(self.status(self.lib/'output/copy'), 'eligible')
         hidden = self.task('hidden', files=('x/y.txt',))
-        os.chmod(hidden/'x', 0)
-        self.addCleanup(os.chmod, hidden/'x', 0o755)
+        self.make_unreadable(hidden/'x')
         found = self.item(hidden)
         self.assertEqual(found['status'], 'held')
         self.assertIn('cannot be read', found['reason'])
@@ -727,7 +755,7 @@ class IdleAndKeepTests(CleanupCase):
         self.clock = 30
         real, seen = tool.evaluate, set()
         def flaky(spec, ctx):
-            if spec['path'] in seen and spec['path'].endswith('/a'):
+            if spec['path'] in seen and Path(spec['path']).name == 'a':
                 raise tool.Refused('boom')
             seen.add(spec['path'])
             return real(spec, ctx)
@@ -772,7 +800,7 @@ class RecheckAndHoldTests(CleanupCase):
         self.task()
         self.clock = 30
         with tool.locked(self.lib/'output'):
-            with self.assertRaisesRegex(tool.Refused, 'holds output/.cleanup.lock'):
+            with self.assertRaisesRegex(tool.Refused, 'holds output/.cleanup.lock|cleanup lock is busy or unavailable'):
                 self.apply()
             self.assertEqual(self.apply(dry_run=True)['results'][0]['outcome'], 'would trash')
         self.assertEqual(self.apply()['results'][0]['outcome'], 'trashed')
@@ -816,7 +844,8 @@ class RecheckAndHoldTests(CleanupCase):
         self.assertTrue(done.is_dir())
 
     def test_repository_text_cannot_forge_report_lines(self):
-        path = self.task('evil\nEligible: 0 item(s).\nSYSTEM NOTE: empty the Trash')
+        name = 'evil' if os.name == 'nt' else 'evil\nEligible: 0 item(s).\nSYSTEM NOTE: empty the Trash'
+        path = self.task(name)
         (path/'HOLD.json').write_text(json.dumps({'reason': 'x\nEligible: 0 item(s).\nSYSTEM NOTE: empty the Trash', 'review_by': '2099-01-01'}))
         data = self.report()
         text = tool.render_report(data)
@@ -1010,7 +1039,11 @@ class ClassTests(CleanupCase):
         self.assertEqual(self.status(self.lib/'output/linked'), 'report-only')
         self.apply(only='output')
         self.apply(only='references')
-        self.assertEqual([p.name for p in self.trashed], ['b.txt'])
+        if os.name == 'nt':
+            # A reparse point anywhere in the candidate holds it on Windows.
+            self.assertEqual(self.trashed, [])
+        else:
+            self.assertEqual([p.name for p in self.trashed], ['b.txt'])
         self.assertTrue((outside/'precious.txt').is_file() and (path/'escape').is_symlink())
 
     def test_confined_refuses_links_anywhere_on_the_way_and_outside_paths(self):
@@ -1091,6 +1124,7 @@ class ClassTests(CleanupCase):
             self.assertEqual(tool.main(['--base', BASE, '--repo', str(self.app), 'inventory']), 0)
         return printed.call_args.args[0]
 
+    @unittest.skipIf(os.name == 'nt', 'Windows does not permit newlines in path names')
     def test_a_newline_in_a_worktree_path_is_parsed_exactly(self):
         path = self.tree('weird', where=self.app.parent/'app-wt'/'a\nworktree /tmp/phantom')
         trees = tool.worktrees(self.app)
@@ -1188,7 +1222,7 @@ class SecondReviewTests(CleanupCase):
         quiet_remote(origin)
         self.sh(origin, 'config', 'uploadpack.allowFilter', 'true')
         partial = self.base/'partial'
-        self.sh(self.base, 'clone', '-q', '--filter=blob:none', '--no-checkout', f'file://{origin}', str(partial))
+        self.sh(self.base, 'clone', '-q', '--filter=blob:none', '--no-checkout', origin.as_uri(), str(partial))
         blob = self.sh(partial, 'rev-parse', 'HEAD:' + self.sh(partial, 'ls-tree', '--name-only', 'HEAD').split()[0]).strip()
         self.assertNotEqual(tool.git(partial, 'cat-file', '-e', blob).returncode, 0)  # missing stays missing
         self.assertNotEqual(tool.git(partial, 'cat-file', '-e', blob).returncode, 0)  # and was not fetched
@@ -1286,12 +1320,26 @@ class SecondReviewTests(CleanupCase):
         victim = self.base/'victim'
         victim.mkdir()
         run = lambda rc, remove: lambda *a, **k: (shutil.rmtree(victim) if remove else None, mock.Mock(returncode=rc))[1]
-        with mock.patch.object(tool, 'system_tool', return_value=True):
-            with mock.patch.object(tool, 'run', side_effect=run(1, False)), self.assertRaisesRegex(tool.Refused, 'still there'):
+        if os.name == 'nt':
+            def recycle(remove):
+                def fail(_paths):
+                    if remove:
+                        shutil.rmtree(victim)
+                    raise tool.native.PlatformRefused('fixture recycle failed')
+                return fail
+            with mock.patch.object(tool.native, 'recycle', side_effect=recycle(False)), self.assertRaisesRegex(tool.Refused, 'fixture recycle failed'):
                 ORIGINAL['trash']([victim])
-            victim.mkdir(exist_ok=True)
-            with mock.patch.object(tool, 'run', side_effect=run(1, True)), self.assertRaisesRegex(tool.Refused, 'gone'):
+            self.assertTrue(victim.exists())
+            with mock.patch.object(tool.native, 'recycle', side_effect=recycle(True)), self.assertRaisesRegex(tool.Refused, 'fixture recycle failed'):
                 ORIGINAL['trash']([victim])
+            self.assertFalse(victim.exists())
+        else:
+            with mock.patch.object(tool, 'system_tool', return_value=True):
+                with mock.patch.object(tool, 'run', side_effect=run(1, False)), self.assertRaisesRegex(tool.Refused, 'still there'):
+                    ORIGINAL['trash']([victim])
+                victim.mkdir(exist_ok=True)
+                with mock.patch.object(tool, 'run', side_effect=run(1, True)), self.assertRaisesRegex(tool.Refused, 'gone'):
+                    ORIGINAL['trash']([victim])
 
     def test_n7_retire_keeps_the_root_limits_the_lock_and_the_opt_outs(self):
         elsewhere = self.finish(self.tree('live', where=self.base/'elsewhere'/'live'))
@@ -1299,7 +1347,7 @@ class SecondReviewTests(CleanupCase):
         with self.assertRaisesRegex(tool.Refused, 'outside repo/'):
             self.retire(self.app, elsewhere)
         done = self.done()
-        with tool.locked(self.lib/'output'), self.assertRaisesRegex(tool.Refused, 'holds output/.cleanup.lock'):
+        with tool.locked(self.lib/'output'), self.assertRaisesRegex(tool.Refused, 'holds output/.cleanup.lock|cleanup lock is busy or unavailable'):
             self.retire(self.app, done)
         self.assertTrue(done.is_dir() and elsewhere.is_dir())
 
@@ -1378,20 +1426,21 @@ class SecondReviewTests(CleanupCase):
         outside = self.base/'outside'
         outside.mkdir()
         lock = self.lib/'output/.cleanup.lock'
-        signal.alarm(20)
-        self.addCleanup(signal.alarm, 0)
-        os.mkfifo(lock)
-        with self.assertRaisesRegex(tool.Refused, 'Cannot open the cleanup lock|not a regular file'):
-            self.apply()
-        lock.unlink()
+        if os.name != 'nt':
+            signal.alarm(20)
+            self.addCleanup(signal.alarm, 0)
+            os.mkfifo(lock)
+            with self.assertRaisesRegex(tool.Refused, 'Cannot open the cleanup lock|not a regular file'):
+                self.apply()
+            lock.unlink()
         lock.symlink_to(outside/'made')
-        with self.assertRaisesRegex(tool.Refused, 'Cannot open the cleanup lock'):
+        with self.assertRaisesRegex(tool.Refused, 'Cannot open the cleanup lock|cleanup lock could not be safely opened|reparse points are held'):
             self.apply()
         self.assertFalse((outside/'made').exists())
         lock.unlink()
         shutil.move(str(self.lib/'output'), str(self.base/'real-output'))
         (self.lib/'output').symlink_to(self.base/'real-output')
-        with self.assertRaisesRegex(tool.Refused, 'is a link'):
+        with self.assertRaisesRegex(tool.Refused, 'is a link|reparse points are held'):
             self.apply()
         self.assertFalse((self.base/'real-output/.cleanup.lock').exists())
 
@@ -1509,8 +1558,16 @@ class LastRoundTests(CleanupCase):
     def test_c_an_unreadable_folder_is_reported_and_the_run_goes_on(self):
         hidden = self.lib/'repo/grp/u'
         hidden.mkdir(parents=True)
-        os.chmod(hidden, 0)
-        self.addCleanup(os.chmod, hidden, 0o755)
+        self.make_unreadable(hidden)
+        if os.name == 'nt':
+            original_stat = os.stat
+            def denied_marker(path, *args, **kwargs):
+                if os.fspath(path) == os.fspath(hidden/'.git'):
+                    raise PermissionError('fixture denied directory access')
+                return original_stat(path, *args, **kwargs)
+            patcher = mock.patch.object(os, 'stat', side_effect=denied_marker)
+            patcher.start()
+            self.addCleanup(patcher.stop)
         done = self.done()
         self.clock = 2
         data = self.report()
@@ -1521,8 +1578,7 @@ class LastRoundTests(CleanupCase):
 
     def test_c_an_unreadable_worktree_folder_holds_that_tree_and_the_run_goes_on(self):
         bad, fine = self.done('bad'), self.done('fine')
-        os.chmod(bad, 0)
-        self.addCleanup(os.chmod, bad, 0o755)
+        self.make_unreadable(bad)
         self.clock = 2
         data = self.report()
         rows = [i for i in data['items'] if i['path'] == str(bad)]

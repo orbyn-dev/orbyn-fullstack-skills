@@ -12681,6 +12681,59 @@
       }
     },
     {
+      "id": "output-cleanup-preserve-emulator-source",
+      "kind": "outcome",
+      "split": "development",
+      "prompt": "Explain a synthetic output cleanup decision in Markdown; do not run commands or change files. A central workspace task contains a proven old Cargo debug unit, a retained source snapshot and an Android emulator profile. A private owner plan names one exact unit and keeps the source and emulator paths. The registered producer checkout is linked to a primary repository; provider readback confirms an actual merge with the exact produced head and target, and current tracked manifests and locks match that head. A second task has only a finished flag and a third has unknown live usage. The user selected aggressive output cleanup. Describe the scoped preview, protections and later authorized apply.",
+      "expected_skills": [
+        "orbyn-worktree"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write",
+        "write_product",
+        "test",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Synthetic development case only; no actual cleanup, provider call, live model trial or native platform qualification.",
+      "rubric": {
+        "preview": "Uses output-profile aggressive and only output in an authorized task boundary; inspects report and exact-unit dry run before any separate authorized apply.",
+        "proof": "Requires the private external plan, actual merged provider state with exact head/target, registered producer and current manifest/lock equality to produced-head blobs; a finished flag or unknown provider cannot authorize cleanup.",
+        "protection": "Retains source snapshot, emulator data and every unlisted or explicitly kept path; unknown usage, policy restrictions, links, HOLD/KEEP or incomplete scans hold the unit.",
+        "apply": "Requires strict more-than-three-day age, two-hour quiet activity and fresh policy, identities, completion and proof; moves only eligible exact units to Trash with per-unit receipts, never deregisters source or empties Trash."
+      }
+    },
+    {
+      "id": "cleanup-cache-only-dirty-tree",
+      "kind": "outcome",
+      "split": "development",
+      "prompt": "Explain a cache-only cleanup decision in Markdown; do not run commands or change files. A registered worktree has long-idle dirty source, an open PR and unpushed commits. Its ignored Cargo debug deps/build/incremental units have supported compiler/root proof and are older than three days; npm node_modules has matching supported tracked lock/install records and is older than seven days. Candidate handles, tool locks and owner source activity have been checked quiet. A linked sibling has a primary checkout cache_profile off; another candidate has a recent tracked source edit; a fourth has unknown usage. Docker is installed but its engine is unavailable, and a data volume is present. The user selected Moderate for this task. Describe preview, eligibility, protection and apply reporting without performing cleanup.",
+      "expected_skills": [
+        "orbyn-worktree"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write",
+        "write_product",
+        "test",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Synthetic development definition only; no real cleanup, Docker operation, live model trial or native platform qualification. Existing holdouts remain unchanged.",
+      "rubric": {
+        "preview": "Proposes report --cache-profile moderate followed by apply --dry-run --cache-profile moderate --only artifact, both inside an authorized --within boundary; reads status/reasons and profile sources before any later authorized apply.",
+        "eligibility": "Separates cache eligibility from source landing: long-idle dirty source, an open PR and unpushed commits alone do not block quiet supported cache units; source files and Git registration are preserved. Uses strict older-than thresholds and never moves the whole Cargo target or release/custom output.",
+        "protections": "Honors primary/linked and pinned restrict-only profile policies: primary off disables linked cleanup. Holds recent owner source activity, unknown usage, unsupported proof and HOLD/KEEP/link/secret/nested-Git/incomplete-scan cases; does not weaken guards to free space.",
+        "apply": "Requires fresh identity, proof, age, source activity and usage checks under the existing lock; moves only eligible units to system Trash with a receipt written before the first move and updated with actual outcomes.",
+        "storage": "Reports the unavailable Docker engine as unknown and every data volume held; proposes no start/prune/remove/package-manager GC. Reports moved amounts as estimates where applicable and explains that space returns when the user empties the Trash; never empties it."
+      }
+    },
+    {
       "id": "cleanup-at-closeout",
       "kind": "outcome",
       "split": "development",
@@ -14310,6 +14363,55 @@
       "rubric": {
         "boundary": "Report pending as pending, preserve status-only scope and do not initiate a merge, queue, retarget, update or installation.",
         "route": "Use ordinary current-head CI evidence; do not assume native stack metadata or treat a pending check as success."
+      }
+    },
+    {
+      "id": "cleanup-reclaim-goal-trash-accounting",
+      "kind": "outcome",
+      "split": "development",
+      "prompt": "Synthetic cleanup: Aggressive moved 12 GiB into the system Trash, free disk changed by -0.2 GiB, and 11 GiB of dependencies have unknown usage. The user expected 20 GiB free. Explain what the report should say and whether --reclaim-gib 20 authorizes more disposal. Reason only; no actions.",
+      "expected_skills": [
+        "orbyn-worktree"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write",
+        "write_product",
+        "test",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Synthetic reasoning only; never empty Trash, permanently delete, weaken usage checks or claim a guaranteed free-space goal.",
+      "rubric": {
+        "accounting": "Distinguish logical moved payload from observed free-space change; the latter can include concurrent writers and is not attributable to cleanup. Bin aggregate includes unrelated items and is not purge clearance.",
+        "authority": "Goal is diagnostic only; uncertain dependencies stay held, preserving source, emulator data and evidence. Explain missing proof rather than promise 20 GiB."
+      }
+    },
+    {
+      "id": "cleanup-deep-scan-still-requires-complete-proof",
+      "kind": "outcome",
+      "split": "development",
+      "prompt": "Synthetic cache cleanup: an owner selects Deep plus Aggressive. Standard stopped at30seconds. Deep completed one cache scan but another hit300seconds; a third has an open-file sharing violation. The tracked producer policy sets scan_depth standard. Explain which inspection setting and safety checks apply; do not act.",
+      "expected_skills": [
+        "orbyn-worktree"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write",
+        "write_product",
+        "test",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Reason only. No real cleanup, permanent disposal, process termination, ignored guard, or new live trial.",
+      "rubric": {
+        "policy": "Tracked standard limits owner deep; pinned/primary/linked/output producer ceilings apply. Scan depth is separate from age and artifact profiles and grants no disposal authority.",
+        "safety": "Budget exhaustion and open-file evidence remain held. A complete scan only supplies one part of full rebuildability, ownership, protection, age and fresh identity/usage proof; finite limits also reach final recycler callbacks.",
+        "accounting": "Per-stage/per-unit/callback limits are not an end-to-end deadline; no free-space guarantee from Trash moves."
       }
     }
   ]

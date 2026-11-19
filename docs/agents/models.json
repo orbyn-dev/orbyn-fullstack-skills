@@ -56,6 +56,9 @@
     "reviewer_children": 1
   },
   "cleanup": {
+    "cache_profile": "legacy",
+    "output_profile": "legacy",
+    "scan_depth": "standard",
     "enabled": true,
     "cache_idle_days": 7,
     "worktree_idle_days": 1,

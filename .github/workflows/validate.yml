@@ -27,6 +27,33 @@ jobs:
         env:
           ORBYN_TEST_RECYCLE: '1'
         run: python -m unittest discover -s tests -p test_worktree_retire_windows.py -v
+      - name: Capacity accounting and native probe contracts
+        run: |
+          python -m unittest discover -s tests -p test_cleanup_capacity.py -v
+          python -m unittest discover -s tests -p test_cleanup_capacity_cli.py -v
+          python -m unittest discover -s tests -p test_retirement_platform.py -v
+          python -m unittest discover -s tests -p test_deep_scan_engine.py -v
+          python -m unittest discover -s tests -p test_deep_scan_cli.py -v
+      - name: Metadata-only usage and shared-junction preservation contracts
+        env:
+          ORBYN_TEST_RECYCLE: '1'
+        run: |
+          python -m unittest discover -s tests -p test_windows_usage_performance.py -v
+          python -m unittest discover -s tests -p test_windows_reparse_probe.py -v
+          python -m unittest discover -s tests -p test_windows_junction_retirement.py -v
+          python -m unittest discover -s tests -p test_worktree_junction_policy.py -v
+      - name: Cache proof and profile contracts
+        run: python -m unittest discover -s tests -p test_artifact_cache.py -v
+      - name: Cache CLI and disposable native recycling contracts
+        env:
+          ORBYN_TEST_RECYCLE: '1'
+        run: python -m unittest discover -s tests -p test_cache_cleanup_cli.py -v
+      - name: Finished output ownership and preservation contracts
+        run: python -m unittest discover -s tests -p test_output_cleanup.py -v
+      - name: Finished output CLI and disposable native recycling contracts
+        env:
+          ORBYN_TEST_RECYCLE: '1'
+        run: python -m unittest discover -s tests -p test_output_cleanup_cli.py -v
   validate:
     name: Validate (Python ${{ matrix.python }})
     # Self-hosted only when the repository variable CI_RUNNER is 'local'. Keep CI_RUNNER

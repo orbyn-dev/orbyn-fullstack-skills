@@ -27,7 +27,7 @@ This index is generated in the full library from `catalog.json` and frontmatter 
 - [orbyn-skill-creator](orbyn-skill-creator/SKILL.md) — Create, refine, merge or retire Orbyn repository skills while keeping task routing, technology boundaries, host discovery and documentation consistent.
 - [orbyn-upstream-review](orbyn-upstream-review/SKILL.md) — Review freshness and changes in external skills, source code or research references; keep downloads in ignored orbyn-references, compare pinned revisions and selectively adapt existing owners.
 - [orbyn-workflow](orbyn-workflow/SKILL.md) — Route engineering work through investigation, design, implementation and verification, including open-source contribution intake and bounded PR feedback/CI iteration. Follow the consuming project's instructions.
-- [orbyn-worktree](orbyn-worktree/SKILL.md) — Manage local task branches, private contribution storage when supported and Git worktree isolation; use sibling <repo>-wt directories, purpose-based names and preservation before cleanup.
+- [orbyn-worktree](orbyn-worktree/SKILL.md) — Manage task branches, contribution storage, Git worktree isolation and rebuildable cache cleanup; inspect build storage, use sibling repo-wt roots and preserve owned source before retirement.
 - [reflect](reflect/SKILL.md) — Remember, find, classify, correct or forget explicitly authorized local engineering memory; reflect on current-task evidence and propose bounded improvements to existing skill owners.
 - [show-me-your-work](show-me-your-work/SKILL.md) — Keep a compact decision and evidence trail for substantial migrations or unattended work that the user will review later; not for routine tasks already explained by Git, PR and CI.
 
