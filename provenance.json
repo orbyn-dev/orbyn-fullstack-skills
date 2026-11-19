@@ -204,6 +204,18 @@
           "license_file": "skills/architect/references/principles/LICENSE.txt",
           "license_sha256": "9c31ea886ff0fdc36aab948579bbb74a2e44bcb5a9c8a165cabc1b38e24175d4",
           "changes": "Short method rewritten with a synthetic status-flag example and links to existing vertical-code and statechart owners. Reviewed at candidate ae5650f only; earlier pins for other material are unchanged and this is not an advance of the whole upstream."
+        },
+        {
+          "relationship": "adapted",
+          "credit": "Lauren Tan (pstack); Orbyn adaptations by Anh Dang and contributors",
+          "copyright": "Copyright (c) 2026 Lauren Tan",
+          "license": "MIT",
+          "source": "https://github.com/cursor/plugins/blob/bf0c7cd80abdbf7fe47b634978a7d1b4071f71a7/pstack/skills/architect/references/design-red-flags.md",
+          "revision": "bf0c7cd80abdbf7fe47b634978a7d1b4071f71a7",
+          "changes": "Red-flag screen condensed into design-review.md; shallow module defers to maintainable-modules.md; pass-through dropped; Orbyn worked example added.",
+          "local_path": "skills/architect/references/design-review.md",
+          "license_file": "skills/architect/references/principles/LICENSE.txt",
+          "license_sha256": "9c31ea886ff0fdc36aab948579bbb74a2e44bcb5a9c8a165cabc1b38e24175d4"
         }
       ],
       "reviewed_sources": [
@@ -242,7 +254,7 @@
       ],
       "bundled_compiler": {
         "repository": "https://github.com/cursor/plugins",
-        "revision": "1ba91fc25c0977741dd0e267849e6234b037ed0a",
+        "revision": "bf0c7cd80abdbf7fe47b634978a7d1b4071f71a7",
         "source_path": "pstack/skills/statechart/scripts",
         "snapshot": "skills/architect/references/upstream/pstack-statechart/snapshot.json",
         "scope": "26 unmodified runtime .ts files and original MIT notice; no bootstrap, runtime binaries, upstream skill aliases or test corpus"
@@ -372,6 +384,20 @@
           "effort": "medium",
           "date": "2026-11-12",
           "scope": "Slimmed SKILL.md entry: detail moved to references, no rule changed"
+        },
+        {
+          "tool": "Claude Code desktop",
+          "model": "claude-opus-5-5",
+          "effort": "medium",
+          "date": "2026-11-16",
+          "scope": "Design red-flag screen in design-review.md from reviewed pstack design-red-flags (bf0c7cd)."
+        },
+        {
+          "tool": "Claude Code desktop (subagent)",
+          "model": "claude-sonnet-5-5",
+          "effort": "medium",
+          "date": "2026-11-16",
+          "scope": "Advanced the bundled pstack statechart compiler snapshot to bf0c7cd (run.ts, mermaid.ts) with adapter checks"
         }
       ]
     },
@@ -465,6 +491,27 @@
           "effort": "medium",
           "date": "2026-11-02",
           "scope": "Harness and security workflow revision"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-18",
+          "scope": "Rewrite parity reference adapted from rust-anything (MIT)"
+        }
+      ],
+      "incorporated_material": [
+        {
+          "relationship": "adapted",
+          "credit": "Erkam Yaman (erkamyaman, rust-anything); Orbyn adaptations by Anh Dang and contributors",
+          "copyright": "Copyright (c) 2026 Erkam Yaman (erkamyaman)",
+          "license": "MIT",
+          "source": "https://github.com/erkamyaman/rust-anything/tree/94a9f2d012c68cd1ad8067f21037357cdd6bcf5f/skills/rust-anything",
+          "revision": "94a9f2d012c68cd1ad8067f21037357cdd6bcf5f",
+          "local_path": "skills/figure-it-out/references/rewrite-parity.md",
+          "license_file": "skills/figure-it-out/references/rust-anything-LICENSE.txt",
+          "license_sha256": "f7c6d76768cf5bdcd8fbc9f4df6b040789ed9802707e49987dd8357a6bd92759",
+          "changes": "Record-and-replay method (equivalence bar, outside recording, two runs to separate noise, front door with falling fallback rate, mismatch is a port bug) rewritten for any language pair with the CLI optional; no tool code or command reference copied, nothing run from the source."
         }
       ]
     },
@@ -1234,6 +1281,13 @@
           "effort": "medium",
           "date": "2026-11-12",
           "scope": "Slimmed SKILL.md entry: detail moved to references, no rule changed"
+        },
+        {
+          "tool": "Claude Code desktop",
+          "model": "claude-opus-5-5",
+          "effort": "medium",
+          "date": "2026-11-17",
+          "scope": "New agent-instructions reference: root and nested AGENTS.md layering, what stays out, hard-won facts, non-conflicting levels and host pointer files; routing line in the description."
         }
       ],
       "reviewed_inspiration": [
@@ -1243,6 +1297,12 @@
           "revision": "fcc0ad462172522aaf5c93a7b2e01f6b9f0b0159",
           "license": "MIT",
           "relationship": "reviewed-inspiration; one-home-per-fact tiers adapted in our words; no text copied"
+        },
+        {
+          "credit": "SSW Rules (Eddie Kranz, Daniel MacKay, Gordon Beeming, Michael Qiu)",
+          "source": "https://www.ssw.com.au/rules/write-agents-md",
+          "revision": "observed 2026-11-17 (page updated 2026-11-16)",
+          "relationship": "reviewed-inspiration; ideas adapted for references/agent-instructions.md (subtree files, what stays out, multi-attempt facts, pointer files); wording, structure and examples are our own; no text copied"
         }
       ]
     },
@@ -1513,6 +1573,41 @@
           "scope": "Two additive synthetic development cases for native-stack stale-head async decisions and ordinary status-only scope; frozen holdouts unchanged."
         },
         {
+          "tool": "Claude Code desktop",
+          "model": "claude-opus-5-5",
+          "effort": "medium",
+          "date": "2026-11-16",
+          "scope": "One development case for ship posts from a commit log (social-content)."
+        },
+        {
+          "tool": "Claude Code desktop (subagent)",
+          "model": "claude-opus-5-5",
+          "effort": "medium",
+          "date": "2026-11-16",
+          "scope": "Eval cases: privacy review routes to orbyn-security-audit with a profile; consent-banner copy edit routes to orbyn-content-design"
+        },
+        {
+          "tool": "Claude Code desktop",
+          "model": "claude-opus-5-5",
+          "effort": "medium",
+          "date": "2026-11-17",
+          "scope": "Two development cases for splitting a monorepo AGENTS.md (orbyn-setup) and an adjacent personal-preference case."
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-18",
+          "scope": "Eval case port-untested-module-record-replay"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-sonnet-5-5 (worker) under claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-19",
+          "scope": "Routing cases for orbyn-scripted-motion"
+        },
+        {
           "tool": "Codex desktop (native subagents and shell)",
           "model": "gpt-6.1-sol (lead and case author)",
           "effort": "medium",
@@ -1727,8 +1822,8 @@
           "changes": "Orbyn-owned conditional guidance and synthetic examples; no upstream active skill collection, host, cloud helper or evaluation runner imported."
         },
         {
-          "source": "https://github.com/emilkowalski/skills/tree/5206a950b715e0cabe7043ea0b2304332b91494e",
-          "revision": "5206a950b715e0cabe7043ea0b2304332b91494e",
+          "source": "https://github.com/emilkowalski/skills/tree/64eb3deb9a5fbfa041faf783e0bc3fd635872e9c",
+          "revision": "64eb3deb9a5fbfa041faf783e0bc3fd635872e9c",
           "copyright": "Copyright (c) 2026 Emil Kowalski",
           "license": "MIT",
           "local_path": "skills/orbyn-ui-design/references/motion.md",
@@ -1738,8 +1833,8 @@
           "changes": "Orbyn-owned conditional guidance and synthetic examples; no upstream active skill collection, host, cloud helper or evaluation runner imported."
         },
         {
-          "source": "https://github.com/emilkowalski/skills/tree/5206a950b715e0cabe7043ea0b2304332b91494e",
-          "revision": "5206a950b715e0cabe7043ea0b2304332b91494e",
+          "source": "https://github.com/emilkowalski/skills/tree/64eb3deb9a5fbfa041faf783e0bc3fd635872e9c",
+          "revision": "64eb3deb9a5fbfa041faf783e0bc3fd635872e9c",
           "copyright": "Copyright (c) 2026 Emil Kowalski",
           "license": "MIT",
           "local_path": "skills/orbyn-ui-design/references/animation-performance.md",
@@ -2146,6 +2241,20 @@
           "effort": "medium",
           "date": "2026-11-12",
           "scope": "Page metadata: title rules and image rules, with a pointer to orbyn-seo"
+        },
+        {
+          "tool": "Claude Code desktop",
+          "model": "claude-opus-5-5",
+          "effort": "medium",
+          "date": "2026-11-16",
+          "scope": "Reviewed emilkowalski/skills 5206a95..64eb3de: motion tokens over literal curves, modal/drawer/sheet/toast duration exception, CSS-on-compositor under load, compositor-only limited to transform/opacity. Pins for motion.md and animation-performance.md advanced."
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-sonnet-5-5 (worker) under claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-19",
+          "scope": "Pointer from the motion reference to orbyn-scripted-motion"
         }
       ]
     },
@@ -3034,6 +3143,13 @@
           "effort": "medium",
           "date": "2026-11-09",
           "scope": "Refresh the unmodified marketingskills social snapshot from e85f3cb to 96798cf after reviewing its diff"
+        },
+        {
+          "tool": "Claude Code desktop",
+          "model": "claude-opus-5-5",
+          "effort": "medium",
+          "date": "2026-11-16",
+          "scope": "New ship-post reference: build-in-public posts from the commit log, from reviewed marketingskills (1f83744)."
         }
       ],
       "reviewed_sources": [
@@ -3043,6 +3159,20 @@
           "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
           "license": "MIT",
           "relationship": "reviewed; version bump and a cross-reference to a skill we do not carry; no source text imported; not an advance of the pin"
+        }
+      ],
+      "incorporated_material": [
+        {
+          "relationship": "adapted",
+          "credit": "Corey Haines (marketingskills)",
+          "copyright": "Copyright (c) 2025 Corey Haines",
+          "license": "MIT",
+          "source": "https://github.com/coreyhaines31/marketingskills/blob/1f837447b20bb6f0e72d87b80ece1c221c362c7d/skills/social/references/ship-post.md",
+          "revision": "1f837447b20bb6f0e72d87b80ece1c221c362c7d",
+          "changes": "Ship-post method adapted: platform list generalised, Orbyn evidence rules and an original worked failure; X/Reddit specifics and tracking tags dropped.",
+          "local_path": "skills/social-content/references/ship-post.md",
+          "license_file": "skills/social-content/references/upstream/marketingskills-social/LICENSE",
+          "license_sha256": "b70d71e24e40fce5da8f4b6f9cd862096a048e433db7f3c8cac5e348e6d34591"
         }
       ]
     },
@@ -3116,6 +3246,13 @@
           "credit": "GitHub Next and Microsoft Research",
           "source": "https://githubnext.com/projects/pdd-kit/",
           "relationship": "reviewed-inspiration; article read 2026-11-05; independently authored intent, trust-list, per-clause mutant and receipt guidance; no text or code copied"
+        },
+        {
+          "credit": "Lauren Tan (pstack)",
+          "source": "https://github.com/cursor/plugins/tree/bf0c7cd80abdbf7fe47b634978a7d1b4071f71a7/pstack/skills/tdd",
+          "revision": "bf0c7cd80abdbf7fe47b634978a7d1b4071f71a7",
+          "license": "MIT",
+          "relationship": "reviewed-inspiration; closest executable regression check examples, independently written; no upstream text imported"
         }
       ],
       "incorporated_material": [
@@ -3296,6 +3433,27 @@
           "effort": "medium",
           "date": "2026-11-09",
           "scope": "Advance emilkowalski/skills pin c8a7962 -> 5206a95: adapted files unchanged, LICENSE unchanged, the only new skill (gestures) reviewed and written into motion.md"
+        },
+        {
+          "tool": "Claude Code desktop",
+          "model": "claude-opus-5-5",
+          "effort": "medium",
+          "date": "2026-11-16",
+          "scope": "Closest executable regression check examples from reviewed pstack tdd (bf0c7cd)."
+        },
+        {
+          "tool": "Claude Code desktop",
+          "model": "claude-opus-5-5",
+          "effort": "medium",
+          "date": "2026-11-16",
+          "scope": "Dated note that the bundled pstack statechart compiler pin advanced to bf0c7cd."
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-18",
+          "scope": "Characterization pointer to rewrite parity"
         }
       ]
     },
@@ -3392,22 +3550,22 @@
     },
     "orbyn-security-audit": {
       "relationship": "adapted",
-      "credit": "Cloudflare, Inc. (audit record tooling); Jim Manico (Grim Prompter threat-model adaptation); Orbyn adaptations by Anh Dang and contributors",
+      "credit": "Cloudflare, Inc. (audit record tooling); Manicode Security (Grim Prompter threat-model adaptation); Orbyn adaptations by Anh Dang and contributors",
       "copyright": "Copyright (c) 2025-2026 Cloudflare, Inc.",
       "license": "MIT",
       "source": "https://github.com/cloudflare/security-audit-skill/tree/c1c8a8c1471069fb0e188eeaff69b8e8db6564a8/skills/security-audit",
       "revision": "c1c8a8c1471069fb0e188eeaff69b8e8db6564a8",
-      "changes": "Orbyn-owned audit workflow, protocol and threat-boundary guide. Only the licensed record schema, validators and synthetic fixtures are retained as support files from the Cloudflare source. Threat-model mode adapts selected MIT Grim Prompter material: the read-only operating boundary, evidence guide, architecture and method selection, challenger, change reviewer, artifact contract, tool and shared-credential boundaries, and twelve architecture checks, condensed into references/threat-model with per-file original and maintained hashes under references/upstream/grim-prompter. The 36 deep chains, 24 other quick prompts, 29 method prompts and all install or host-specific steps are excluded. Original additions: the threat-model checker, the threat-to-ledger converter, the join with the boundary guide, status words, run-folder and no-publication rules, the threat model, audit, remediation and verification workflow, and the verification protocol section.",
+      "changes": "Orbyn-owned audit workflow, protocol and threat-boundary guide. Only the licensed record schema, validators and synthetic fixtures are retained as support files from the Cloudflare source. Threat-model mode adapts selected MIT Grim Prompter material: the read-only operating boundary, evidence guide, architecture and method selection, challenger, change reviewer, artifact contract, tool and shared-credential boundaries, twelve architecture checks, and the privacy review scope with condensed GDPR and CCPA/CPRA profiles, condensed into references/threat-model with per-file original and maintained hashes under references/upstream/grim-prompter. The 36 deep chains, the six privacy deep stages, the other-regimes screening profile, the data-inventory companion, 24 other quick prompts, 29 method prompts and all install or host-specific steps are excluded. Original additions: the threat-model checker and its privacy-object checks, the profile-loading rule, the threat-to-ledger converter, the join with the boundary guide, status words, run-folder and no-publication rules, the threat model, audit, remediation and verification workflow, and the verification protocol section.",
       "incorporated_material": [
         {
-          "source": "https://github.com/jmanico/grim-prompter/tree/3642a31aa67efdc22ae2bd30444537ceefb7424a",
-          "revision": "3642a31aa67efdc22ae2bd30444537ceefb7424a",
+          "source": "https://github.com/jmanico/grim-prompter/tree/2a94457c7bc63ffbc4a44ea50ae645ab8cee26bf",
+          "revision": "2a94457c7bc63ffbc4a44ea50ae645ab8cee26bf",
           "license": "MIT",
           "local_path": "skills/orbyn-security-audit/references/upstream/grim-prompter/SOURCE.md",
           "license_file": "skills/orbyn-security-audit/references/upstream/grim-prompter/LICENSE",
           "relationship": "selected-maintained-adaptation",
-          "copyright": "Copyright (c) 2026 Jim Manico",
-          "license_sha256": "e12b09de9f3d07a057e95b07681ed0f1bf29d156148156b02fc4ef945b677f2a"
+          "copyright": "Copyright (c) 2026 Manicode Security",
+          "license_sha256": "4e34094caee63d43009a2e2c611f59f9b349407f1afe392b82cb0e6908ee9cbc"
         },
         {
           "relationship": "adapted",
@@ -3463,6 +3621,13 @@
           "effort": "medium",
           "date": "2026-11-12",
           "scope": "Slimmed SKILL.md entry: detail moved to references, no rule changed"
+        },
+        {
+          "tool": "Claude Code desktop (subagent)",
+          "model": "claude-opus-5-5",
+          "effort": "medium",
+          "date": "2026-11-16",
+          "scope": "Grim Prompter 3642a31 to 2a94457: copyright holder now Manicode Security; privacy review scope, GDPR and CCPA/CPRA profiles, privacy records and checker rules; pin advanced"
         }
       ]
     },
@@ -3874,6 +4039,18 @@
           "license_file": "skills/language-best-practices/references/ecc-LICENSE.txt",
           "license_sha256": "326146379f01bb137c0a5d3c54770c1aa31076705c8b88a7f6b26a460f6221b2",
           "changes": "Empty catches, swallowed errors and dangerous fallbacks as a review list with a synthetic example; agent prompt and its baseline block not copied. Reviewed at the pinned ECC revision only; written in Orbyn voice with synthetic examples, nothing run from the source."
+        },
+        {
+          "relationship": "adapted",
+          "credit": "Erkam Yaman (erkamyaman, rust-anything); Orbyn adaptations by Anh Dang and contributors",
+          "copyright": "Copyright (c) 2026 Erkam Yaman (erkamyaman)",
+          "license": "MIT",
+          "source": "https://github.com/erkamyaman/rust-anything/blob/94a9f2d012c68cd1ad8067f21037357cdd6bcf5f/skills/rust-anything/SKILL.md",
+          "revision": "94a9f2d012c68cd1ad8067f21037357cdd6bcf5f",
+          "local_path": "skills/language-best-practices/references/rust.md",
+          "license_file": "skills/language-best-practices/references/rust-anything-LICENSE.txt",
+          "license_sha256": "f7c6d76768cf5bdcd8fbc9f4df6b040789ed9802707e49987dd8357a6bd92759",
+          "changes": "Porting-into-Rust traps (FFI call cost and batching, UTF-16 offsets, regex Unicode classes, int and float handling, map order, errors versus panics) as a short checklist in Orbyn voice."
         }
       ],
       "reviewed_sources": [
@@ -3937,6 +4114,13 @@
           "effort": "medium",
           "date": "2026-11-09",
           "scope": "TypeScript one-way imports through product and generic tiers, enforced by lint"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-18",
+          "scope": "Rust porting traps adapted from rust-anything (MIT)"
         }
       ],
       "reviewed_inspiration": [
@@ -4256,6 +4440,17 @@
           "copyright": "Copyright (c) 2026 caru-ini",
           "license_sha256": "7b153fc3f5f1ccce2b9ac98a35301c666c025db85d6c44565e13304774d144a9",
           "changes": "Google Cloud and Azure icon support: gcp/ and azure/ spec forms with product and name tables, group gcp and group azure template styles, and vendor drawing rules, rewritten into this skill's package class, limits, fallback and manifest rules. Gallery sharing (share.py and the publish step) not adopted."
+        },
+        {
+          "source": "https://github.com/caru-ini/stack-diagram/tree/9175bde8449cc8f5390d6eb72ecc2e1f5bfe21f3/skills/stack-diagram",
+          "revision": "9175bde8449cc8f5390d6eb72ecc2e1f5bfe21f3",
+          "license": "MIT",
+          "local_path": "skills/stack-diagram/references/upstream/stack-diagram/SOURCE.md",
+          "license_file": "skills/stack-diagram/references/upstream/stack-diagram/LICENSE",
+          "relationship": "adapted-selected-changes",
+          "copyright": "Copyright (c) 2026 caru-ini",
+          "license_sha256": "7b153fc3f5f1ccce2b9ac98a35301c666c025db85d6c44565e13304774d144a9",
+          "changes": "Kubernetes icon support: k8s/ spec form with the icon table and aliases and the kubernetes/community commit upstream pins, rewritten into this skill's package class, limits, fallback and manifest rules; reads, including redirects, are restricted to raw.githubusercontent.com, that pinned commit and table-derived icons/svg paths. Guidance in references/kubernetes.md and references/icons.md. Gallery sharing (share.py) and the 12px tile radius not adopted; k8s-* and kubernetes-* slug forms not adopted."
         }
       ],
       "authoring": [
@@ -4300,6 +4495,13 @@
           "effort": "medium",
           "date": "2026-11-12",
           "scope": "Slimmed SKILL.md entry: detail moved to references, no rule changed"
+        },
+        {
+          "tool": "Claude Code desktop (subagent)",
+          "model": "claude-sonnet-5-5",
+          "effort": "medium",
+          "date": "2026-11-16",
+          "scope": "Kubernetes icon support (k8s/ specs, pinned kubernetes/community icons, allowlist and tests) and accurate source records"
         }
       ],
       "reviewed_sources": [
@@ -4309,6 +4511,13 @@
           "revision": "1ed53e3e9525364ae5d82e0430f2bb3f7ef4c838",
           "license": "MIT",
           "relationship": "reviewed; public gallery share step not adopted (publishing option excluded); Google Cloud and Azure icon support adapted in Orbyn (see incorporated_material); not an advance of the pin; rechecked 2026-11-09: tile radius change and public gallery sharing (share.py) not adopted"
+        },
+        {
+          "credit": "caru-ini",
+          "source": "https://github.com/caru-ini/stack-diagram/tree/f333b47160442dc28f10b6e3c026ecbdac181ff8/skills/stack-diagram",
+          "revision": "f333b47160442dc28f10b6e3c026ecbdac181ff8",
+          "license": "MIT",
+          "relationship": "reviewed 2026-11-16; tile radius 12px and redrawn examples not adopted, this template keeps its 8px radius"
         }
       ]
     },
@@ -4359,26 +4568,26 @@
       "reviewed_sources": [
         {
           "credit": "Anthropic, PBC (anthropics/skills)",
-          "source": "https://github.com/anthropics/skills/tree/2c5958ecac7cee2b583967a2c4981d0f4a75c579/skills/docx",
-          "revision": "2c5958ecac7cee2b583967a2c4981d0f4a75c579",
+          "source": "https://github.com/anthropics/skills/tree/1780c5e5a552fd4d1c9d6a7b0cab26b0c2bef064/skills/docx",
+          "revision": "1780c5e5a552fd4d1c9d6a7b0cab26b0c2bef064",
           "relationship": "bundled unmodified snapshot; Apache-2.0; see snapshot.json"
         },
         {
           "credit": "Anthropic, PBC (anthropics/skills)",
-          "source": "https://github.com/anthropics/skills/tree/2c5958ecac7cee2b583967a2c4981d0f4a75c579/skills/pdf",
-          "revision": "2c5958ecac7cee2b583967a2c4981d0f4a75c579",
+          "source": "https://github.com/anthropics/skills/tree/1780c5e5a552fd4d1c9d6a7b0cab26b0c2bef064/skills/pdf",
+          "revision": "1780c5e5a552fd4d1c9d6a7b0cab26b0c2bef064",
           "relationship": "bundled unmodified snapshot; Apache-2.0; see snapshot.json"
         },
         {
           "credit": "Anthropic, PBC (anthropics/skills)",
-          "source": "https://github.com/anthropics/skills/tree/2c5958ecac7cee2b583967a2c4981d0f4a75c579/skills/pptx",
-          "revision": "2c5958ecac7cee2b583967a2c4981d0f4a75c579",
+          "source": "https://github.com/anthropics/skills/tree/1780c5e5a552fd4d1c9d6a7b0cab26b0c2bef064/skills/pptx",
+          "revision": "1780c5e5a552fd4d1c9d6a7b0cab26b0c2bef064",
           "relationship": "bundled unmodified snapshot; Apache-2.0; see snapshot.json"
         },
         {
           "credit": "Anthropic, PBC (anthropics/skills)",
-          "source": "https://github.com/anthropics/skills/tree/2c5958ecac7cee2b583967a2c4981d0f4a75c579/skills/xlsx",
-          "revision": "2c5958ecac7cee2b583967a2c4981d0f4a75c579",
+          "source": "https://github.com/anthropics/skills/tree/1780c5e5a552fd4d1c9d6a7b0cab26b0c2bef064/skills/xlsx",
+          "revision": "1780c5e5a552fd4d1c9d6a7b0cab26b0c2bef064",
           "relationship": "bundled unmodified snapshot; Apache-2.0; see snapshot.json"
         }
       ],
@@ -4389,6 +4598,13 @@
           "effort": "medium",
           "date": "2026-11-09",
           "scope": "New skill wrapping pinned Anthropic sources for every host"
+        },
+        {
+          "tool": "Claude Code desktop (subagent)",
+          "model": "claude-sonnet-5-5",
+          "effort": "medium",
+          "date": "2026-11-16",
+          "scope": "Advanced the bundled Anthropic docx, pptx, xlsx and pdf snapshots to 1780c5e; pdf renames, pptx slide_text.py and apply_theme.js"
         }
       ]
     },
@@ -4452,10 +4668,10 @@
       "reviewed_sources": [
         {
           "credit": "Meta Platforms, Inc. (meta/astryx)",
-          "source": "https://github.com/meta/astryx/tree/c86484dc57847e7c4d1127810ff1422bc2174d4d/packages/cli/assets/docs",
-          "revision": "c86484dc57847e7c4d1127810ff1422bc2174d4d",
+          "source": "https://github.com/meta/astryx/tree/af509ad9117efebbc92169facd3d3b497ad8f93c/packages/cli/assets/docs",
+          "revision": "af509ad9117efebbc92169facd3d3b497ad8f93c",
           "license": "MIT",
-          "relationship": "bundled unmodified snapshot of @astryxdesign/cli 0.7.12 agent docs; see snapshot.json",
+          "relationship": "bundled unmodified snapshot of @astryxdesign/cli 0.7.17 agent docs; see snapshot.json",
           "copyright": "Copyright (c) 2026 Meta Platforms, Inc."
         }
       ],
@@ -4466,6 +4682,13 @@
           "effort": "medium",
           "date": "2026-11-09",
           "scope": "New skill bringing Astryx to every host, compatible with Orbyn authority and design rules"
+        },
+        {
+          "tool": "Claude Code desktop (subagent)",
+          "model": "claude-sonnet-5-5",
+          "effort": "medium",
+          "date": "2026-11-16",
+          "scope": "Advanced the bundled Astryx agent docs snapshot to af509ad (CLI 0.7.17), 43 changed docs"
         }
       ]
     },
@@ -4519,6 +4742,38 @@
           "effort": "medium",
           "date": "2026-11-12",
           "scope": "New skill: entry, six references, link_graph.py and verify_redirects.py with tests"
+        }
+      ]
+    },
+    "orbyn-scripted-motion": {
+      "relationship": "adapted",
+      "credit": "GreenSock (gsap-skills); Orbyn adaptations by Anh Dang and contributors",
+      "copyright": "Copyright (c) 2026 GreenSock",
+      "license": "MIT",
+      "source": "https://github.com/greensock/gsap-skills/tree/aed9cfd3277740755f6bfc1155c7aa645403b760/skills",
+      "revision": "aed9cfd3277740755f6bfc1155c7aa645403b760",
+      "changes": "Eight upstream skills (core, timeline, scrolltrigger, react, frameworks, plugins, utils, performance) consolidated into one Orbyn skill with conditional references. Rewritten in Orbyn's own structure and examples; the default-recommend stance is replaced by CSS-first routing, a licence boundary, project motion tokens, reduced motion and handoffs. No library code is copied.",
+      "authoring": [
+        {
+          "tool": "Claude Code",
+          "model": "claude-sonnet-5-5 (worker) under claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-19",
+          "scope": "New skill for scripted timeline and scroll-linked web motion, adapted from GreenSock's MIT gsap-skills"
+        }
+      ],
+      "incorporated_material": [
+        {
+          "relationship": "adapted",
+          "credit": "GreenSock (gsap-skills); Orbyn adaptations by Anh Dang and contributors",
+          "copyright": "Copyright (c) 2026 GreenSock",
+          "license": "MIT",
+          "source": "https://github.com/greensock/gsap-skills/tree/aed9cfd3277740755f6bfc1155c7aa645403b760/skills",
+          "revision": "aed9cfd3277740755f6bfc1155c7aa645403b760",
+          "changes": "Eight upstream skills (core, timeline, scrolltrigger, react, frameworks, plugins, utils, performance) consolidated into one Orbyn skill with conditional references. Rewritten in Orbyn's own structure and examples; the default-recommend stance is replaced by CSS-first routing, a licence boundary, project motion tokens, reduced motion and handoffs. No library code is copied.",
+          "local_path": "skills/orbyn-scripted-motion/SKILL.md",
+          "license_file": "skills/orbyn-scripted-motion/references/gsap-skills-LICENSE.txt",
+          "license_sha256": "51b04b06556662dd817e8f4aa6d06bc7139dc73739e1319a7233cfde3e147b90"
         }
       ]
     }

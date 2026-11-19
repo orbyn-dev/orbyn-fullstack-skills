@@ -45,13 +45,14 @@ fails at once.
 ## When the ideal test is out of reach
 
 - Baseline execution unavailable: record that limit. A passing new test without a demonstrated baseline failure is weaker regression evidence, so state that distinction and do not call it failing-before evidence.
-- The practical test requires unrelated harness churn or unrealistic mocks: explain the limitation and use the closest authorized evidence.
+- The practical test requires unrelated harness churn or unrealistic mocks: explain the limitation and use the closest authorized executable check: a targeted script, a reproduction command, browser automation, a snapshot comparison, a log assertion or a focused integration check. Keep it on the bug, without broad fixture churn.
 - No production databases or unapproved live-provider calls. Production databases and paid providers require their own applicable authority. Read [development](../orbyn-workflow/references/project-policy.md#development-resources) for guarded database and package prerequisites.
 
 ## Read when needed
 
 - A repair that retains a previously ignored value: the [propagated-value method](references/propagated-values.md).
 - A critical invariant, event-order race, explicit formal verification request or stale verification model: [property verification](references/formal-verification.md) and its [drift review](references/verification-drift.md). Choose tools from the property and real code, agree the intent both ways, list what the proof trusts, plant a failing control per clause, and distinguish model results from implementation evidence. Skip the formal model for ordinary small UI edits.
+- Code with no tests that is about to be rewritten or ported: record the original's behaviour as its characterization suite ([rewrite parity](../figure-it-out/references/rewrite-parity.md)).
 - Requested test design: [test strategy](references/test-strategy.md) to select the real boundary, fixtures, failure controls and execution scope. A plan can be the requested output; this skill does not turn every test request into mandatory production edits.
 - Model-powered application quality: pair deterministic permission/state tests with [task evaluations](../orbyn-ai-application/references/evaluations.md). A correct schema or one expected answer is not a reliability estimate; preserve held-out cases, repeated-trial failures and critical slices. Ordinary deterministic changes do not require live model calls.
 - Clocks, async cleanup, readiness, module identity or runner legs that can hide the assertion: [test reliability](references/test-reliability.md). Preserve actual production/fixture boundaries and first-attempt evidence.
