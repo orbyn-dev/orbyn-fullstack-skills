@@ -631,7 +631,7 @@ class Context:
                                                 workspace=str(self.workspace) if self.workspace else None, probe=False)
                 self.memo['resolved'][repo] = resolved
                 self.memo['limits'][repo] = ({k: v['value'] for k, v in resolved['cleanup'].items()}, None)
-            except (self.harness.Invalid, self.harness.CannotRun) as error:
+            except (self.harness.Invalid, self.harness.CannotRun, OSError) as error:
                 self.memo['limits'][repo] = (None, str(error))
         return self.memo['limits'][repo]
 
@@ -1032,6 +1032,9 @@ def eval_worktree(spec, ctx):
         return done('held', "host-managed; use the host's own cleanup")
     if not ctx.allowed_tree(path, False):
         return done('report-only', 'outside repo/ and the library worktree root; report only')
+    why = ctx.blocked(path)
+    if why:
+        return done('held', why)
     plan = ctx.junction_plan(path)
     judged = ctx.judge(spec['repo'], tree, False)
     reasons = list(judged['why'])

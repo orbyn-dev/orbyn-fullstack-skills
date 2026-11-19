@@ -1576,6 +1576,27 @@ class LastRoundTests(CleanupCase):
         self.assertEqual(self.status(done, data), 'eligible')
         self.assertEqual(self.apply(only='worktree')['results'][0]['outcome'], 'trashed')
 
+    def test_c_policy_os_error_holds_that_tree_and_other_trees_continue(self):
+        bad, fine = self.done('bad-policy'), self.done('fine-policy')
+        self.clock = 2
+        harness = tool.load_harness()
+        original = harness.resolve
+
+        def denied(target, *args, **kwargs):
+            if str(target) == str(bad):
+                raise PermissionError('fixture policy denied')
+            return original(target, *args, **kwargs)
+
+        with mock.patch.object(harness, 'resolve', side_effect=denied):
+            data = self.report()
+            self.assertEqual(self.status(bad, data), 'held')
+            self.assertIn('fixture policy denied', self.item(bad, data)['reason'])
+            self.assertEqual(self.status(fine, data), 'eligible')
+            results = self.apply(only='worktree')['results']
+        self.assertEqual([row['path'] for row in results], [str(fine)])
+        self.assertTrue(bad.is_dir())
+        self.assertIn(str(bad), [row['worktree'] for row in tool.worktrees(self.app)])
+
     def test_c_an_unreadable_worktree_folder_holds_that_tree_and_the_run_goes_on(self):
         bad, fine = self.done('bad'), self.done('fine')
         self.make_unreadable(bad)

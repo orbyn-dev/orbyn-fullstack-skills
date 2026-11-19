@@ -3791,6 +3791,13 @@
           "effort": "medium",
           "date": "2026-11-20",
           "scope": "Metadata-only Windows usage probing with share-conflict preservation; handle-based directory enumeration; explicit whole-worktree junction-object escrow with recovery journal and unchanged shared targets; source-policy integration, synthetic/native contracts and documentation. Local runtime evidence and separate review are recorded outside Git."
+        },
+        {
+          "tool": "Codex desktop (shell and native subagents)",
+          "model": "gpt-6.1-sol (CI diagnosis, owner-policy repair and separate review); gpt-6.1-terra (Windows short-path fixture regression)",
+          "effort": "medium",
+          "date": "2026-11-20",
+          "scope": "PR 201 CI repair: hold an owner when harness resolution raises an OS error while allowing unrelated owners to continue; require whole-worktree owner policy checks; canonicalize disposable Windows cache fixtures without loosening production path guards. Failing-before permission and real 8.3 TEMP regressions."
         }
       ],
       "reviewed_inspiration": [

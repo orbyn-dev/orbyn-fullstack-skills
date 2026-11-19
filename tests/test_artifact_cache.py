@@ -18,7 +18,9 @@ class ArtifactTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
-        self.workspace = Path(self.temp.name)
+        # Windows runners can expose TEMP through an 8.3 alias; production
+        # requires canonical owner paths, so build the fixture from that path.
+        self.workspace = Path(self.temp.name).resolve()
         self.root = self.workspace/'app'
         self.root.mkdir()
         self.gitdir = self.root/'.git'
