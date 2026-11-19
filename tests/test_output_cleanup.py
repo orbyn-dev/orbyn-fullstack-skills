@@ -20,7 +20,9 @@ class OutputTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
-        self.workspace = Path(self.temp.name)
+        # Windows runners can expose TEMP through an 8.3 alias; plans require
+        # canonical paths, so construct the fixture from the resolved root.
+        self.workspace = Path(self.temp.name).resolve()
         self.task = self.workspace/'output/task'
         self.repo = self.workspace/'repo/app'
         self.task.mkdir(parents=True)

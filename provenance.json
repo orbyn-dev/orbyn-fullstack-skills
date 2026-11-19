@@ -3798,6 +3798,13 @@
           "effort": "medium",
           "date": "2026-11-20",
           "scope": "PR 201 CI repair: hold an owner when harness resolution raises an OS error while allowing unrelated owners to continue; require whole-worktree owner policy checks; canonicalize disposable Windows cache fixtures without loosening production path guards. Failing-before permission and real 8.3 TEMP regressions."
+        },
+        {
+          "tool": "Codex desktop (shell and native subagents)",
+          "model": "gpt-6.1-sol (CI diagnosis, fail-fast Windows test steps and separate review); gpt-6.1-terra (canonical output fixtures and aliased-TEMP qualification)",
+          "effort": "medium",
+          "date": "2026-11-20",
+          "scope": "PR 201 final CI repair: canonicalize disposable finished-output fixture roots on Windows 8.3 TEMP paths while preserving production canonicality checks; explicitly stop multiline Windows test steps on each native-command failure. No disposal guard or test assertion relaxed."
         }
       ],
       "reviewed_inspiration": [
