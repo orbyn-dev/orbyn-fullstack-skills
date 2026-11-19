@@ -82,7 +82,8 @@ A ScrollTrigger that uses `containerAnimation` cannot pin or snap.
 ## Batches and standalone triggers
 
 `ScrollTrigger.batch(".card", { onEnter: (els) => gsap.to(els, { autoAlpha: 1, y: 0, stagger: 0.08 }), start: "top 85%" })`
-groups elements entering together; callbacks receive arrays. Do not pass
+groups elements entering together; `onEnter`, `onLeave`, `onEnterBack` and
+`onLeaveBack` each receive arrays. Do not pass
 `trigger`, `scrub`, `snap` or `toggleActions` to a batch. For a progress readout
 or a UI toggle use `ScrollTrigger.create({ trigger, start, end, onUpdate })` and
 read `self.progress`.

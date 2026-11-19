@@ -1,6 +1,6 @@
 ---
 name: orbyn-scripted-motion
-description: "Write scripted web motion: timelines, scroll-linked scrub and pin scenes, Flip layout transitions, split text, drag with inertia, framework cleanup and reduced motion. Use when the project ships a scripted engine or CSS cannot meet the need. Not for deciding what moves."
+description: "Write scripted web motion: timelines, scroll-linked scrub and pin scenes, Flip layout transitions, split text, drag with inertia, framework cleanup and reduced motion. Targets the GSAP engine. Use when the project ships it or CSS cannot meet the need. Not for deciding what moves."
 ---
 
 # Scripted motion

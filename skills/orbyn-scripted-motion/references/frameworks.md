@@ -80,8 +80,10 @@ reorders; reach for the engine when they do not.
 ## Vanilla and routers
 
 Build inside one `gsap.context()` per page or widget and keep the handle. On route
-change, call `revert()`. Wire event listeners through `ctx.add(() => ...)` so
-tweens they create belong to the context.
+change, call `revert()`. `ctx.add(fn)` runs `fn` at once; for a handler that fires later, register it as a
+named method (`ctx.add("open", () => ...)`, then call `ctx.open()` from the listener)
+so the tweens it creates still belong to the context, and remove the listener on
+revert.
 
 ## Responsive and reduced motion
 
@@ -101,7 +103,7 @@ mm.add(
 mm.revert();
 ```
 
-Do not wrap `matchMedia` inside another `context()`. Use `gsap.matchMediaRefresh()`
+A `matchMedia` created inside `useGSAP` or a `context()` is reverted with it; do not create a `context()` inside a `matchMedia` handler, since the handler is already one. Use `gsap.matchMediaRefresh()`
 to re-run handlers after an in-app reduced-motion toggle.
 
 ## Do not

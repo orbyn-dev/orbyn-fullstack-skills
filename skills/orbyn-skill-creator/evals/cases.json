@@ -14511,6 +14511,42 @@
         "message"
       ],
       "excluded": "Do not rewrite the sequence or add dependencies."
+    },
+    {
+      "id": "scroll-reveal-no-library-native",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Our marketing page has no animation library. Fade each section in as it scrolls into view.",
+      "expected_skills": [
+        "orbyn-ui-design"
+      ],
+      "forbidden_skills": [
+        "orbyn-scripted-motion"
+      ],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "A simple scroll-linked reveal uses CSS scroll-driven timelines or an IntersectionObserver class toggle; no new animation dependency."
+    },
+    {
+      "id": "scrubbed-pin-no-library-asks-first",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Build a pinned product tour that scrubs through five steps as the user scrolls. The project has no animation library yet.",
+      "expected_skills": [
+        "orbyn-scripted-motion"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Proposes the dependency and waits for install approval before adding it, mentioning the licence's ban on visual no-code animation builders; never installs it silently."
     }
   ]
 }

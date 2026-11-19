@@ -4596,8 +4596,8 @@
     },
     "orbyn-scripted-motion": {
       "relationship": "adapted",
-      "credit": "Anh Dang and Orbyn contributors; adapted from GreenSock (gsap-skills), credited below",
-      "copyright": "Copyright (c) 2026 Anh Dang and Orbyn contributors",
+      "credit": "GreenSock (gsap-skills); Orbyn adaptations by Anh Dang and contributors",
+      "copyright": "Copyright (c) 2026 GreenSock",
       "license": "MIT",
       "source": "https://github.com/greensock/gsap-skills/tree/aed9cfd3277740755f6bfc1155c7aa645403b760/skills",
       "revision": "aed9cfd3277740755f6bfc1155c7aa645403b760",

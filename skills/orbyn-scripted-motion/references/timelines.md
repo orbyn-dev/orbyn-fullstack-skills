@@ -23,9 +23,16 @@ import { CustomEase } from "gsap/CustomEase";
 gsap.registerPlugin(CustomEase);
 
 const css = getComputedStyle(document.documentElement);
-const ms = (name) => parseFloat(css.getPropertyValue(name)) / 1000;
+// Tokens may be "200ms", "0.2s" or a bare number of ms; return seconds.
+const ms = (name) => {
+  const raw = css.getPropertyValue(name).trim();
+  const n = parseFloat(raw);
+  return raw.endsWith("ms") || !raw.endsWith("s") ? n / 1000 : n;
+};
+// CustomEase takes bare control points; strip a cubic-bezier() wrapper.
+const bezier = (name) => css.getPropertyValue(name).trim().replace(/^cubic-bezier\((.*)\)$/, "$1");
 
-CustomEase.create("standard", css.getPropertyValue("--ease-standard").trim()); // "0.2, 0, 0, 1"
+CustomEase.create("standard", bezier("--ease-standard")); // "0.2, 0, 0, 1"
 gsap.defaults({ duration: ms("--motion-base"), ease: "standard" });
 ```
 
