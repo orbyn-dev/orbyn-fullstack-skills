@@ -14549,6 +14549,60 @@
       "excluded": "Proposes the dependency and waits for install approval before adding it, mentioning the licence's ban on visual no-code animation builders; never installs it silently."
     },
     {
+      "id": "tdd-suite-audit-weak-tests",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Our test suite grew a lot through generated tests and CI is slow. Audit the existing tests: find the ones that are tautological, tied to implementation structure, or use mocks that differ from the real dependency, and tell me what to delete, tighten or keep. Do not delete anything yet.",
+      "expected_skills": [
+        "tdd"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write_product",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not delete or rewrite tests, and do not run the full suite."
+    },
+    {
+      "id": "tdd-suite-audit-adjacent-ci-scope",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Make CI run only the checks a pull request can affect and keep the required status names stable. Do not touch the test files themselves.",
+      "expected_skills": [
+        "orbyn-ci-design"
+      ],
+      "forbidden_skills": [
+        "tdd"
+      ],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not edit tests."
+    },
+    {
+      "id": "ci-main-red-visibility",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Our main branch CI has been red for a day and nobody noticed because pull requests only run a light set. Design how we find out quickly when main goes red, without adding a merge gate or making required checks slower.",
+      "expected_skills": [
+        "orbyn-ci-design"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not change branch protection or run the full suite on every pull request."
+    },
+    {
       "id": "design-status-check",
       "kind": "routing",
       "split": "development",
