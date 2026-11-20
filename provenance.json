@@ -1613,6 +1613,13 @@
           "effort": "medium",
           "date": "2026-11-19",
           "scope": "Routing cases for orbyn-scripted-motion"
+        },
+        {
+          "tool": "DeepSeek Harness 0.2.2-rc.5",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-20",
+          "scope": "Two routing eval cases for the new tdd suite-audit reference (an audit request that must select tdd, and an adjacent CI-scope request that must not); evaluation data only."
         }
       ],
       "reviewed_inspiration": [
