@@ -33,6 +33,7 @@ see less. Before turning the old one off:
 - **Pin the binary:** the build from the pinned commit ([install from source](install-from-source.md)),
   cached by that commit, or a release asset checked against the checksum the project publishes for it (or against a build of the pinned commit you made yourself). Never fetch and run an installer
   inside a workflow. Pin actions to commits.
+- **Write the rules yourself where you can.** The official community rules repository is a fork of Semgrep's rules under LGPL-2.1 with a Commons Clause that forbids selling, and its README says the rules are for research, testing and benchmarking. Do not copy them into this library. A local clone under the ignored `orbyn-references/` folder (`opengrep_source.py reference --slug opengrep/opengrep-rules`) can be pointed to with `--config <folder>`, but only after the maintainer has accepted that licence for the project. Rules written for the project's own risk list have no such question.
 - **Pin and review the rules** in the repository like code, with tests. Do not fetch a ruleset at run
   time from a registry in a job that has secrets. A fork's pull request runs unprivileged and with no
   secrets, as with any other job.

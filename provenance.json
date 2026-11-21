@@ -4751,6 +4751,13 @@
           "revision": "526deafe6f0519c272bbee316fea8df26dd85dfa",
           "license": "LGPL-2.1",
           "relationship": "reviewed-inspiration and pinned build source (v2.0.0, observed 2026-11-21); copyleft, so no text or code is imported and the source is downloaded into the ignored orbyn-references folder, never committed"
+        },
+        {
+          "credit": "Opengrep contributors (opengrep/opengrep-rules, a fork of Semgrep Inc.'s semgrep-rules)",
+          "source": "https://github.com/opengrep/opengrep-rules/tree/f1d2b562b414783763fd02a6ed2736eaed622efa",
+          "revision": "f1d2b562b414783763fd02a6ed2736eaed622efa",
+          "license": "LGPL-2.1 with Commons Clause",
+          "relationship": "reviewed-inspiration (observed 2026-11-21); no rule text is copied or bundled and the repository is only pinned so a local clone can be fetched into the ignored orbyn-references folder"
         }
       ],
       "authoring": [

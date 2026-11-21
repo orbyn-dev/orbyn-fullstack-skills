@@ -87,3 +87,4 @@ bundled, and they may carry other licences. Generated from `provenance.json` by
 | [microsoft/vscode](https://github.com/microsoft/vscode) | Microsoft and VS Code contributors | See source | orbyn-ui-design |
 | [obra/superpowers](https://github.com/obra/superpowers) | Jesse Vincent (obra/superpowers) | MIT | how, orbyn-workflow, tdd |
 | [opengrep/opengrep](https://github.com/opengrep/opengrep) | Opengrep contributors (opengrep/opengrep, forked from Semgrep Inc.) | LGPL-2.1 | orbyn-opengrep |
+| [opengrep/opengrep-rules](https://github.com/opengrep/opengrep-rules) | Opengrep contributors (opengrep/opengrep-rules, a fork of Semgrep Inc.'s semgrep-rules) | LGPL-2.1 with Commons Clause | orbyn-opengrep |

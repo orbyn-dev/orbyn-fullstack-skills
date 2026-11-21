@@ -50,6 +50,15 @@
       "license": "MIT",
       "observed": "2026-11-21",
       "use": "Adapted into skills/orbyn-opengrep/SKILL.md and references/rule-writing.md with credit; licence kept in references/opengrep-skills-LICENSE.txt."
+    },
+    {
+      "slug": "opengrep/opengrep-rules",
+      "url": "https://github.com/opengrep/opengrep-rules",
+      "tag": null,
+      "revision": "f1d2b562b414783763fd02a6ed2736eaed622efa",
+      "license": "LGPL-2.1 with Commons Clause",
+      "observed": "2026-11-21",
+      "use": "The official community rules (a fork of Semgrep's rules). Reviewed only: never copied into the library. Its README says research, testing and benchmarking; the Commons Clause forbids selling. A local clone may be used to scan your own code once the maintainer has accepted the licence."
     }
   ]
 }
