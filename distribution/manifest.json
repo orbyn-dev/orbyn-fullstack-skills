@@ -79,7 +79,7 @@
     "skills/architect/references/verification-LICENSE.txt": "bc957ca6bee02792566a1a028d105e02e247c6e77cf057061674273da77b200e",
     "skills/architect/references/verification-source.md": "4e970e6c9ecc1cb5926297d95e75f12fff734ceb95fc1f9dd6b2aa18a00e6a37",
     "skills/architect/references/vertical-codebase.md": "850091c0b1ca2e4cf131dca8b31d63aeff5c38b2d2edef09ce8858c5e0a23b05",
-    "skills/architect/scripts/check-statechart.py": "bc1086000510c7c52a236d1a9f644b4aa52a81a92e2d4dd9a8509623ec19b6c4",
+    "skills/architect/scripts/check-statechart.py": "f4d75984bbdb75b384f174c97edc7cb18a86426be655e4459a05b247fbe5de6c",
     "skills/architect/scripts/guard-statechart-view.mjs": "75fc201d018ba6cdb29c970db8fb9d08e3080fc40432aced9dc9aa6564307209",
     "skills/architect/scripts/illustrate-statechart.py": "276b1c204b787916c70cd9c1eb1a17b3833e23e7a308924b889851daa4ffa82f",
     "skills/architect/scripts/render-statechart.mjs": "276a936d48cfb361f56ab450594b06b64d8c1dfcebc5a329da6cdeea75203f98",
