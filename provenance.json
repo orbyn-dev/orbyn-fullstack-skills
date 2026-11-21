@@ -1641,6 +1641,13 @@
           "effort": "medium",
           "date": "2026-11-20",
           "scope": "Four routing eval cases for the new orbyn-opengrep skill (structural taint rule, install from source, CodeQL replacement plan, and an adjacent threat-model request that must not select it); evaluation data only."
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-sonnet-5-5 (worker), claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-16",
+          "scope": "Eval cases: design-status check, record and stale-evidence holdout route to orbyn-design-status; building a screen from a Designer frame routes to orbyn-ui-design"
         }
       ],
       "reviewed_inspiration": [
@@ -2114,6 +2121,11 @@
           "source": "https://github.com/flohoeller/affectui/tree/3c5df43893d870ee42d81fad4a4ba3ad72ba1b99",
           "revision": "3c5df43893d870ee42d81fad4a4ba3ad72ba1b99",
           "relationship": "reviewed-inspiration; MIT; independently written agent-run views, no upstream text imported"
+        },
+        {
+          "source": "https://github.com/luannn010/orbyn-designer/tree/b129ab293ba00487549baa5da2c0b6e83d7f4f10",
+          "revision": "b129ab293ba00487549baa5da2c0b6e83d7f4f10",
+          "relationship": "User-specified lifecycle contract and behavior reference; independently implemented Python and synthetic fixtures. No licensed source snapshot imported."
         }
       ],
       "authoring": [
@@ -2269,6 +2281,21 @@
           "effort": "medium",
           "date": "2026-11-19",
           "scope": "Pointer from the motion reference to orbyn-scripted-motion"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-sonnet-5-5 (worker), claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-15",
+          "scope": "Designer handoff reference: branch, marker, record and PR convention for screens with an Orbyn Designer frame key; human requested and approved the design"
+        },
+        {
+          "tool": "Codex CLI",
+          "model": "gpt-6.1-sol (lead), gpt-6.1-terra (worker), gpt-6-luna (scout)",
+          "effort": "medium",
+          "date": "2026-11-16",
+          "human_role": "requested the change; lead session reviewed",
+          "scope": "Designer handoff: marker per screen, build.screens and release/deployment settings."
         }
       ]
     },
@@ -4767,6 +4794,46 @@
           "effort": "medium",
           "date": "2026-11-20",
           "scope": "New skill adapted from the MIT opengrep/skills (pinned bfbc2419) and checked against the engine source at v2.0.0: authority rules, rule writing, a CI gate that compares scanners before replacing one, install from pinned source with a tested helper. The LGPL engine is reviewed inspiration only; nothing copied."
+        }
+      ]
+    },
+    "orbyn-design-status": {
+      "relationship": "original",
+      "credit": "Anh Dang and Orbyn contributors",
+      "copyright": "Copyright (c) 2026 Anh Dang and Orbyn contributors",
+      "license": "MIT",
+      "source": "https://github.com/orbyn-dev/orbyn-fullstack-skills/tree/main/skills/orbyn-design-status",
+      "changes": "Orbyn skill that checks and records design and build status of Orbyn Designer frames from git evidence. Written in Orbyn's words with an original script and tests; no upstream text or code copied.",
+      "authoring": [
+        {
+          "tool": "Claude Code",
+          "model": "claude-sonnet-5-5 (worker), claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-15",
+          "scope": "New skill: entry, design_status.py (check, record, clear) with tests; human requested and approved the design"
+        },
+        {
+          "tool": "Codex CLI",
+          "model": "gpt-6.1-sol (lead), gpt-6.1-terra (worker), gpt-6-luna (scout)",
+          "effort": "medium",
+          "date": "2026-11-16",
+          "human_role": "requested the change; lead session reviewed",
+          "scope": "Designer lifecycle parity: pure shared rule cases, Git/GitHub evidence, migration, marker confirmation and Shipped checks; Python stdlib helper and regressions."
+        },
+        {
+          "tool": "Codex CLI",
+          "model": "gpt-6.1-sol",
+          "effort": "medium",
+          "date": "2026-11-16",
+          "human_role": "requested the three confirmed parity fixes and scoped both worktree commits",
+          "scope": "Fix colliding rename destinations, preserve inline whitespace in normalization, and accept fork-qualified build heads with PR evidence; add shared normalization and rename regression cases in Python and Designer."
+        }
+      ],
+      "reviewed_inspiration": [
+        {
+          "source": "https://github.com/luannn010/orbyn-designer/tree/b129ab293ba00487549baa5da2c0b6e83d7f4f10",
+          "revision": "b129ab293ba00487549baa5da2c0b6e83d7f4f10",
+          "relationship": "User-specified lifecycle contract and behavior reference; independently implemented Python and synthetic fixtures. No licensed source snapshot imported."
         }
       ]
     }

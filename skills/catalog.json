@@ -136,6 +136,15 @@
       ]
     },
     {
+      "name": "orbyn-design-status",
+      "category": "Product design",
+      "related": [
+        "orbyn-ui-design",
+        "orbyn-workflow",
+        "orbyn-ci-design"
+      ]
+    },
+    {
       "name": "orbyn-data-migration",
       "category": "Fullstack contracts and delivery",
       "related": [
@@ -239,7 +248,8 @@
         "architect",
         "tdd",
         "orbyn-ai-application",
-        "product-illustration"
+        "product-illustration",
+        "orbyn-design-status"
       ]
     },
     {

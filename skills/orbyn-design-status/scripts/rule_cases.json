@@ -1,0 +1,188 @@
+{
+  "build": [
+    {"name":"no evidence","frame":{},"expected":{"state":"none"}},
+    {"name":"legacy building","frame":{"legacy":"building"},"expected":{"state":"check","reason":"Tagged Building by hand, with no branch. Record a branch or clear it."}},
+    {"name":"legacy implemented","frame":{"legacy":"implemented"},"expected":{"state":"check","reason":"Tagged Implemented by hand, with no branch. Record a branch or clear it."}},
+    {"name":"own commits merged","frame":{"build":{"repo":"app","branch":"feature","sha":"aaaaaaa"}},"facts":{"tip":"bbbbbbb","onDefault":true,"ownCommits":true,"pulls":[]},"expected":{"state":"implemented","reason":"Branch merged into main"}},
+    {"name":"merged pull adds evidence","frame":{"build":{"repo":"app","branch":"feature","sha":"aaaaaaa"}},"facts":{"tip":"bbbbbbb","onDefault":true,"ownCommits":true,"pulls":[{"number":1,"branch":"feature","state":"merged","mergedAt":"2026-01-01"}]},"expected":{"state":"implemented","reason":"Branch merged into main","pr":{"number":1,"branch":"feature","state":"merged","mergedAt":"2026-01-01"},"merged":"2026-01-01"}},
+    {"name":"merged pull without branch","frame":{"build":{"repo":"app","branch":"feature"}},"facts":{"onDefault":false,"ownCommits":false,"pulls":[{"number":2,"branch":"feature","state":"merged","mergedAt":"2026-01-02"}]},"expected":{"state":"implemented","reason":"Pull request merged","pr":{"number":2,"branch":"feature","state":"merged","mergedAt":"2026-01-02"},"merged":"2026-01-02"}},
+    {"name":"open pull","frame":{"build":{"repo":"app","branch":"feature"}},"facts":{"onDefault":false,"ownCommits":false,"pulls":[{"number":3,"branch":"feature","state":"open"}]},"expected":{"state":"building","reason":"Pull request open","pr":{"number":3,"branch":"feature","state":"open"}}},
+    {"name":"branch exists","frame":{"build":{"repo":"app","branch":"feature"}},"facts":{"tip":"bbbbbbb","onDefault":false,"ownCommits":false,"pulls":[]},"expected":{"state":"building","reason":"Branch not merged yet"}},
+    {"name":"closed pull and deleted branch","frame":{"build":{"repo":"app","branch":"feature"}},"facts":{"onDefault":false,"ownCommits":false,"pulls":[{"number":4,"branch":"feature","state":"closed"}]},"expected":{"state":"check","reason":"Branch gone and pull request #4 closed without a merge","pr":{"number":4,"branch":"feature","state":"closed"}}},
+    {"name":"lookup unavailable","frame":{"build":{"repo":"app","branch":"feature"}},"facts":{"onDefault":false,"ownCommits":false,"pulls":null},"expected":{"state":"check","reason":"unverified"}},
+    {"name":"missing facts","frame":{"build":{"repo":"app","branch":"feature"}},"expected":{"state":"check","reason":"unverified"}},
+    {"name":"deleted without merge","frame":{"build":{"repo":"app","branch":"feature"}},"facts":{"onDefault":false,"ownCommits":false,"pulls":[]},"expected":{"state":"check","reason":"Branch deleted without a merge"}},
+    {"name":"sha prefix equal","frame":{"build":{"repo":"app","branch":"feature","sha":"abcdef0"}},"facts":{"tip":"abcdef0123456789","onDefault":true,"ownCommits":true,"pulls":[]},"expected":{"state":"building","reason":"Branch not merged yet"}},
+    {"name":"no recorded sha","frame":{"build":{"repo":"app","branch":"feature"}},"facts":{"tip":"abcdef0","onDefault":true,"ownCommits":true,"pulls":[]},"expected":{"state":"building","reason":"Branch not merged yet"}},
+    {"name":"only default first parent commits","frame":{"build":{"repo":"app","branch":"feature","sha":"aaaaaaa"}},"facts":{"tip":"bbbbbbb","onDefault":true,"ownCommits":false,"pulls":[]},"expected":{"state":"building","reason":"Branch not merged yet"}}
+  ],
+  "design": [
+    {"name":"planned wins","section":"s","planned":true,"versions":{"work":{"s":"a"},"main":{"s":"a"},"pulls":[],"dirty":false,"behind":false},"expected":{"state":"planned"}},
+    {"name":"matches main","section":"s","planned":false,"versions":{"work":{"s":"a"},"main":{"s":"a"},"pulls":[],"dirty":true,"behind":false,"mainSha":"abc1234","mainDate":"2026-01-01"},"expected":{"state":"published","sha":"abc1234","date":"2026-01-01"}},
+    {"name":"clean behind and exists on main","section":"s","planned":false,"versions":{"work":{"s":"old"},"main":{"s":"new"},"pulls":[],"dirty":false,"behind":true},"expected":{"state":"published"}},
+    {"name":"behind but absent from main","section":"s","planned":false,"versions":{"work":{"s":"old"},"main":{},"pulls":[],"dirty":false,"behind":true,"branch":"feature"},"expected":{"state":"designed","branch":"feature"}},
+    {"name":"matching pull dirty","section":"s","planned":false,"versions":{"work":{"s":"a"},"main":{},"pulls":[{"pr":{"number":1,"branch":"feature","state":"open"},"sections":{"s":"a"}}],"dirty":true,"behind":false},"expected":{"state":"publishing","branch":"feature","pr":{"number":1,"branch":"feature","state":"open"},"dirty":true}},
+    {"name":"clean branch pull even without matching section","section":"s","planned":false,"versions":{"work":{"s":"a"},"main":{},"pulls":[{"pr":{"number":2,"branch":"feature","state":"open"},"sections":{}}],"dirty":false,"behind":false,"branch":"feature"},"expected":{"state":"publishing","branch":"feature","pr":{"number":2,"branch":"feature","state":"open"}}},
+    {"name":"dirty branch does not imply pull match","section":"s","planned":false,"versions":{"work":{"s":"a"},"main":{},"pulls":[{"pr":{"number":2,"branch":"feature","state":"open"},"sections":{}}],"dirty":true,"behind":false,"branch":"feature"},"expected":{"state":"designed","branch":"feature","dirty":true}},
+    {"name":"designed","section":"s","planned":false,"versions":{"work":{"s":"a"},"main":{},"pulls":[],"dirty":false,"behind":false},"expected":{"state":"designed"}},
+    {"name":"shared styles metadata","section":"s","planned":true,"versions":{"work":{},"main":{},"pulls":[],"dirty":false,"behind":false,"sharedStylesChanged":true},"expected":{"state":"planned","sharedStylesChanged":true}}
+  ],
+  "normalize": [
+  {
+    "name": "inline trailing space matters",
+    "left": "<span>Hello </span><em>world</em>",
+    "right": "<span>Hello</span><em>world</em>",
+    "equal": false
+  },
+  {
+    "name": "inline leading space matters",
+    "left": "<span>Hello</span> <em>world</em>",
+    "right": "<span>Hello</span><em>world</em>",
+    "equal": false
+  },
+  {
+    "name": "inline whitespace collapses",
+    "left": "<span>Hello  \n</span><em>world</em>",
+    "right": "<span>Hello </span><em>world</em>",
+    "equal": true
+  },
+  {
+    "name": "comments ignored",
+    "left": "<p>Hello<!-- note --> world</p>",
+    "right": "<p>Hello world</p>",
+    "equal": true
+  },
+  {
+    "name": "comment beside inline space",
+    "left": "<span>Hello </span><!-- note --><em>world</em>",
+    "right": "<span>Hello </span><em>world</em>",
+    "equal": true
+  },
+  {
+    "name": "attribute order and quotes",
+    "left": "<SECTION z=\"2\" id=\"s\" a=one>Hi</SECTION>",
+    "right": "<section a='one' id='s' z='2'>Hi</section>",
+    "equal": true
+  },
+  {
+    "name": "block indentation ignored",
+    "left": "<section>\n <p> Hello   world </p>\n</section>",
+    "right": "<section><p>Hello world</p></section>",
+    "equal": true
+  },
+  {
+    "name": "pre spaces significant",
+    "left": "<pre> a  b </pre>",
+    "right": "<pre> a b </pre>",
+    "equal": false
+  },
+  {
+    "name": "pre line endings normalised",
+    "left": "<pre>a\r\nb</pre>",
+    "right": "<pre>a\nb</pre>",
+    "equal": true
+  },
+  {
+    "name": "script content preserved",
+    "left": "<script> a  b </script>",
+    "right": "<script> a b </script>",
+    "equal": false
+  },
+  {
+    "name": "style content preserved",
+    "left": "<style> a  b </style>",
+    "right": "<style> a b </style>",
+    "equal": false
+  },
+  {
+    "name": "textarea content preserved",
+    "left": "<textarea> a  b </textarea>",
+    "right": "<textarea> a b </textarea>",
+    "equal": false
+  }
+],
+  "renames": [
+  {
+    "name": "single alias carries",
+    "html": "<section id=\"new\" data-was=\"old\"></section>",
+    "saved": [
+      "old"
+    ],
+    "expected": [
+      "new"
+    ]
+  },
+  {
+    "name": "colliding destinations preserve both old entries",
+    "html": "<section id=\"new\" data-was=\"old-a\"></section><section id=\"new\" data-was=\"old-b\"></section>",
+    "saved": [
+      "old-a",
+      "old-b"
+    ],
+    "expected": [
+      "old-a",
+      "old-b"
+    ]
+  },
+  {
+    "name": "multiple aliases from old preserve old",
+    "html": "<section id=\"new-a\" data-was=\"old\"></section><section id=\"new-b\" data-was=\"old\"></section>",
+    "saved": [
+      "old"
+    ],
+    "expected": [
+      "old"
+    ]
+  },
+  {
+    "name": "live old key wins",
+    "html": "<section id=\"old\"></section><section id=\"new\" data-was=\"old\"></section>",
+    "saved": [
+      "old"
+    ],
+    "expected": [
+      "old"
+    ]
+  },
+  {
+    "name": "saved destination wins",
+    "html": "<section id=\"new\" data-was=\"old\"></section>",
+    "saved": [
+      "old",
+      "new"
+    ],
+    "expected": [
+      "old",
+      "new"
+    ]
+  },
+  {
+    "name": "missing old entry does not carry",
+    "html": "<section id=\"new\" data-was=\"old\"></section>",
+    "saved": [],
+    "expected": []
+  },
+  {
+    "name": "independent aliases carry",
+    "html": "<section id=\"new-a\" data-was=\"old-a\"></section><section id=\"new-b\" data-was=\"old-b\"></section>",
+    "saved": [
+      "old-a",
+      "old-b"
+    ],
+    "expected": [
+      "new-a",
+      "new-b"
+    ]
+  },
+  {
+    "name": "duplicate same alias is ambiguous",
+    "html": "<section id=\"new\" data-was=\"old\"></section><section id=\"new\" data-was=\"old\"></section>",
+    "saved": [
+      "old"
+    ],
+    "expected": [
+      "old"
+    ]
+  }
+]
+}
