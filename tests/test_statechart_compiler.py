@@ -35,6 +35,11 @@ class AdapterContracts(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, 'hash mismatch'):
                     adapter.compiler_identity()
 
+    def test_closure_check_compares_posix_style_names_on_every_platform(self):
+        receipt = adapter.compiler_identity()
+        self.assertTrue(all('\\' not in name for name in receipt['files']))
+        self.assertIn('compiler/backends/cfg.ts', receipt['files'])
+
     def test_unqualified_platform_is_blocked_without_launch(self):
         with patch.object(adapter.sys, 'platform', 'freebsd14'), patch.object(adapter.subprocess, 'run') as launch:
             with self.assertRaisesRegex(ValueError, 'not qualified'):
@@ -66,10 +71,10 @@ class AdapterContracts(unittest.TestCase):
         launch.assert_called_once()
         self.assertEqual(launch.call_args.args[0], ['taskkill', '/pid', '4321', '/t', '/f'])
         group.assert_not_called()
-        with patch.object(adapter.sys, 'platform', 'linux'), patch.object(adapter.subprocess, 'run') as launch, patch.object(adapter.os, 'killpg', create=True) as group:
+        with patch.object(adapter.sys, 'platform', 'linux'), patch.object(adapter.subprocess, 'run') as launch, patch.object(adapter.os, 'killpg', create=True) as group, patch.object(adapter.signal, 'SIGKILL', 9, create=True):
             adapter.kill_tree(child)
         launch.assert_not_called()
-        group.assert_called_once_with(4321, adapter.signal.SIGKILL)
+        group.assert_called_once_with(4321, 9)
 
     def test_existing_output_is_never_overwritten(self):
         with tempfile.TemporaryDirectory() as temp:

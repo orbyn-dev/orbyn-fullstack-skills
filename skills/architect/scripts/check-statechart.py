@@ -37,7 +37,7 @@ def compiler_identity():
         if not Path(item['path']).is_relative_to(root.resolve()) or item['sha256'] != record['sha256']:
             raise ValueError(f'Bundled compiler hash mismatch: {name}')
         verified[name] = item['sha256']
-    actual = {str(p.relative_to(root)) for p in (root / 'compiler').rglob('*') if p.is_file()}
+    actual = {p.relative_to(root).as_posix() for p in (root / 'compiler').rglob('*') if p.is_file()}
     if actual != {name for name in verified if name.startswith('compiler/')}:
         raise ValueError('Unmapped compiler runtime file')
     boundary = Path(__file__).resolve().parents[1] / 'package.json'
