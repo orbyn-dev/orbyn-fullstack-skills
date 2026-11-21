@@ -26,3 +26,6 @@ output/
 
 # Local preview launcher with absolute paths.
 .claude/launch.json
+
+# Private agent handoffs and review evidence stay local.
+/.collab/tasks/

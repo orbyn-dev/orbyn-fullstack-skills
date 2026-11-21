@@ -10,7 +10,8 @@ python3 <orbyn-workflow skill directory>/scripts/harness.py resolve --target <ta
 Run the `harness.py` in the directory of the loaded `orbyn-workflow` skill, by
 absolute path. If that script is missing, stop and report it; never fall back to
 the library defaults. The tool reads files and prints the effective value of every
-setting with its source. `resolve` writes nothing (only `setup` saves the work mode), starts no model and never runs a check
+setting with its source. `resolve` writes nothing (`setup` saves the work mode and
+`setup-cleanup` saves explicitly chosen cleanup profiles), starts no model and never runs a check
 a file lists. Exit 0 is success. Exit 1 is an invalid file or drift: report the
 file and message to the user and stop; do not guess a value. Exit 2 means the tool
 could not run (bad target, bad `--set`, unreadable defaults or arguments): fix the
@@ -25,7 +26,9 @@ invocation or report the message. It never means "use the defaults".
 3. A local, Git-ignored file in the outer workspace, `repo/.harness/<target-slug>.json`.
    This is the owner's own file, for a target whose owner does not want a file
    committed or wants more subagents than the default.
-4. The library defaults in [harness-defaults.json](harness-defaults.json),
+4. Owner workspace cleanup defaults in ignored `repo/.harness/_defaults.json`,
+   accepting only `schema_version` and `cleanup`; `_defaults` is a reserved slug.
+5. The library defaults in [harness-defaults.json](harness-defaults.json),
    generated from the model registry.
 
 A missing file is normal. Setup installs nothing into a target; writing
@@ -95,7 +98,7 @@ repository text" label and must be one line without control characters.
   repository prefers for new behavior ([cover each behavior once](../../tdd/references/test-strategy.md#cover-each-behavior-once)).
   Unset means the cheapest layer that observes the behavior.
 - `cleanup`: limits for `worktree_retire.py report` and `apply`. `enabled` (true) is a
-  boolean; the rest are positive integers: `cache_idle_days` (7), `worktree_idle_days`
+  boolean; `cache_profile`, `output_profile` and `scan_depth` are described below; other values are positive integers: `cache_idle_days` (7), `worktree_idle_days`
   (1), `output_idle_days` (14), `archive_max_days` (30), `archive_max_mb` (500),
   `references_idle_days` (30) and `low_disk_free_percent` (15, range 1..50). Shorter
   days or a smaller archive send more to the Trash, so a target file may only lengthen
@@ -123,6 +126,62 @@ setting; locked security roles or lead work routed below the lead tier;
 architect, reviewer or complex-engineering work routed to a scout; and an effort
 above the cap for `gpt-6.1-sol`, `gpt-6.1-terra`, `sonnet` or `fable` (full ids
 included). Only the user's explicit instruction can exceed an effort cap.
+
+## Cache-only profiles
+
+`cleanup.cache_profile` accepts `legacy` (unset default), `off`, `safe`, `moderate`
+and `aggressive`. The named levels activate [artifact-only cleanup](../../orbyn-worktree/references/cache-only-cleanup.md)
+without authorizing source retirement. Safe keeps dependency caches; Moderate uses
+3-day compiler/7-day dependency ages; Aggressive uses 1 day for both. Every item
+still needs independent tool, source-activity, protection and live-usage proof.
+
+Owner workspace defaults sit below per-repository/in-place settings. A target
+file cannot enable profile mode when the owner remains `legacy`, raise a chosen
+profile, or re-enable `off`. A target `legacy` while the owner selected a named
+profile becomes `off`, so it cannot restore more permissive legacy cache rules.
+Target restrictions, including the pinned-base copy checked by cleanup, still
+win against `--cache-profile`. Primary and linked-tree policies are combined.
+
+```sh
+python3 <workflow>/scripts/harness.py setup-cleanup --target <repo> --scope repo --profile moderate --dry-run
+python3 <workflow>/scripts/harness.py setup-cleanup --target <repo> --scope repo --profile moderate
+python3 <workflow>/scripts/harness.py setup-cleanup --target <repo> --scope workspace --profile safe
+```
+
+These commands update only the appropriate ignored owner file, atomically, and
+preserve unrelated settings. Linked/in-place clones use their existing stable
+owner identity. Malformed, linked or tracked destinations are rejected. Preview
+writes nothing; saving a profile executes no cleanup. Use `legacy`/`off` to revert
+policy, not to restore already-moved files. Shared package caches and Docker data
+volumes are not enabled for removal by any profile.
+
+## Output profiles
+
+`cleanup.output_profile` independently accepts `legacy`, `off`, `safe`, `moderate`
+and `aggressive`; the default is `legacy`. Named levels require the owned, completed
+[output plan and unit proofs](../../orbyn-worktree/references/output-cleanup.md)
+and strict idle ages of 14, 7 and 3 days respectively. `off` holds output; a named
+profile never falls back to whole-task cleanup. Existing `output_idle_days` applies
+to legacy behavior and is not changed by selecting a profile. Current, primary/linked
+and pinned target restrictions can tighten an owner or CLI choice, including `off`;
+a target's `legacy` cannot re-enable legacy cleanup under a named owner profile.
+
+`setup-cleanup --class cache|output|all` selects which profile is saved, defaulting
+to `cache`. Use `--scope repo` for the owner repository or `--scope workspace` for
+cleanup defaults. `all` writes both profiles atomically, preserving other settings;
+`--dry-run` writes nothing. A one-run `--output-profile` selects output policy only.
+
+## Inspection depth
+
+`cleanup.scan_depth` is independent of the profiles and defaults to `standard`.
+An owner may select `deep` in a repo or workspace file, or for one command with
+`--scan-depth deep`. `setup-cleanup --scope repo|workspace --scan-depth deep`
+saves depth alone; add `--profile` to save both atomically. `--class` requires a
+profile and defaults to cache when a profile is supplied. Current target, pinned
+base, primary and linked policies can restrict deep to standard, even over a CLI
+choice; target data cannot raise the owner's depth. Unknown policy holds the item.
+[Inspection bounds and safeguards](../../orbyn-worktree/references/deep-scan.md)
+remain independent of age, cleanup permissions and reclaim goals.
 
 ## The work mode
 
@@ -193,3 +252,13 @@ below those). Codex reads `agents.max_concurrent_threads_per_session` from a tru
 project's `.codex/config.toml`; spawn depth is policy only on Codex. `--explain`
 prints the values that would enforce the resolved settings; apply them only with
 authority over that host configuration.
+
+
+## Owner-selected NTFS compression
+
+`cleanup.compression_enabled` defaults to false; `cleanup.compression_roots`
+defaults to an empty list. Owner repo/workspace setup accepts `--compression on|off`
+and repeated `--compression-root` exact C:/D: subdirectories. Tracked policy can
+only disable/intersect these settings. Effective Aggressive cache policy and an
+authorized cleanup request are required separately; other profiles never compress.
+See [compression execution and preservation](../../orbyn-worktree/references/ntfs-compression.md).

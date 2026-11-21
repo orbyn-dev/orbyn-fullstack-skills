@@ -4,8 +4,24 @@ How any request flows. Each step has one owner; this page only links them.
 
 1. **Resolve settings.** Run `harness.py resolve` for the target and read the
    result. The user's chat instruction outranks `.orbyn/harness.json`, which
-   outranks a local `repo/.harness/<slug>.json`, which outranks the library
-   defaults. Schema, trust rules and rejections:
+   outranks a local `repo/.harness/<slug>.json`, which outranks workspace cleanup
+   defaults in `repo/.harness/_defaults.json`, then the library defaults.
+   Workspace defaults accept only cleanup settings and are owner-local, untracked
+   files. For `cleanup.cache_profile` and `cleanup.output_profile`, checked-out and pinned target policies can
+   only restrict the owner's selected profile, including an explicit CLI choice:
+   `off` disables profiles, an absent or owner-selected `legacy` preserves legacy
+   behavior, and a target's explicit `legacy` disables an owner-selected named
+   profile. Ordered profiles restrict to the less aggressive value. A linked worktree also obeys
+   its primary checkout's restrictions. Profiles stay `legacy` when absent;
+   repository data cannot enable them. Save an owner choice with
+   `harness.py setup-cleanup --target TARGET --scope repo|workspace --class cache|output|all --profile PROFILE`
+   (class defaults to cache). Output profiles use strict 14/7/3-day unit thresholds;
+   legacy `output_idle_days` is unchanged. See [output cleanup](../../skills/orbyn-worktree/references/output-cleanup.md).
+   Independent `cleanup.scan_depth` defaults to `standard`; an owner can choose
+   `deep` using `setup-cleanup --scope repo|workspace --scan-depth deep`, alone or
+   with `--profile`. Current, pinned, primary and linked target policies can only
+   restrict it to standard. See [inspection depth](../../skills/orbyn-worktree/references/deep-scan.md).
+   Schema, trust rules and rejections:
    [harness settings](../../skills/orbyn-workflow/references/harness-settings.md).
    Library defaults and what each host enforces: [model policy](model-policy.md).
    The result also prints the repository's work mode (`simple`, `isolated` or

@@ -7,6 +7,10 @@ an assessment, not new authority to commit, publish, stop resources or delete.
 A cleanup dry run inventories and proposes only; it does not perform teardown,
 move files, prune refs, reclone or run mutation probes.
 
+For free-space measurements and diagnostic goals, use [space recovery](space-recovery.md).
+For exact rebuildable units in finished task output, use the separate
+[output cleanup profile](output-cleanup.md); unknown task output remains held.
+
 ## Retire at delivery
 
 A merged worktree is finished work, and leaving it costs storage every day. Make
@@ -59,6 +63,11 @@ or delete a tree by hand.
 
 ## Clean the workspace
 
+For an authorized cache-only request, use [cache-only profiles](cache-only-cleanup.md)
+and preview `--only artifact`. The source may remain for an open PR; its cache still
+needs independent rebuild/protection/quiescence proof. Docker storage is read-only
+and all data volumes are held. Legacy cleanup below remains the unset default.
+
 Three moments call for the workspace cleanup: task closeout, before creating a
 worktree, and when `harness.py resolve` prints `LOW DISK` (free space under
 `low_disk_free_percent`, default 15%). At each one:
@@ -107,8 +116,19 @@ trimmed by age, then largest first only while the archive is over its budget.
 On native Windows 10/11, the helper uses built-in Windows APIs for its nonblocking
 cleanup lock, candidate-scoped file/directory usage probes and Recycle Bin move.
 Local fixed volumes with working Recycle Bin support are the initial supported
-surface. UNC/network paths, reparse points (including junctions), inaccessible
+surface. UNC/network paths, reparse points by default, inaccessible
 entries and ambiguous usage stay held; no tool installation or elevation follows.
+
+Usage probes request file attributes plus delete access with exclusive sharing;
+they do not request file-content reads. Existing read/write/delete handles and
+process working directories still hold a candidate. Budget exhaustion remains
+unknown, even when an earlier scan succeeded.
+
+For reviewed ignored generated-cache junctions in a finished whole worktree, the
+opt-in [shared-junction method](shared-junctions.md) preserves the link objects in
+the protected retirement archive before recycling the ordinary folder. It never
+evicts or counts shared target storage. Other reparse types and cache-only links
+remain held. Recovery needs the saved junction objects as well as the Bin folder.
 
 An open file or a process using a directory can hold a candidate. Usage checks are
 snapshots, repeated before retirement; they do not grant ownership of another

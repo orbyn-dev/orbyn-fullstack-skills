@@ -103,6 +103,35 @@ class NativeWindowsContracts(unittest.TestCase):
         self.stop(process)
         self.assertEqual(tool.native.usage(self.root), set())
 
+    def test_artifact_owner_probe_detects_cwd_and_release_without_recursing(self):
+        path = self.root/'cache'
+        path.mkdir()
+        opened = path/'held.txt'
+        opened.write_text('synthetic', encoding='utf-8')
+        file_process = self.child('import sys; f=open(sys.argv[1]); print("ready",flush=True); sys.stdin.readline()', opened)
+        self.assertEqual(tool.native.probe_dirs([self.root]), set())
+        self.assertTrue(tool.native.usage(path, max_seconds=30, max_entries=100))
+        self.stop(file_process)
+        cwd_process = self.child('import sys; print("ready",flush=True); sys.stdin.readline()', cwd=self.root)
+        self.assertTrue(tool.native.probe_dirs([self.root]))
+        self.stop(cwd_process)
+        self.assertEqual(tool.native.probe_dirs([self.root, path]), set())
+
+    def test_artifact_probe_unknown_and_budget_exhaustion_never_mean_idle(self):
+        (self.root/'data.txt').write_text('synthetic', encoding='utf-8')
+        self.assertIsNone(tool.native.probe_dirs([self.root/'missing']))
+        self.assertIsNone(tool.native.usage(self.root, max_seconds=0))
+        self.assertIsNone(tool.native.usage(self.root, max_entries=1))
+        self.assertEqual(tool.native.usage(self.root, max_seconds=30, max_entries=100), set())
+
+    def test_artifact_tool_lock_probe_handles_regular_files(self):
+        lock = self.root/'.cargo-lock'
+        lock.write_text('synthetic', encoding='utf-8')
+        process = self.child('import sys; f=open(sys.argv[1]); print("ready",flush=True); sys.stdin.readline()', lock)
+        self.assertTrue(tool.native.probe_dirs([lock]))
+        self.stop(process)
+        self.assertEqual(tool.native.probe_dirs([lock]), set())
+
     def test_cleanup_lock_contends_across_processes_and_releases(self):
         code = ('import importlib.util,sys; '
                 's=importlib.util.spec_from_file_location("native",sys.argv[1]); '
@@ -155,6 +184,43 @@ class NativeWindowsContracts(unittest.TestCase):
         path.write_text('synthetic', encoding='utf-8')
         with mock.patch.object(tool.native, '_open', side_effect=PermissionError('synthetic denial')):
             self.assertIsNone(tool.native.usage(path))
+
+    def test_usage_details_explain_native_busy_budget_and_access_states(self):
+        path = self.root/'sample.txt'
+        path.write_text('synthetic', encoding='utf-8')
+        clear = tool.native.usage_details(self.root, max_seconds=30, max_entries=100)
+        self.assertEqual((clear['state'], clear['reason_code'], clear['visited_entries']), ('clear', 'clear', 2))
+        self.assertEqual(tool.native.usage_details(self.root, max_seconds=0)['reason_code'], 'budget_time')
+        self.assertEqual(tool.native.usage_details(self.root, max_entries=1)['reason_code'], 'budget_entries')
+        with mock.patch.object(tool.native, '_open', side_effect=PermissionError('synthetic private path')):
+            denied = tool.native.usage_details(path)
+        self.assertEqual((denied['state'], denied['reason_code']), ('unknown', 'access_denied'))
+        self.assertNotIn('synthetic private', json.dumps(denied))
+        process = self.child('import sys; f=open(sys.argv[1]); print("ready",flush=True); sys.stdin.readline()', path)
+        busy = tool.native.usage_details(self.root, max_seconds=30, max_entries=100)
+        self.assertEqual((busy['state'], busy['reason_code']), ('busy', 'busy'))
+        self.assertIn(str(path), busy['busy_paths'])
+        self.stop(process)
+
+    def test_retained_native_root_still_proves_all_child_identities(self):
+        path = self.root/'child.txt'
+        path.write_text('synthetic', encoding='utf-8')
+        api = tool.native._win32()
+        with tool.native._handle(api, str(self.root), 0x80010000, 7) as retained:
+            self.assertEqual(tool.native._usage(str(self.root), retained, max_seconds=30, max_entries=100), set())
+
+    def test_recycle_bin_aggregate_is_readonly_and_failure_is_unknown(self):
+        details = tool.native.recycle_bin_info(self.root)
+        self.assertIn(details['state'], ('ok', 'unknown'))
+        if details['state'] == 'ok':
+            self.assertGreaterEqual(details['reported_bytes'], 0)
+            self.assertGreaterEqual(details['items'], 0)
+        with mock.patch.object(tool.native, '_bin_details', side_effect=tool.native.PlatformRefused(
+                'private native diagnostic', 'recycle_bin_unavailable')):
+            failed = tool.native.recycle_bin_info(self.root)
+        self.assertEqual(failed['state'], 'unknown')
+        self.assertIsNone(failed['reported_bytes'])
+        self.assertIsNone(failed['items'])
 
     def test_incomplete_recycle_proof_keeps_source_and_does_not_claim_success(self):
         target = self.root/'candidate'

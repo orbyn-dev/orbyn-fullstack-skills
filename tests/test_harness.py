@@ -13,7 +13,7 @@ import unittest
 from unittest import mock
 
 # Classes run_tests.py runs as parallel processes; keep in step with the classes below.
-SHARDS = ["DefaultsAndPrecedence", "Rejections", "TrustBoundary", "HostileInput", "ExitCodes", "HostVersions", "DriftAndPortableDefaults", "CleanupSettings", "WorkMode", "LibraryAsTarget"]
+SHARDS = ["DefaultsAndPrecedence", "Rejections", "TrustBoundary", "HostileInput", "ExitCodes", "HostVersions", "DriftAndPortableDefaults", "CleanupSettings", "WorkMode", "LibraryAsTarget", "CacheProfiles"]
 
 ROOT = Path(__file__).resolve().parents[1]
 TOOL = ROOT / 'skills/orbyn-workflow/scripts/harness.py'
@@ -73,7 +73,7 @@ class HarnessCase(unittest.TestCase):
 class DefaultsAndPrecedence(HarnessCase):
     def test_missing_files_are_normal_and_every_value_names_its_default_source(self):
         result = self.resolve()
-        self.assertEqual([layer['status'] for layer in result['layers']], ['used', 'absent', 'absent', 'none given'])
+        self.assertEqual([layer['status'] for layer in result['layers']], ['used', 'absent', 'absent', 'absent', 'none given'])
         self.assertEqual(result['delegation']['max_children']['value'], 2)
         self.assertEqual(result['delegation']['max_depth']['value'], 1)
         self.assertEqual(result['delegation']['read_only_children_extra']['value'], 0)
@@ -461,7 +461,7 @@ class HostileInput(HarnessCase):
                 self.assertIn('invalid target slug', result.stderr)
 
     def test_a_name_without_a_safe_injective_slug_gets_no_local_file(self):
-        for name in ['my app..v2', '.dot', 'a--b', 'a-', 'x' * 200]:
+        for name in ['my app..v2', '.dot', 'a--b', 'a-', 'x' * 129]:
             with self.subTest(name=name):
                 odd = self.workspace / 'repo' / name
                 (odd / '.git').mkdir(parents=True)
@@ -597,23 +597,18 @@ class HostVersions(HarnessCase):
         self.assertEqual(self.resolve('--host-version', '2.1.300')['warnings'], [])
 
     def test_the_running_claude_binary_is_probed_before_the_one_on_path(self):
-        def fake(folder, version):
-            folder.mkdir(parents=True, exist_ok=True)
-            path = folder / 'claude'
-            path.write_text(f'#!/bin/sh\necho "{version} (Claude Code)"\n')
-            path.chmod(0o755)
-            return path
-        on_path, running = fake(self.base / 'bin', '2.1.150'), fake(self.base / 'run', '2.1.309')
-        def probe(**env):
-            result = subprocess.run([sys.executable, str(TOOL), 'resolve', '--target', str(self.target), '--workspace',
-                                     str(self.workspace), '--host', 'claude', '--json'], capture_output=True, text=True,
-                                    env=dict({k: v for k, v in os.environ.items() if k != 'CLAUDE_CODE_EXECPATH'},
-                                              PATH=str(on_path.parent) + os.pathsep + '/usr/bin:/bin', **env))
-            self.assertEqual(result.returncode, 0, result.stderr)
-            return json.loads(result.stdout)
-        self.assertEqual(probe()['hosts']['claude']['version'], '2.1.150')
-        out = probe(CLAUDE_CODE_EXECPATH=str(running))
-        self.assertEqual((out['hosts']['claude']['version'], out['warnings']), ('2.1.309', []))
+        spec = importlib.util.spec_from_file_location('harness_probe', TOOL)
+        harness = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(harness)
+        with mock.patch.dict(os.environ, {}, clear=True), mock.patch.object(harness.shutil, 'which', return_value='path-claude'), \
+                mock.patch.object(harness.os, 'access', return_value=True), \
+                mock.patch.object(harness.subprocess, 'run', return_value=mock.Mock(stdout='2.1.150 (Claude Code)')) as run:
+            self.assertEqual(harness.probe_version('claude')[0], (2, 1, 150))
+            self.assertEqual(run.call_args.args[0], ['path-claude', '--version'])
+            os.environ['CLAUDE_CODE_EXECPATH'] = 'running-claude'
+            run.return_value.stdout = '2.1.309 (Claude Code)'
+            self.assertEqual(harness.probe_version('claude')[0], (2, 1, 309))
+            self.assertEqual(run.call_args.args[0], ['running-claude', '--version'])
 
     def test_codex_has_no_claude_minimums_and_a_missing_cli_is_a_warning(self):
         self.assertEqual(self.resolve('--host-version', '0.166.0', host='codex')['warnings'], [])
@@ -764,8 +759,9 @@ class DriftAndPortableDefaults(HarnessCase):
 
 
 class CleanupSettings(HarnessCase):
-    LIMITS = {'enabled': True, 'cache_idle_days': 7, 'worktree_idle_days': 1, 'output_idle_days': 14, 'archive_max_days': 30,
-              'archive_max_mb': 500, 'references_idle_days': 30, 'low_disk_free_percent': 15}
+    LIMITS = {'enabled': True, 'cache_profile': 'legacy', 'output_profile': 'legacy', 'scan_depth': 'standard', 'cache_idle_days': 7, 'worktree_idle_days': 1, 'output_idle_days': 14, 'archive_max_days': 30,
+              'archive_max_mb': 500, 'references_idle_days': 30, 'low_disk_free_percent': 15,
+              'compression_enabled': False, 'compression_roots': []}
 
     def values(self, result):
         return {key: item['value'] for key, item in result['cleanup'].items()}
@@ -780,7 +776,8 @@ class CleanupSettings(HarnessCase):
     def test_registry_defaults_flow_to_resolve_with_their_source(self):
         result = self.resolve()
         self.assertEqual(self.values(result), self.LIMITS)
-        self.assertEqual(json.loads(REGISTRY.read_text())['cleanup'], self.LIMITS)
+        self.assertEqual(json.loads(REGISTRY.read_text())['cleanup'],
+                         {k: v for k, v in self.LIMITS.items() if not k.startswith('compression_')})
         self.assertTrue(all(item['source'].startswith('library default') for item in result['cleanup'].values()))
 
     def test_values_must_be_positive_integers_the_disk_percent_one_to_fifty_and_enabled_a_boolean(self):
@@ -1292,3 +1289,245 @@ class LibraryAsTarget(HarnessCase):
                                  '--host', 'claude', '--no-probe', '--json'], capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIsNone(json.loads(result.stdout)['workspace'])
+
+class CacheProfiles(HarnessCase):
+    def test_compression_defaults_and_target_cannot_grant_or_expand(self):
+        cleanup = self.resolve()['cleanup']
+        self.assertFalse(cleanup['compression_enabled']['value'])
+        self.assertEqual(cleanup['compression_roots']['value'], [])
+        self.write_target(valid(cleanup={'compression_enabled': True, 'compression_roots': ['D:/other']}))
+        cleanup = self.resolve()['cleanup']
+        self.assertFalse(cleanup['compression_enabled']['value'])
+        self.assertEqual(cleanup['compression_roots']['value'], [])
+        self.write_local(valid(cleanup={'compression_enabled': True,
+                                        'compression_roots': ['C:/build/deps', 'D:/build/deps']}), '_defaults')
+        self.write_target(valid(cleanup={'compression_enabled': False,
+                                         'compression_roots': ['c:\\BUILD\\deps', 'D:/other']}))
+        cleanup = self.resolve()['cleanup']
+        self.assertFalse(cleanup['compression_enabled']['value'])
+        self.assertEqual(cleanup['compression_roots']['value'], ['C:/build/deps'])
+        self.write_target(valid(cleanup={'compression_enabled': True}))
+        self.write_local(valid(cleanup={'compression_enabled': False, 'compression_roots': ['D:/repo']}))
+        cleanup = self.resolve()['cleanup']
+        self.assertFalse(cleanup['compression_enabled']['value'])
+        self.assertEqual(cleanup['compression_roots']['value'], ['D:/repo'])
+
+    def test_compression_setup_and_malformed_paths(self):
+        self.write_local(valid(work={'mode': 'isolated'}, cleanup={'cache_profile': 'safe'}))
+        args = ('setup-cleanup', '--target', str(self.target), '--workspace', str(self.workspace), '--scope', 'repo')
+        path = self.workspace / 'repo/.harness/app.json'
+        before = path.read_bytes()
+        self.run_tool(*args, '--compression', 'on', '--compression-root', 'C:/cache/deps', '--dry-run')
+        self.assertEqual(path.read_bytes(), before)
+        self.run_tool(*args, '--compression', 'on', '--compression-root', 'C:/cache/deps',
+                      '--compression-root', 'D:/cache/deps')
+        saved = json.loads(path.read_text())
+        self.assertEqual(saved['work']['mode'], 'isolated')
+        self.assertEqual(saved['cleanup']['cache_profile'], 'safe')
+        self.assertTrue(saved['cleanup']['compression_enabled'])
+        self.assertEqual(saved['cleanup']['compression_roots'], ['C:/cache/deps', 'D:/cache/deps'])
+        self.run_tool(*args, '--compression', 'off', '--compression-root', 'D:/cache', ok=2)
+        self.run_tool(*args, '--compression-root', 'D:/cache', ok=2)
+        for root in ('C:/', 'E:/cache', '//host/share/cache', 'C:relative', 'D:/x/../secret',
+                     'C:/bad:stream', 'C:/folder/..', 'D:/bad./foo'):
+            with self.subTest(root=root):
+                self.validate(valid(cleanup={'compression_roots': [root]}), ok=1)
+        self.validate(valid(cleanup={'compression_roots': ['C:/cache', 'c:\\CACHE']}), ok=1)
+        self.validate(valid(cleanup={'compression_roots': [f'D:/cache/{i}' for i in range(33)]}), ok=1)
+        self.validate(valid(cleanup={'compression_enabled': 'true'}), ok=1)
+
+    def test_compression_workspace_setup_and_repo_override(self):
+        args = ('setup-cleanup', '--target', str(self.target), '--workspace', str(self.workspace))
+        self.run_tool(*args, '--scope', 'workspace', '--compression', 'on', '--compression-root', 'D:/cache')
+        self.assertEqual(self.resolve()['cleanup']['compression_roots']['value'], ['D:/cache'])
+        self.run_tool(*args, '--scope', 'repo', '--compression', 'off')
+        cleanup = self.resolve()['cleanup']
+        self.assertFalse(cleanup['compression_enabled']['value'])
+        self.assertEqual(cleanup['compression_roots']['value'], ['D:/cache'])
+
+    def test_workspace_precedence_and_target_restriction(self):
+        self.write_local(valid(cleanup={'cache_profile': 'safe', 'cache_idle_days': 20}), '_defaults')
+        self.write_local(valid(cleanup={'cache_profile': 'moderate'}))
+        result = self.resolve('--set', 'cleanup.cache_profile=aggressive')
+        field = result['cleanup']['cache_profile']
+        self.assertEqual(field['value'], 'aggressive')
+        self.assertEqual([v['value'] for v in field['overridden']], ['moderate', 'safe', 'legacy'])
+        self.assertEqual(result['cleanup']['cache_idle_days']['value'], 20)
+        self.write_target(valid(cleanup={'cache_profile': 'off'}))
+        field = self.resolve('--set', 'cleanup.cache_profile=aggressive')['cleanup']['cache_profile']
+        self.assertEqual(field['value'], 'off')
+        self.assertTrue(field['source'].startswith('target file'))
+        self.assertEqual(field['overridden'][0]['value'], 'aggressive')
+
+    def test_restriction_truth_table(self):
+        spec = importlib.util.spec_from_file_location('cache_harness', TOOL)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        for owner in ('legacy', 'off', 'safe', 'moderate', 'aggressive'):
+            for target in ('legacy', 'off', 'safe', 'moderate', 'aggressive'):
+                expected = ('off' if owner == 'off' or target == 'off' else
+                            ('legacy' if owner == 'legacy' else 'off') if target == 'legacy' else
+                            'legacy' if owner == 'legacy' else min((owner, target), key=module.CACHE_PROFILES.index))
+                self.assertEqual(module.restrict_cache_profile(owner, target)[0], expected, (owner, target))
+
+    def test_workspace_defaults_reject_other_fields_and_invalid_profile(self):
+        for data in (valid(work={'mode': 'simple'}), valid(cleanup={'cache_profile': 'bad'}), valid(bogus=1)):
+            self.write_local(data, '_defaults')
+            self.resolve(ok=1)
+        path = self.write_local(valid(), '_defaults')
+        path.write_text('{')
+        self.resolve(ok=1)
+
+    def test_reserved_slug_does_not_read_workspace_defaults_as_local(self):
+        self.target = self.workspace / 'repo' / '_defaults'
+        (self.target / '.git').mkdir(parents=True)
+        self.write_local(valid(cleanup={'cache_profile': 'safe'}), '_defaults')
+        result = self.resolve()
+        self.assertEqual(result['cleanup']['cache_profile']['value'], 'safe')
+        self.assertTrue(any('reserved' in n for n in result['notices']))
+
+    def test_setup_cleanup_repo_and_workspace_dry_run(self):
+        self.write_local(valid(work={'mode': 'isolated'}))
+        args = ('setup-cleanup', '--target', str(self.target), '--workspace', str(self.workspace))
+        self.run_tool(*args, '--scope', 'workspace', '--profile', 'safe', '--dry-run')
+        self.assertFalse((self.workspace / 'repo/.harness/_defaults.json').exists())
+        self.run_tool(*args, '--scope', 'workspace', '--profile', 'safe')
+        self.run_tool(*args, '--scope', 'repo', '--profile', 'moderate')
+        self.assertEqual(self.resolve()['cleanup']['cache_profile']['value'], 'moderate')
+        data = json.loads((self.workspace / 'repo/.harness/app.json').read_text())
+        self.assertEqual(data['work']['mode'], 'isolated')
+        self.assertEqual(data['cleanup']['cache_profile'], 'moderate')
+
+    def test_workspace_defaults_tracked_and_symlink_rejected(self):
+        path = self.write_local(valid(cleanup={'cache_profile': 'safe'}), '_defaults')
+        subprocess.run(['git', 'init', '-q', str(self.workspace)], check=True)
+        subprocess.run(['git', '-C', str(self.workspace), 'add', '-f', str(path)], check=True)
+        self.resolve(ok=1)
+        args = ('setup-cleanup', '--target', str(self.target), '--workspace', str(self.workspace),
+                '--scope', 'workspace', '--profile', 'off')
+        self.run_tool(*args, ok=2)
+
+    def test_setup_cleanup_rejects_malformed_existing(self):
+        self.write_local(valid(cleanup={'cache_profile': 'broken'}), '_defaults')
+        self.run_tool('setup-cleanup', '--target', str(self.target), '--workspace', str(self.workspace),
+                      '--scope', 'workspace', '--profile', 'safe', ok=1)
+
+    def test_workspace_symlink_rejected(self):
+        path = self.write_local(valid(), '_defaults')
+        other = self.base / 'other.json'
+        path.replace(other)
+        try:
+            path.symlink_to(other)
+        except OSError:
+            self.skipTest('symbolic links unavailable')
+        self.resolve(ok=1)
+        self.run_tool('setup-cleanup', '--target', str(self.target), '--workspace', str(self.workspace),
+                      '--scope', 'workspace', '--profile', 'safe', ok=1)
+
+    def test_target_profiles_remain_restrictive_after_user_override(self):
+        for owner, target, expected in [('moderate', 'aggressive', 'moderate'),
+                                        ('legacy', 'moderate', 'legacy'),
+                                        ('aggressive', 'off', 'off'),
+                                        ('aggressive', 'legacy', 'off'), ('safe', 'legacy', 'off'),
+                                        ('off', 'legacy', 'off')]:
+            with self.subTest(owner=owner, target=target):
+                self.write_target(valid(cleanup={'cache_profile': target}))
+                result = self.resolve('--set', f'cleanup.cache_profile={owner}')
+                profile = result['cleanup']['cache_profile']
+                self.assertEqual(profile['value'], expected)
+                self.assertTrue(profile['source'].startswith('target file'))
+                self.assertEqual(profile['overridden'][0]['value'], owner)
+                self.assertTrue(any('restrict' in notice for notice in result['notices']))
+
+    def test_output_profile_precedence_and_sticky_restrictions(self):
+        default = self.resolve()['cleanup']
+        self.assertEqual(default['output_profile']['value'], 'legacy')
+        self.assertEqual(default['output_idle_days']['value'], 14)
+        self.write_local(valid(cleanup={'output_profile': 'safe'}), '_defaults')
+        self.write_local(valid(cleanup={'output_profile': 'moderate', 'cache_profile': 'safe'}))
+        result = self.resolve('--set', 'cleanup.output_profile=aggressive')['cleanup']
+        self.assertEqual(result['output_profile']['value'], 'aggressive')
+        self.assertEqual([v['value'] for v in result['output_profile']['overridden']], ['moderate', 'safe', 'legacy'])
+        self.assertEqual(result['cache_profile']['value'], 'safe')
+        for target, owner, expected in [('off', 'aggressive', 'off'), ('legacy', 'safe', 'off'),
+                                        ('aggressive', 'moderate', 'moderate'), ('legacy', 'legacy', 'legacy')]:
+            with self.subTest(target=target, owner=owner):
+                self.write_target(valid(cleanup={'output_profile': target}))
+                field = self.resolve('--set', f'cleanup.output_profile={owner}')['cleanup']['output_profile']
+                self.assertEqual(field['value'], expected)
+                if target != owner:
+                    self.assertTrue(field['source'].startswith('target file'))
+                    self.assertEqual(field['overridden'][0]['value'], owner)
+
+    def test_setup_cleanup_selects_output_or_all_atomically(self):
+        self.write_local(valid(work={'mode': 'isolated'}, cleanup={'cache_profile': 'safe', 'output_idle_days': 30}))
+        args = ('setup-cleanup', '--target', str(self.target), '--workspace', str(self.workspace), '--scope', 'repo')
+        self.run_tool(*args, '--class', 'output', '--profile', 'moderate')
+        data = json.loads((self.workspace / 'repo/.harness/app.json').read_text())
+        self.assertEqual(data['cleanup'], {'cache_profile': 'safe', 'output_profile': 'moderate', 'output_idle_days': 30})
+        self.assertEqual(data['work']['mode'], 'isolated')
+        self.run_tool(*args, '--class', 'all', '--profile', 'off')
+        result = self.resolve()['cleanup']
+        self.assertEqual((result['cache_profile']['value'], result['output_profile']['value']), ('off', 'off'))
+        self.assertEqual(result['output_idle_days']['value'], 30)
+        self.run_tool(*args, '--class', 'unknown', '--profile', 'safe', ok=2)
+
+    def test_output_profile_workspace_writer_and_validation(self):
+        args = ('setup-cleanup', '--target', str(self.target), '--workspace', str(self.workspace), '--scope', 'workspace')
+        self.run_tool(*args, '--class', 'output', '--profile', 'safe')
+        field = self.resolve()['cleanup']['output_profile']
+        self.assertEqual(field['value'], 'safe')
+        self.assertTrue(field['source'].startswith('workspace defaults'))
+        self.write_local(valid(cleanup={'output_profile': 'invalid'}), '_defaults')
+        self.resolve(ok=1)
+        self.run_tool(*args, '--class', 'all', '--profile', 'safe', ok=1)
+
+    def test_scan_depth_owner_precedence_and_target_ceiling(self):
+        self.assertEqual(self.resolve()['cleanup']['scan_depth']['value'], 'standard')
+        self.write_local(valid(cleanup={'scan_depth': 'deep'}), '_defaults')
+        field = self.resolve()['cleanup']['scan_depth']
+        self.assertEqual(field['value'], 'deep')
+        self.assertTrue(field['source'].startswith('workspace defaults'))
+        self.write_local(valid(cleanup={'scan_depth': 'standard'}))
+        self.assertEqual(self.resolve()['cleanup']['scan_depth']['value'], 'standard')
+        self.write_target(valid(cleanup={'scan_depth': 'standard'}))
+        field = self.resolve('--set', 'cleanup.scan_depth=deep')['cleanup']['scan_depth']
+        self.assertEqual(field['value'], 'standard')
+        self.assertTrue(field['source'].startswith('target file'))
+        self.assertEqual(field['overridden'][0]['value'], 'deep')
+        self.write_target(valid(cleanup={'scan_depth': 'deep'}))
+        self.assertEqual(self.resolve()['cleanup']['scan_depth']['value'], 'standard')
+        self.write_target(valid(cleanup={'scan_depth': 'invalid'}))
+        self.resolve(ok=1)
+        self.write_target(valid())
+        self.resolve('--set', 'cleanup.scan_depth=invalid', ok=2)
+
+    def test_scan_depth_setup_preserves_other_settings(self):
+        self.write_local(valid(work={'mode': 'isolated'}, cleanup={'cache_profile': 'safe', 'output_profile': 'off'}))
+        args = ('setup-cleanup', '--target', str(self.target), '--workspace', str(self.workspace), '--scope', 'repo')
+        path = self.workspace / 'repo/.harness/app.json'
+        before = path.read_bytes()
+        self.run_tool(*args, '--scan-depth', 'deep', '--dry-run')
+        self.assertEqual(path.read_bytes(), before)
+        self.run_tool(*args, '--scan-depth', 'deep')
+        data = json.loads(path.read_text())
+        self.assertEqual(data['cleanup'], {'cache_profile': 'safe', 'output_profile': 'off', 'scan_depth': 'deep'})
+        self.assertEqual(data['work']['mode'], 'isolated')
+        self.run_tool(*args, '--profile', 'moderate', '--scan-depth', 'standard', '--class', 'output')
+        data = json.loads(path.read_text())
+        self.assertEqual(data['cleanup'], {'cache_profile': 'safe', 'output_profile': 'moderate', 'scan_depth': 'standard'})
+        self.run_tool(*args, ok=2)
+        self.run_tool(*args, '--scan-depth', 'deep', '--class', 'cache', ok=2)
+        self.run_tool(*args, '--scan-depth', 'infinite', ok=2)
+        self.run_tool('setup-cleanup', '--target', str(self.target), '--workspace', str(self.workspace),
+                      '--scope', 'workspace', '--scan-depth', 'deep')
+        self.assertEqual(json.loads((self.workspace / 'repo/.harness/_defaults.json').read_text())['cleanup'],
+                         {'scan_depth': 'deep'})
+
+    def test_scan_depth_restriction_helper(self):
+        spec = importlib.util.spec_from_file_location('scan_depth_harness', TOOL)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        for owner, target, expected in [('standard', 'standard', 'standard'), ('standard', 'deep', 'standard'),
+                                        ('deep', 'standard', 'standard'), ('deep', 'deep', 'deep')]:
+            self.assertEqual(module.restrict_scan_depth(owner, target)[0], expected)

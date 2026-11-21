@@ -1,6 +1,6 @@
 ---
 name: orbyn-worktree
-description: "Manage local task branches, private contribution storage when supported and Git worktree isolation; use sibling <repo>-wt directories, purpose-based names and preservation before cleanup."
+description: "Manage task branches, contribution storage, Git worktree isolation and rebuildable cache cleanup; inspect build storage, use sibling repo-wt roots and preserve owned source before retirement."
 ---
 
 # Worktree ownership and lifecycle
@@ -88,11 +88,21 @@ clean status alone does not clear a tree for removal. Retire a tree only through
 cleared). Its `apply` proves only landing, a clean tree, no hidden changes, nothing open and no hold; the owner still
 judges the rest ([retirement gate](references/task-closeout.md#retirement-gate-for-an-exact-path-or-ref)).
 A refusal has no automatic force fallback; ref deletion and tracking prune stay separate.
+For an authorized Windows tree with shared generated-cache junctions, use the
+explicit [junction-preservation method](references/shared-junctions.md). It retains
+the link objects separately; shared target data stays with its owner.
+
+For inactive build/dependency storage while source stays, use the explicit
+[cache-only profiles](references/cache-only-cleanup.md). Select an owner profile,
+preview `--only artifact`, and retain failed/unknown usage, holds and pinned output.
+Docker build storage is reporting only; all Docker data volumes stay held. For finished
+task output, use the separate [output profile](references/output-cleanup.md).
+For explicit Standard/Deep inspection and disk measurements, see [space recovery](references/space-recovery.md).
 
 After a merge, [retire the worktree in the same closeout](references/task-closeout.md#retire-at-delivery)
 when you have cleanup authority; never hand-run `git worktree remove` on a live tree,
 which deletes ignored files. Keep a merged tree only with a named reason and review
-event in a `HOLD.json`. At closeout, before creating a worktree and on low disk, [run workspace cleanup](references/task-closeout.md#clean-the-workspace)
+event in a `HOLD.json`. For authorized Aggressive cleanup, inspect and apply opt-in [NTFS compression](references/ntfs-compression.md) to configured idle private compiler files on C: and D: while preserving source, shared data and evidence. At closeout, before creating a worktree and on low disk, [run workspace cleanup](references/task-closeout.md#clean-the-workspace)
 (`worktree_retire.py report`, then `apply`). It trashes only finished worktrees,
 rebuildable caches and idle output, archive and references; everything else in
 `repo/` is report-only.
