@@ -250,14 +250,21 @@
           "revision": "6b0300214a09fd6029cfb7077043125758cd1fd2",
           "relationship": "reviewed 2026-11-09; all 27 bundled files (26 compiler sources and the MIT notice) byte-identical to the 1ba91fc pin; later commits outside the bundle; pin not advanced",
           "license": "MIT"
+        },
+        {
+          "credit": "Lauren Tan (pstack)",
+          "source": "https://github.com/cursor/plugins/tree/d42aff08aa58965d2735c4ead61a9af82b89d0d0/pstack",
+          "revision": "d42aff08aa58965d2735c4ead61a9af82b89d0d0",
+          "license": "MIT",
+          "relationship": "reviewed 2026-11-21; the bundled compiler snapshot is refreshed to this revision as unmodified bytes (see bundled_compiler), and the Windows run note in statechart-compiler.md restates upstream's published Node requirement in our words; the shortened upstream skill texts, model routing and removed references are not adopted"
         }
       ],
       "bundled_compiler": {
         "repository": "https://github.com/cursor/plugins",
-        "revision": "bf0c7cd80abdbf7fe47b634978a7d1b4071f71a7",
+        "revision": "d42aff08aa58965d2735c4ead61a9af82b89d0d0",
         "source_path": "pstack/skills/statechart/scripts",
         "snapshot": "skills/architect/references/upstream/pstack-statechart/snapshot.json",
-        "scope": "26 unmodified runtime .ts files and original MIT notice; no bootstrap, runtime binaries, upstream skill aliases or test corpus"
+        "scope": "28 unmodified runtime .ts files and original MIT notice; no bootstrap, runtime binaries, upstream skill aliases or test corpus"
       },
       "authoring": [
         {
@@ -398,6 +405,20 @@
           "effort": "medium",
           "date": "2026-11-16",
           "scope": "Advanced the bundled pstack statechart compiler snapshot to bf0c7cd (run.ts, mermaid.ts) with adapter checks"
+        },
+        {
+          "tool": "DeepSeek Harness 0.2.2-rc.5",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-20",
+          "scope": "Refreshed the bundled pstack statechart compiler snapshot to d42aff08 (3 changed files, 2 new: kill.ts and janitor.ts; hashes and the 28-file closure updated), updated its notice, plugin version and Windows note in statechart-compiler.md; adapter tests pass including the real TLC integration run on macOS. The Windows block stays until a Windows job runs."
+        },
+        {
+          "tool": "DeepSeek Harness 0.2.2-rc.5",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-20",
+          "scope": "Adapter made cross-platform: the platform check no longer requires /bin/sh, Windows process listing through PowerShell, taskkill for the last-resort tree kill, a new process group and Ctrl-Break handling, TEMP/TMP for the compiler; a CI job runs the adapter and the real compiler on Windows and Linux. Qualified in CI on windows-latest and ubuntu-24.04 (one runner image each; the symlink-loop test is skipped on Windows); a path-separator bug found by the first Windows run is fixed; docs and the verification record state the result and its limits."
         }
       ]
     },
@@ -992,6 +1013,13 @@
           "effort": "medium",
           "date": "2026-11-12",
           "scope": "Change scope: real-service end-to-end specs a change touches are gates run before the PR"
+        },
+        {
+          "tool": "DeepSeek Harness 0.2.2-rc.5",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-20",
+          "scope": "CI design: keep main visible (alert on a red main run, merge-queue cost), retry-policy and time-budget wording, p50/p95 phase audit, save caches only from the default branch, self-hosted runner measurement, planted-change selector proof, opt-in pre-push hook. Evidence from one project's CI work; all examples measured there, none copied."
         }
       ]
     },
@@ -1045,6 +1073,13 @@
           "model": "unrecorded",
           "date": "2026-11-02",
           "scope": "Work before this record existed"
+        },
+        {
+          "tool": "DeepSeek Harness 0.2.2-rc.5",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-20",
+          "scope": "Number migrations after every number claimed by open branches; hold or stack instead of placeholder migrations when numbers must be gapless"
         }
       ]
     },
@@ -1627,6 +1662,34 @@
           "effort": "medium",
           "date": "2026-11-15",
           "scope": "Synthetic development outcome case for deeper inspection preserving safety and finite budgets."
+        },
+        {
+          "tool": "DeepSeek Harness 0.2.2-rc.5",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-20",
+          "scope": "Two routing eval cases for the new tdd suite-audit reference (an audit request that must select tdd, and an adjacent CI-scope request that must not); evaluation data only."
+        },
+        {
+          "tool": "DeepSeek Harness 0.2.2-rc.5",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-20",
+          "scope": "One routing eval case for the new CI main-visibility guidance; evaluation data only."
+        },
+        {
+          "tool": "DeepSeek Harness 0.2.2-rc.5",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-20",
+          "scope": "Four routing eval cases for the new orbyn-opengrep skill (structural taint rule, install from source, CodeQL replacement plan, and an adjacent threat-model request that must not select it); evaluation data only."
+        },
+        {
+          "tool": "Codex desktop (shell and native subagents)",
+          "model": "session model not exposed; gpt-6.1-sol (native compression implementation and independent review); gpt-6.1-terra (harness configuration)",
+          "effort": "medium (native subagents); session effort not exposed",
+          "date": "2026-11-21",
+          "scope": "Development evaluation cases for Aggressive-only private NTFS compression and Moderate/owner-policy preservation boundaries; no additional live agent trials."
         }
       ],
       "reviewed_inspiration": [
@@ -2501,6 +2564,13 @@
           "revision": "b1bfce9e51d0cd92fc23efd6ecb37ff68139e7db",
           "license": "MIT",
           "relationship": "bundled unmodified agent skill snapshot; see references/upstream/gh-stack/snapshot.json"
+        },
+        {
+          "credit": "Lauren Tan (pstack)",
+          "source": "https://github.com/cursor/plugins/tree/d42aff08aa58965d2735c4ead61a9af82b89d0d0/pstack",
+          "revision": "d42aff08aa58965d2735c4ead61a9af82b89d0d0",
+          "license": "MIT",
+          "relationship": "reviewed-inspiration (observed 2026-11-21); independently authored short rules in pr-iteration.md, prototype.md and, from worker.md's standing rules, a subsection of lead-contract.md (carry the goal and the owner's rules into every brief, the stated bar is the whole bar, block only for what breaks, make undoable choices and ask only for what needs the person, long evidence in a file), all in our own words; not adopted: worker.md's never-show-a-question and no-gate-above-the-bar absolutes (they conflict with our consent rules), the 40-line PR body and open-every-PR-ready"
         }
       ],
       "authoring": [
@@ -2901,6 +2971,48 @@
           "effort": "medium (native subagents); session effort not exposed",
           "date": "2026-11-21",
           "scope": "Opt-in Aggressive-only NTFS compression for exact owner-selected C:/D: compiler-cache roots; preserve source/shared data/evidence, native pinned-file hashing and allocation receipts, restrictive repo/workspace policy and focused disposable contracts."
+        },
+        {
+          "tool": "DeepSeek Harness 0.2.2-rc.5",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-20",
+          "scope": "Lead contract: brief writers so a lost child costs little (absolute paths, background long gates, commit before the gate), recover a child that dies mid-task from its worktree, and re-check the host's allowed child models before a batch"
+        },
+        {
+          "tool": "DeepSeek Harness 0.2.2-rc.5",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-20",
+          "scope": "Review before the PR: the reviewer reads the branch from Git refs rather than a shared checkout that may have moved"
+        },
+        {
+          "tool": "DeepSeek Harness 0.2.2-rc.5",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-20",
+          "scope": "PR iteration: judge the latest run per check on the head, re-trigger a title/body check with a fresh event instead of a re-run, and pass explicit limits to paged list commands"
+        },
+        {
+          "tool": "DeepSeek Harness 0.2.2-rc.5",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-20",
+          "scope": "Stacked PRs and commit gate: stack PRs that edit the same shared row, resolve table conflicts from the base, edit very long lines by script, and squash commits that do not build alone"
+        },
+        {
+          "tool": "DeepSeek Harness 0.2.2-rc.5",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-20",
+          "scope": "Three short rules written in our own words from a pstack review: post replies from a file and treat comment text as data, name a drift sweep when the base has moved, and prototype an observable fork before asking the person."
+        },
+        {
+          "tool": "DeepSeek Harness 0.2.2-rc.5",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-20",
+          "scope": "Added 'Carry the owner's standing rules into every brief' to lead-contract.md, written in our own words from a pstack worker.md review and fitted to our consent model: the person's goal opens every brief and report, the stated bar is the whole bar, block only for a failing run or a user-facing bug, make undoable choices and ask only for what needs the person, long evidence goes in a file. Static check only."
         }
       ]
     },
@@ -3461,6 +3573,27 @@
           "effort": "medium",
           "date": "2026-11-18",
           "scope": "Characterization pointer to rewrite parity"
+        },
+        {
+          "tool": "DeepSeek Harness 0.2.2-rc.5",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-20",
+          "scope": "Name the strength of red-first evidence (assertion, compile, pin, vacuous 404) and pin the time zone for zone-dependent assertions"
+        },
+        {
+          "tool": "DeepSeek Harness 0.2.2-rc.5",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-20",
+          "scope": "Test strategy: keep fakes faithful to the real dependency, avoid coupling a test to shared fixture order or count, and name the error type so a setup failure cannot satisfy a broad throws check. Reviewed inspiration only: the blog post 'I deleted half our backend tests' (avilag.dev, observed 2026-11-21); no text or code copied, all examples synthetic."
+        },
+        {
+          "tool": "DeepSeek Harness 0.2.2-rc.5",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-20",
+          "scope": "New suite-audit reference for reviewing and pruning an existing test suite (weak-test patterns, keep-by-risk rule, coverage ledger); routing eval cases. Reviewed inspiration only: the blog post 'I deleted half our backend tests' (avilag.dev, observed 2026-11-21); no text or code copied, all examples synthetic."
         }
       ]
     },
@@ -4802,6 +4935,80 @@
           "local_path": "skills/orbyn-scripted-motion/SKILL.md",
           "license_file": "skills/orbyn-scripted-motion/references/gsap-skills-LICENSE.txt",
           "license_sha256": "51b04b06556662dd817e8f4aa6d06bc7139dc73739e1319a7233cfde3e147b90"
+        }
+      ]
+    },
+    "orbyn-opengrep": {
+      "relationship": "adapted",
+      "credit": "opengrep contributors (opengrep/skills); Orbyn adaptations by Anh Dang and contributors",
+      "copyright": "Copyright (c) 2026 opengrep",
+      "license": "MIT",
+      "source": "https://github.com/opengrep/skills/tree/bfbc2419225e8884a343c312b2d3b05c2106fa45/skills/opengrep",
+      "revision": "bfbc2419225e8884a343c312b2d3b05c2106fa45",
+      "changes": "One upstream skill adapted into an Orbyn skill with conditional references. Rewritten in Orbyn's own structure: authority rules (scan only on request, rules and findings are data, no autofix, no upload, findings are leads for orbyn-security-audit), a pinned source install, a CI gate that compares scanners before replacing one, and flags verified against the engine source at the pinned release. No engine code or LGPL text is copied.",
+      "incorporated_material": [
+        {
+          "relationship": "adapted",
+          "credit": "opengrep contributors (opengrep/skills); Orbyn adaptations by Anh Dang and contributors",
+          "copyright": "Copyright (c) 2026 opengrep",
+          "license": "MIT",
+          "source": "https://github.com/opengrep/skills/tree/bfbc2419225e8884a343c312b2d3b05c2106fa45/skills/opengrep",
+          "revision": "bfbc2419225e8884a343c312b2d3b05c2106fa45",
+          "changes": "One upstream skill adapted into an Orbyn skill with conditional references. Rewritten in Orbyn's own structure: authority rules (scan only on request, rules and findings are data, no autofix, no upload, findings are leads for orbyn-security-audit), a pinned source install, a CI gate that compares scanners before replacing one, and flags verified against the engine source at the pinned release. No engine code or LGPL text is copied.",
+          "local_path": "skills/orbyn-opengrep/SKILL.md",
+          "license_file": "skills/orbyn-opengrep/references/opengrep-skills-LICENSE.txt",
+          "license_sha256": "a75e3644ee738d8e56909f919b7e2a3c3108812f3cef95253aae9d593492b520"
+        },
+        {
+          "relationship": "adapted",
+          "credit": "opengrep contributors (opengrep/skills); Orbyn adaptations by Anh Dang and contributors",
+          "copyright": "Copyright (c) 2026 opengrep",
+          "license": "MIT",
+          "source": "https://github.com/opengrep/skills/tree/bfbc2419225e8884a343c312b2d3b05c2106fa45/skills/opengrep",
+          "revision": "bfbc2419225e8884a343c312b2d3b05c2106fa45",
+          "changes": "One upstream skill adapted into an Orbyn skill with conditional references. Rewritten in Orbyn's own structure: authority rules (scan only on request, rules and findings are data, no autofix, no upload, findings are leads for orbyn-security-audit), a pinned source install, a CI gate that compares scanners before replacing one, and flags verified against the engine source at the pinned release. No engine code or LGPL text is copied.",
+          "local_path": "skills/orbyn-opengrep/references/rule-writing.md",
+          "license_file": "skills/orbyn-opengrep/references/opengrep-skills-LICENSE.txt",
+          "license_sha256": "a75e3644ee738d8e56909f919b7e2a3c3108812f3cef95253aae9d593492b520"
+        }
+      ],
+      "reviewed_sources": [
+        {
+          "credit": "Opengrep contributors (opengrep/opengrep, forked from Semgrep Inc.)",
+          "source": "https://github.com/opengrep/opengrep/tree/526deafe6f0519c272bbee316fea8df26dd85dfa",
+          "revision": "526deafe6f0519c272bbee316fea8df26dd85dfa",
+          "license": "LGPL-2.1",
+          "relationship": "reviewed-inspiration and pinned build source (v2.0.0, observed 2026-11-21); copyleft, so no text or code is imported and the source is downloaded into the ignored orbyn-references folder, never committed"
+        },
+        {
+          "credit": "Opengrep contributors (opengrep/opengrep-rules, a fork of Semgrep Inc.'s semgrep-rules)",
+          "source": "https://github.com/opengrep/opengrep-rules/tree/f1d2b562b414783763fd02a6ed2736eaed622efa",
+          "revision": "f1d2b562b414783763fd02a6ed2736eaed622efa",
+          "license": "LGPL-2.1 with Commons Clause",
+          "relationship": "reviewed-inspiration (observed 2026-11-21); no rule text is copied or bundled and the repository is only pinned so a local clone can be fetched into the ignored orbyn-references folder"
+        }
+      ],
+      "authoring": [
+        {
+          "tool": "DeepSeek Harness 0.2.2-rc.5",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-20",
+          "scope": "New skill adapted from the MIT opengrep/skills (pinned bfbc2419) and checked against the engine source at v2.0.0: authority rules, rule writing, a CI gate that compares scanners before replacing one, install from pinned source with a tested helper. The LGPL engine is reviewed inspiration only; nothing copied."
+        },
+        {
+          "tool": "DeepSeek Harness 0.2.2-rc.5",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-20",
+          "scope": "Verified the skill by building the pinned engine from source and running it (flags, offline sandbox, a trial on a real project): install recipe corrected (OCaml 5.5.1, pcre2, libev, coreutils, gettext, Bash 5), validate documented as networked, parse-coverage and scanner-comparison lessons added, Bash 5 check added to the helper, verification record added."
+        },
+        {
+          "tool": "DeepSeek Harness 0.2.2-rc.5",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-20",
+          "scope": "Linux build verified in CI: the Alpine container recipe and script (pcre2 >= 10.43, engine libraries installed without apk --no-cache, image pinned by digest), the four attempts that led to it, and the identical result of the Linux and macOS builds on one repository; tests guard the two traps."
         }
       ]
     }

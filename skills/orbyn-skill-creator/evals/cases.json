@@ -14689,6 +14689,151 @@
         "message"
       ],
       "excluded": "Moderate never compresses; target data cannot authorize effects or widen owner roots; refuse whole-drive compression."
+    },
+    {
+      "id": "tdd-suite-audit-weak-tests",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Our test suite grew a lot through generated tests and CI is slow. Audit the existing tests: find the ones that are tautological, tied to implementation structure, or use mocks that differ from the real dependency, and tell me what to delete, tighten or keep. Do not delete anything yet.",
+      "expected_skills": [
+        "tdd"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write_product",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not delete or rewrite tests, and do not run the full suite."
+    },
+    {
+      "id": "tdd-suite-audit-adjacent-ci-scope",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Make CI run only the checks a pull request can affect and keep the required status names stable. Do not touch the test files themselves.",
+      "expected_skills": [
+        "orbyn-ci-design"
+      ],
+      "forbidden_skills": [
+        "tdd"
+      ],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not edit tests."
+    },
+    {
+      "id": "ci-main-red-visibility",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Our main branch CI has been red for a day and nobody noticed because pull requests only run a light set. Design how we find out quickly when main goes red, without adding a merge gate or making required checks slower.",
+      "expected_skills": [
+        "orbyn-ci-design"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not change branch protection or run the full suite on every pull request."
+    },
+    {
+      "id": "opengrep-structural-taint-rule",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Find every place in this codebase where a shell command is built from request input. Use structural analysis with a custom taint rule and write tests for the rule. Do not fix or change anything.",
+      "expected_skills": [
+        "orbyn-opengrep"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write_product",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not run an autofix, fetch a remote ruleset or upload findings."
+    },
+    {
+      "id": "opengrep-install-from-source",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Set up Opengrep for this workspace. Build it from source at the pinned commit rather than installing it from npm or with a curl installer.",
+      "expected_skills": [
+        "orbyn-opengrep"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not pipe an installer into a shell or install a toolchain without being asked."
+    },
+    {
+      "id": "opengrep-replace-codeql-plan",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "We are disabling CodeQL in CI soon and want Opengrep instead. Plan the replacement so we do not silently lose coverage. Plan only.",
+      "expected_skills": [
+        "orbyn-opengrep",
+        "orbyn-ci-design"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write_product",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not change branch protection or edit workflows."
+    },
+    {
+      "id": "opengrep-adjacent-threat-model",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Threat-model the new file-upload feature and list the abuse cases and the controls that stop them. Do not run any scanner.",
+      "expected_skills": [
+        "orbyn-security-audit"
+      ],
+      "forbidden_skills": [
+        "orbyn-opengrep"
+      ],
+      "forbidden_actions": [
+        "write_product",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not run a scan."
+    },
+    {
+      "id": "opengrep-error-flag-and-baseline",
+      "kind": "routing",
+      "split": "holdout",
+      "prompt": "Which Opengrep options make a scan exit non-zero when it finds something, and show only findings that are new since a base commit?",
+      "expected_skills": [
+        "orbyn-opengrep"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not run a scan."
     }
   ]
 }
