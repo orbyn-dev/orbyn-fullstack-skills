@@ -31,6 +31,7 @@ import argparse
 import importlib.util
 import hashlib
 import json
+import ntpath
 import os
 import re
 import shlex
@@ -68,7 +69,23 @@ CLEANUP_RANGES = {'cache_idle_days': (1, 3650), 'worktree_idle_days': (1, 3650),
                   'low_disk_free_percent': (1, 50)}
 CACHE_PROFILES = ('off', 'safe', 'moderate', 'aggressive')
 SCAN_DEPTHS = ('standard', 'deep')
-CLEANUP_KEYS = (*CLEANUP_RANGES, 'enabled', 'cache_profile', 'output_profile', 'scan_depth')
+CLEANUP_KEYS = (*CLEANUP_RANGES, 'enabled', 'cache_profile', 'output_profile', 'scan_depth',
+                'compression_enabled', 'compression_roots')
+
+
+def compression_root_key(value):
+    """Validate and normalize a bounded absolute local Windows cache root."""
+    if not isinstance(value, str) or not value or len(value) > 2048 or any(bad_char(c) for c in value):
+        return None
+    path = value.replace('/', '\\')
+    drive, tail = ntpath.splitdrive(path)
+    if drive.lower() not in ('c:', 'd:') or not tail.startswith('\\'):
+        return None
+    parts = tail.split('\\')[1:]
+    if not parts or any(not part or part in ('.', '..') or part.endswith((' ', '.'))
+                        or any(c in part for c in ':*?"<>|') for part in parts):
+        return None
+    return ntpath.normcase(path)
 
 
 def restrict_cache_profile(owner, target):
@@ -365,6 +382,18 @@ def validate_layer(data, human_only=(), complete=False, allowed=None, is_file=Fa
                 errors.append(f'cleanup: unknown key {key!r}')
             if 'enabled' in cleanup and type(cleanup['enabled']) is not bool:
                 errors.append('cleanup.enabled must be true or false')
+            if 'compression_enabled' in cleanup and type(cleanup['compression_enabled']) is not bool:
+                errors.append('cleanup.compression_enabled must be true or false')
+            if 'compression_roots' in cleanup:
+                roots = cleanup['compression_roots']
+                if not isinstance(roots, list) or len(roots) > 32:
+                    errors.append('cleanup.compression_roots must be a list of at most 32 paths')
+                else:
+                    keys = [compression_root_key(root) for root in roots]
+                    if any(key is None for key in keys):
+                        errors.append('cleanup.compression_roots must contain absolute non-root C: or D: paths')
+                    elif len(set(keys)) != len(keys):
+                        errors.append('cleanup.compression_roots must not contain duplicate paths')
             for key in ('cache_profile', 'output_profile'):
                 if key in cleanup and cleanup[key] not in ('legacy', *CACHE_PROFILES):
                     errors.append(f'cleanup.{key} must be one of legacy, ' + ', '.join(CACHE_PROFILES))
@@ -549,7 +578,7 @@ def defaults_from_registry(registry):
         'tiers': ordered,
         'agents': {tier: agents[tier] for tier in TIERS},
         'delegation': dict(registry['delegation']),
-        'cleanup': dict(registry['cleanup']),
+        'cleanup': {'compression_enabled': False, 'compression_roots': [], **registry['cleanup']},
         'work': dict(registry['work']),
         'evals': dict(registry.get('evals', {})),
         'routing': {role: registry['routing'][role] for role in ROLE_KEYS},
@@ -933,6 +962,18 @@ def resolve(target, hosts, sets=(), workspace=None, slug=None, defaults_path=DEF
             effective['cleanup.scan_depth'] = {
                 'value': value, 'source': target_depth['source'],
                 'overridden': [{'source': c['source'], 'value': c['value']} for c in reversed(owner_chain)]}
+    for key in ('cleanup.compression_enabled', 'cleanup.compression_roots'):
+        chain = chains[key]
+        target = next((c for c in chain if c['layer'] == 'target file'), None)
+        if target:
+            owner = [c for c in chain if c['layer'] != 'target file'][-1]
+            if key.endswith('enabled'):
+                value = owner['value'] and target['value']
+            else:
+                permitted = {compression_root_key(path) for path in target['value']}
+                value = [path for path in owner['value'] if compression_root_key(path) in permitted]
+            effective[key] = {'value': value, 'source': target['source'] + ' (owner restriction)',
+                              'overridden': [{'source': owner['source'], 'value': owner['value']}]}
     off = next((c for c in chains.get('cleanup.enabled', []) if c['value'] is False), None)
     if off and not effective['cleanup.enabled']['source'].startswith('user instruction'):
         # Any file that opts a repository out of cleanup wins over another file that turns it back on.
@@ -1331,8 +1372,10 @@ def owner_file(root, workspace, slug):
 def command_setup(args):
     """Save the work mode atomically to the owner's file in the workspace; the only write this tool makes."""
     cleanup_setup = args.command == 'setup-cleanup'
-    if cleanup_setup and not (args.profile or args.scan_depth):
-        raise CannotRun('setup-cleanup needs --profile or --scan-depth')
+    if cleanup_setup and not (args.profile or args.scan_depth or args.compression):
+        raise CannotRun('setup-cleanup needs --profile, --scan-depth or --compression')
+    if cleanup_setup and args.compression_root and args.compression != 'on':
+        raise CannotRun('--compression-root requires --compression on')
     if cleanup_setup and args.cleanup_class is not None and args.profile is None:
         raise CannotRun('--class requires --profile')
     if not cleanup_setup and args.max_active is not None and args.mode != 'parallel':
@@ -1396,6 +1439,10 @@ def command_setup(args):
                     cleanup[f'{name}_profile'] = args.profile
             if args.scan_depth is not None:
                 cleanup['scan_depth'] = args.scan_depth
+            if args.compression is not None:
+                cleanup['compression_enabled'] = args.compression == 'on'
+                if args.compression_root is not None:
+                    cleanup['compression_roots'] = args.compression_root
             data = {**data, 'cleanup': cleanup}
         else:
             work = dict(data.get('work', {})) if isinstance(data.get('work', {}), dict) else {}
@@ -1416,6 +1463,10 @@ def command_setup(args):
             settings = [f'cleanup.{name}_profile={args.profile}' for name in fields] if args.profile else []
             if args.scan_depth:
                 settings.append(f'cleanup.scan_depth={args.scan_depth}')
+            if args.compression:
+                settings.append(f'cleanup.compression_enabled={args.compression}')
+            if args.compression_root:
+                settings.append(f'cleanup.compression_roots={args.compression_root}')
             setting = ' '.join(settings)
             print(f'Dry run: would save {setting} to {label}. Nothing was written.')
             return 0
@@ -1451,6 +1502,10 @@ def command_setup(args):
         settings = [f'cleanup.{name}_profile={args.profile}' for name in fields] if args.profile else []
         if args.scan_depth:
             settings.append(f'cleanup.scan_depth={args.scan_depth}')
+        if args.compression:
+            settings.append(f'cleanup.compression_enabled={args.compression}')
+        if args.compression_root:
+            settings.append(f'cleanup.compression_roots={args.compression_root}')
         setting = ' '.join(settings)
         print(f'OK: saved {setting} to {label}. Nothing else was written.')
     else:
@@ -1506,6 +1561,8 @@ def build_parser():
     cleanup.add_argument('--class', dest='cleanup_class', choices=('cache', 'output', 'all'))
     cleanup.add_argument('--profile', choices=('legacy', *CACHE_PROFILES))
     cleanup.add_argument('--scan-depth', choices=SCAN_DEPTHS)
+    cleanup.add_argument('--compression', choices=('on', 'off'))
+    cleanup.add_argument('--compression-root', action='append')
     cleanup.add_argument('--workspace')
     cleanup.add_argument('--slug')
     cleanup.add_argument('--dry-run', action='store_true')

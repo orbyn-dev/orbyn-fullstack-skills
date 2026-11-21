@@ -102,7 +102,7 @@ For explicit Standard/Deep inspection and disk measurements, see [space recovery
 After a merge, [retire the worktree in the same closeout](references/task-closeout.md#retire-at-delivery)
 when you have cleanup authority; never hand-run `git worktree remove` on a live tree,
 which deletes ignored files. Keep a merged tree only with a named reason and review
-event in a `HOLD.json`. At closeout, before creating a worktree and on low disk, [run workspace cleanup](references/task-closeout.md#clean-the-workspace)
+event in a `HOLD.json`. For authorized Aggressive cleanup, inspect and apply opt-in [NTFS compression](references/ntfs-compression.md) to configured idle private compiler files on C: and D: while preserving source, shared data and evidence. At closeout, before creating a worktree and on low disk, [run workspace cleanup](references/task-closeout.md#clean-the-workspace)
 (`worktree_retire.py report`, then `apply`). It trashes only finished worktrees,
 rebuildable caches and idle output, archive and references; everything else in
 `repo/` is report-only.

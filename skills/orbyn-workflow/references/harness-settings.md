@@ -252,3 +252,13 @@ below those). Codex reads `agents.max_concurrent_threads_per_session` from a tru
 project's `.codex/config.toml`; spawn depth is policy only on Codex. `--explain`
 prints the values that would enforce the resolved settings; apply them only with
 authority over that host configuration.
+
+
+## Owner-selected NTFS compression
+
+`cleanup.compression_enabled` defaults to false; `cleanup.compression_roots`
+defaults to an empty list. Owner repo/workspace setup accepts `--compression on|off`
+and repeated `--compression-root` exact C:/D: subdirectories. Tracked policy can
+only disable/intersect these settings. Effective Aggressive cache policy and an
+authorized cleanup request are required separately; other profiles never compress.
+See [compression execution and preservation](../../orbyn-worktree/references/ntfs-compression.md).

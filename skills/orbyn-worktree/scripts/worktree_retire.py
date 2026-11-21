@@ -1391,6 +1391,112 @@ def artifact_engine():
     return LOADED['artifact_engine']
 
 
+def compression_engine():
+    """Load the separate, non-disposal NTFS compression boundary."""
+    if 'compression_engine' not in LOADED:
+        spec = importlib.util.spec_from_file_location('_orbyn_artifact_compression',
+                                                     Path(__file__).with_name('artifact_compression.py'))
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[spec.name] = module
+        previous, sys.dont_write_bytecode = sys.dont_write_bytecode, True
+        try:
+            spec.loader.exec_module(module)
+        finally:
+            sys.dont_write_bytecode = previous
+        LOADED['compression_engine'] = module
+    return LOADED['compression_engine']
+
+
+def compression_policy(target, workspace, base, cache_profile=None):
+    """Refresh owner settings and pinned repository ceilings; failures disable compression."""
+    ctx = Context(workspace, base, cache_profile=cache_profile)
+    limits, error = ctx.limits(str(target))
+    if limits is None:
+        raise Refused('compression harness unreadable: ' + str(error))
+    profile, source = ctx.profile(str(target))
+    enabled = limits.get('enabled') is True and limits.get('compression_enabled') is True
+    roots = list(limits.get('compression_roots', []))
+    sha, reason = ctx.pin(str(target))
+    if sha is None:
+        raise Refused('compression pinned policy unreadable: ' + str(reason))
+    listed = git(str(target), 'ls-tree', '-z', sha, '--', '.orbyn/harness.json')
+    if listed.returncode:
+        raise Refused('compression pinned policy cannot be inspected')
+    if listed.stdout:
+        shown = git(str(target), 'show', f'{sha}:.orbyn/harness.json')
+        try:
+            if not listed.stdout.startswith('100644 ') or shown.returncode:
+                raise ValueError('unreadable or linked policy')
+            data = json.loads(shown.stdout, object_pairs_hook=reject_duplicates)
+            if ctx.harness.validate_layer(data):
+                raise ValueError('invalid pinned policy')
+            ceiling = data.get('cleanup', {})
+            if ceiling.get('enabled', True) is not True or ceiling.get('compression_enabled', True) is not True:
+                enabled = False
+            if 'compression_roots' in ceiling:
+                allowed = {os.path.normcase(path) for path in ceiling['compression_roots']}
+                roots = [path for path in roots if os.path.normcase(path) in allowed]
+        except (ValueError, TypeError, AttributeError, KeyError) as error:
+            raise Refused('compression pinned policy is malformed') from error
+    return {'enabled': enabled, 'profile': profile, 'roots': roots, 'source': source}
+
+
+def compression_receipt_path(ws):
+    """Create only ordinary receipt directories while their ancestors cannot move."""
+    api = native._win32()
+    folder = Path(ws)
+    for name in ('output', 'cleanup-receipts'):
+        folder = folder/name
+        with native._pinned_ancestors(api, folder):
+            if os.path.lexists(folder):
+                with native._handle(api, str(folder)) as handle:
+                    native._identity(api, handle, str(folder), directory=True)
+            else:
+                folder.mkdir()
+    return folder/('compression-' + datetime.datetime.now(
+        datetime.timezone.utc).strftime('%Y%m%dT%H%M%S%fZ') + '.json')
+
+
+def compress(workspace, target, base, *, dry_run=False, cache_profile=None):
+    """Preview or compress configured idle compiler files, without running Trash cleanup."""
+    ws, target = Path(workspace).resolve(), Path(target or workspace).resolve()
+    configured = compression_policy(target, ws, base, cache_profile)
+
+    def fresh_policy(root, owner):
+        try:
+            current = compression_policy(target, ws, base, cache_profile)
+            if not current['enabled'] or current['profile'] != 'aggressive':
+                return False
+            key = os.path.normcase(str(root))
+            if key not in {os.path.normcase(path) for path in current['roots']}:
+                return False
+            if owner and Path(owner).resolve() != target:
+                owner_policy = compression_policy(owner, ws, base, cache_profile)
+                if not owner_policy['enabled'] or owner_policy['profile'] != 'aggressive':
+                    return False
+                if key not in {os.path.normcase(path) for path in owner_policy['roots']}:
+                    return False
+            return True
+        except (Refused, OSError, subprocess.SubprocessError, ValueError):
+            return False
+
+    engine = compression_engine()
+    try:
+        plan = engine.report(configured['roots'], profile=configured['profile'],
+                             enabled=configured['enabled'], policy_check=fresh_policy)
+    except engine.Held as error:
+        raise Refused('compression held: ' + str(error)) from error
+    if dry_run or plan.get('status') != 'eligible':
+        return {'action': 'compression', 'dry_run': dry_run, 'plan': plan}
+    receipt = compression_receipt_path(ws)
+    try:
+        result = engine.apply(plan, receipt_path=receipt, profile=configured['profile'],
+                              enabled=configured['enabled'], policy_check=fresh_policy)
+    except engine.Held as error:
+        raise Refused('compression held: ' + str(error)) from error
+    return {'action': 'compression', 'dry_run': False, 'receipt_path': str(receipt), 'receipt': result}
+
+
 def artifact_usage(path, held, *, details=None, scan_depth='standard'):
     if not native.is_windows():
         reason = usage_reason(path, held)
@@ -2327,6 +2433,12 @@ def main(argv=None):
     applying.add_argument('--only', choices=CLASSES, help='Act on one class only')
     applying.add_argument('--finish-output', metavar='TASK',
                           help='Act on output/TASK alone, now, whatever its age; its KEEP.txt lists what stays')
+    compressing = commands.add_parser('compress', help='Losslessly compress owner-configured idle compiler files; Aggressive only')
+    compressing.add_argument('--workspace', default=home)
+    compressing.add_argument('--target', help='Repository whose owner compression policy selects exact roots')
+    compressing.add_argument('--cache-profile', choices=('legacy', 'off', 'safe', 'moderate', 'aggressive'))
+    compressing.add_argument('--dry-run', action='store_true', help='Inspect only; write no receipts or compressed files')
+    compressing.add_argument('--json', action='store_true', help='Print machine-readable compression evidence (also the default)')
     args = parser.parse_args(argv)
     try:
         if not re.fullmatch(r'[A-Za-z0-9._-]+/[A-Za-z0-9._/-]+', args.base) or '..' in args.base:
@@ -2335,6 +2447,9 @@ def main(argv=None):
             result = inventory(args.repo or '.', args.base)
         elif args.command == 'retire':
             result = retire(args.repo, args.path, args.base, args.archive, args.workspace, preserve_shared_junctions=args.preserve_shared_junctions)
+        elif args.command == 'compress':
+            result = compress(args.workspace, args.target, args.base, dry_run=args.dry_run,
+                              cache_profile=args.cache_profile)
         elif args.command == 'report':
             result = report(args.workspace, args.base, args.finish_output, cache_profile=args.cache_profile,
                             output_profile=args.output_profile, within=args.within, only=args.only,
@@ -2350,6 +2465,10 @@ def main(argv=None):
         print(render_report(result) if args.command == 'report' else render_apply(result))
     else:
         print(json.dumps(result, indent=2))
+    if args.command == 'compress' and not result['dry_run']:
+        receipt = result.get('receipt', {})
+        if receipt.get('error') or receipt.get('status') in ('failed', 'partial', 'cancelled'):
+            return 1
     if args.command == 'apply' and result.get('cancelled'):
         return 130
     return 1 if args.command == 'apply' and any(r['outcome'] == 'failed' for r in result['results']) else 0

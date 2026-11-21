@@ -760,7 +760,8 @@ class DriftAndPortableDefaults(HarnessCase):
 
 class CleanupSettings(HarnessCase):
     LIMITS = {'enabled': True, 'cache_profile': 'legacy', 'output_profile': 'legacy', 'scan_depth': 'standard', 'cache_idle_days': 7, 'worktree_idle_days': 1, 'output_idle_days': 14, 'archive_max_days': 30,
-              'archive_max_mb': 500, 'references_idle_days': 30, 'low_disk_free_percent': 15}
+              'archive_max_mb': 500, 'references_idle_days': 30, 'low_disk_free_percent': 15,
+              'compression_enabled': False, 'compression_roots': []}
 
     def values(self, result):
         return {key: item['value'] for key, item in result['cleanup'].items()}
@@ -775,7 +776,8 @@ class CleanupSettings(HarnessCase):
     def test_registry_defaults_flow_to_resolve_with_their_source(self):
         result = self.resolve()
         self.assertEqual(self.values(result), self.LIMITS)
-        self.assertEqual(json.loads(REGISTRY.read_text())['cleanup'], self.LIMITS)
+        self.assertEqual(json.loads(REGISTRY.read_text())['cleanup'],
+                         {k: v for k, v in self.LIMITS.items() if not k.startswith('compression_')})
         self.assertTrue(all(item['source'].startswith('library default') for item in result['cleanup'].values()))
 
     def test_values_must_be_positive_integers_the_disk_percent_one_to_fifty_and_enabled_a_boolean(self):
@@ -1289,6 +1291,60 @@ class LibraryAsTarget(HarnessCase):
         self.assertIsNone(json.loads(result.stdout)['workspace'])
 
 class CacheProfiles(HarnessCase):
+    def test_compression_defaults_and_target_cannot_grant_or_expand(self):
+        cleanup = self.resolve()['cleanup']
+        self.assertFalse(cleanup['compression_enabled']['value'])
+        self.assertEqual(cleanup['compression_roots']['value'], [])
+        self.write_target(valid(cleanup={'compression_enabled': True, 'compression_roots': ['D:/other']}))
+        cleanup = self.resolve()['cleanup']
+        self.assertFalse(cleanup['compression_enabled']['value'])
+        self.assertEqual(cleanup['compression_roots']['value'], [])
+        self.write_local(valid(cleanup={'compression_enabled': True,
+                                        'compression_roots': ['C:/build/deps', 'D:/build/deps']}), '_defaults')
+        self.write_target(valid(cleanup={'compression_enabled': False,
+                                         'compression_roots': ['c:\\BUILD\\deps', 'D:/other']}))
+        cleanup = self.resolve()['cleanup']
+        self.assertFalse(cleanup['compression_enabled']['value'])
+        self.assertEqual(cleanup['compression_roots']['value'], ['C:/build/deps'])
+        self.write_target(valid(cleanup={'compression_enabled': True}))
+        self.write_local(valid(cleanup={'compression_enabled': False, 'compression_roots': ['D:/repo']}))
+        cleanup = self.resolve()['cleanup']
+        self.assertFalse(cleanup['compression_enabled']['value'])
+        self.assertEqual(cleanup['compression_roots']['value'], ['D:/repo'])
+
+    def test_compression_setup_and_malformed_paths(self):
+        self.write_local(valid(work={'mode': 'isolated'}, cleanup={'cache_profile': 'safe'}))
+        args = ('setup-cleanup', '--target', str(self.target), '--workspace', str(self.workspace), '--scope', 'repo')
+        path = self.workspace / 'repo/.harness/app.json'
+        before = path.read_bytes()
+        self.run_tool(*args, '--compression', 'on', '--compression-root', 'C:/cache/deps', '--dry-run')
+        self.assertEqual(path.read_bytes(), before)
+        self.run_tool(*args, '--compression', 'on', '--compression-root', 'C:/cache/deps',
+                      '--compression-root', 'D:/cache/deps')
+        saved = json.loads(path.read_text())
+        self.assertEqual(saved['work']['mode'], 'isolated')
+        self.assertEqual(saved['cleanup']['cache_profile'], 'safe')
+        self.assertTrue(saved['cleanup']['compression_enabled'])
+        self.assertEqual(saved['cleanup']['compression_roots'], ['C:/cache/deps', 'D:/cache/deps'])
+        self.run_tool(*args, '--compression', 'off', '--compression-root', 'D:/cache', ok=2)
+        self.run_tool(*args, '--compression-root', 'D:/cache', ok=2)
+        for root in ('C:/', 'E:/cache', '//host/share/cache', 'C:relative', 'D:/x/../secret',
+                     'C:/bad:stream', 'C:/folder/..', 'D:/bad./foo'):
+            with self.subTest(root=root):
+                self.validate(valid(cleanup={'compression_roots': [root]}), ok=1)
+        self.validate(valid(cleanup={'compression_roots': ['C:/cache', 'c:\\CACHE']}), ok=1)
+        self.validate(valid(cleanup={'compression_roots': [f'D:/cache/{i}' for i in range(33)]}), ok=1)
+        self.validate(valid(cleanup={'compression_enabled': 'true'}), ok=1)
+
+    def test_compression_workspace_setup_and_repo_override(self):
+        args = ('setup-cleanup', '--target', str(self.target), '--workspace', str(self.workspace))
+        self.run_tool(*args, '--scope', 'workspace', '--compression', 'on', '--compression-root', 'D:/cache')
+        self.assertEqual(self.resolve()['cleanup']['compression_roots']['value'], ['D:/cache'])
+        self.run_tool(*args, '--scope', 'repo', '--compression', 'off')
+        cleanup = self.resolve()['cleanup']
+        self.assertFalse(cleanup['compression_enabled']['value'])
+        self.assertEqual(cleanup['compression_roots']['value'], ['D:/cache'])
+
     def test_workspace_precedence_and_target_restriction(self):
         self.write_local(valid(cleanup={'cache_profile': 'safe', 'cache_idle_days': 20}), '_defaults')
         self.write_local(valid(cleanup={'cache_profile': 'moderate'}))

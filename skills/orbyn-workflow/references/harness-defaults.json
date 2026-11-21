@@ -43,6 +43,8 @@
     "reviewer_children": 1
   },
   "cleanup": {
+    "compression_enabled": false,
+    "compression_roots": [],
     "cache_profile": "legacy",
     "output_profile": "legacy",
     "scan_depth": "standard",

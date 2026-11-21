@@ -182,6 +182,11 @@ Trash is files only (Git's own record of it is cleared), and recovery depends on
 Trash staying unemptied, which Finder's 30-day setting can undo by itself: never empty it, never remove files by hand, and tell the user when `apply`
 cannot free enough space.
 
+For an authorized Aggressive cleanup, owner-opted-in [NTFS compression](skills/orbyn-worktree/references/ntfs-compression.md)
+is a separate reversible action on exact idle private compiler roots on C: and D:.
+It preserves file bytes, source, shared data and evidence. A low-disk report alone
+never enables compression; configuration cannot authorize effects or widen roots.
+
 For worktree isolation, naming and cleanup, follow
 [orbyn-worktree](skills/orbyn-worktree/SKILL.md). Use the primary clone’s sibling
 `<repo>-wt/<purpose>/` root by default; preserve existing owned work and output.

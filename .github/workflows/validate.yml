@@ -51,6 +51,12 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -m unittest discover -s tests -p test_worktree_junction_policy.py -v
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Reversible compiler compression and routing contracts
+        run: |
+          python -m unittest discover -s tests -p test_artifact_compression.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m unittest discover -s tests -p test_compression_cli.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Cache proof and profile contracts
         run: python -m unittest discover -s tests -p test_artifact_cache.py -v
       - name: Cache CLI and disposable native recycling contracts

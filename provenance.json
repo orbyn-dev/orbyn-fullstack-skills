@@ -2894,6 +2894,13 @@
           "effort": "medium",
           "date": "2026-11-15",
           "scope": "Owner per-repository and workspace scan-depth selection with tracked policy cost ceilings and atomic setup preservation."
+        },
+        {
+          "tool": "Codex desktop (shell and native subagents)",
+          "model": "session model not exposed; gpt-6.1-sol (native compression implementation and independent review); gpt-6.1-terra (harness configuration)",
+          "effort": "medium (native subagents); session effort not exposed",
+          "date": "2026-11-21",
+          "scope": "Opt-in Aggressive-only NTFS compression for exact owner-selected C:/D: compiler-cache roots; preserve source/shared data/evidence, native pinned-file hashing and allocation receipts, restrictive repo/workspace policy and focused disposable contracts."
         }
       ]
     },
@@ -3805,6 +3812,13 @@
           "effort": "medium",
           "date": "2026-11-20",
           "scope": "PR 201 final CI repair: canonicalize disposable finished-output fixture roots on Windows 8.3 TEMP paths while preserving production canonicality checks; explicitly stop multiline Windows test steps on each native-command failure. No disposal guard or test assertion relaxed."
+        },
+        {
+          "tool": "Codex desktop (shell and native subagents)",
+          "model": "session model not exposed; gpt-6.1-sol (native compression implementation and independent review); gpt-6.1-terra (harness configuration)",
+          "effort": "medium (native subagents); session effort not exposed",
+          "date": "2026-11-21",
+          "scope": "Opt-in Aggressive-only NTFS compression for exact owner-selected C:/D: compiler-cache roots; preserve source/shared data/evidence, native pinned-file hashing and allocation receipts, restrictive repo/workspace policy and focused disposable contracts."
         }
       ],
       "reviewed_inspiration": [

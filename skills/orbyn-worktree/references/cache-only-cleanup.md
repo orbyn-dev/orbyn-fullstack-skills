@@ -88,6 +88,14 @@ are snapshots: they cannot promise an idle process will never resume. Known acti
 consumers still require owner disposition. Native budget exhaustion means unknown,
 not idle; a blocked OS call can exceed a traversal budget. Never terminate consumers.
 
+## Optional physical space recovery
+
+Aggressive cleanup can separately use [reversible NTFS compression](ntfs-compression.md)
+on exact owner-configured private compiler roots on C: and D:. It preserves all
+file bytes and requires seven-day idle checks, native usage/identity proof and
+per-file hash verification. Safe/Moderate remain unchanged. Preview this step
+with `worktree_retire.py compress --dry-run`; normal `apply` keeps its Trash behavior.
+
 ## Build volumes and capacity
 
 For measured free space, Bin aggregates and diagnostic goals, see
