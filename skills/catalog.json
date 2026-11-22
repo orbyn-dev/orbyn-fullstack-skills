@@ -243,6 +243,16 @@
       ]
     },
     {
+      "name": "orbyn-ux-audit",
+      "category": "Product design",
+      "related": [
+        "orbyn-ui-design",
+        "orbyn-webapp-testing",
+        "orbyn-research",
+        "orbyn-workflow"
+      ]
+    },
+    {
       "name": "orbyn-upstream-review",
       "category": "Workflow and planning",
       "related": [

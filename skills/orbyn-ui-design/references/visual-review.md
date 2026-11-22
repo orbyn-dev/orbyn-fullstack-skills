@@ -78,6 +78,11 @@ interaction; a source file or screenshot alone leaves that open.
 
 ## Audit an existing surface from evidence
 
+For a comprehensive multi-flow UI/UX fault inventory, including functional,
+accessibility, navigation and performance checks, use
+[orbyn-ux-audit](../../orbyn-ux-audit/SKILL.md). The method below is a focused
+design-consistency critique; its three-finding limit does not truncate that audit.
+
 Use for "review/refine/clean up this UI" or a design handoff, not for a change
 you are verifying. Read-only on product source: write nothing except a plan
 folder the user names or approves, and record documentation changes in the plan

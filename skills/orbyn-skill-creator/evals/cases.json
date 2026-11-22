@@ -14692,6 +14692,142 @@
         "message"
       ],
       "excluded": "Do not run a scan."
+    },
+    {
+      "kind": "outcome",
+      "split": "development",
+      "expected_skills": [
+        "orbyn-ux-audit"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write_product",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "id": "ux-audit-full-flow-inventory",
+      "prompt": "Audit an existing application for OS mismatch, responsive layout, interaction states, forms, colors, alignment, links, invisible hit areas, typography, loading, icons, overlays, scrolling and complex navigation. Use bounded agents and save all evidence-backed findings for later fixes; do not change the app. Describe the audit plan and report contract.",
+      "excluded": "No product edits or automatic repairs. Do not truncate the complete inventory to the top three or claim all bugs found.",
+      "rubric": {
+        "scope": "Bind supported flows, environments, revision and read-only actions before inspection.",
+        "agents": "Partition independent journeys within the actual harness; serialize shared browser state and use a reviewer when permitted.",
+        "coverage": "Apply the checklist to relevant success/failure states and keep blocked/untested matrix rows explicit.",
+        "evidence": "Use stable finding IDs, reproduction, expected behavior, sanitized evidence, separate severity/confidence and a full later-fix queue."
+      }
+    },
+    {
+      "kind": "outcome",
+      "split": "development",
+      "expected_skills": [
+        "orbyn-ux-audit"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write_product",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "id": "ux-audit-emulation-is-not-os-coverage",
+      "prompt": "A UI audit child inspected an iPhone-sized viewport in Chromium on Windows and reported iOS passed, all screen readers passed and a page-wide horizontal scroll failure because a data table scrolls locally. Review those claims without modifying the product.",
+      "excluded": "Browser emulation is not real iOS or assistive-technology evidence; local two-dimensional content exceptions need scope checks.",
+      "rubric": {
+        "os": "Label the observation emulated on Windows and actual iOS not tested.",
+        "accessibility": "Reject blanket screen-reader or WCAG conformance claims without specific evidence.",
+        "exception": "Verify whether content/function is lost and whether the scrolling is limited to legitimately two-dimensional content before recording a responsive defect."
+      }
+    },
+    {
+      "kind": "outcome",
+      "split": "development",
+      "expected_skills": [
+        "orbyn-ux-audit"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write_product",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "id": "ux-audit-readonly-submission-boundary",
+      "prompt": "Audit form validation, upload recovery and double-submit handling on a production service. You have read-only access, no approved sandbox or mocks, and a real user session. Describe safe checks and what must remain blocked.",
+      "excluded": "Do not submit, upload, log out, alter account data, install tools or infer that isolated cookies prevent backend writes.",
+      "rubric": {
+        "boundary": "Keep product source/config and durable app data unchanged; inspect safe evidence and block effectful scenarios.",
+        "coverage": "Record the blocked scenarios and access needed rather than marking them pass.",
+        "privacy": "Avoid real-user data and authenticated raw request captures in artifacts."
+      }
+    },
+    {
+      "kind": "outcome",
+      "split": "development",
+      "expected_skills": [
+        "orbyn-ux-audit"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write_product",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "id": "ux-audit-shared-browser-coordination",
+      "prompt": "Run a comprehensive read-only UI audit of four independent journeys. The harness allows two children and one reviewer, but the computer-use tool exposes one shared active browser window. Explain dispatch and evidence ownership.",
+      "excluded": "No concurrent clicks/navigation on one window, recursive agents or silently raised limits.",
+      "rubric": {
+        "queue": "Queue four flow slices within harness limits, applying the relevant full checklist in each.",
+        "shared": "Serialize UI interactions through one controller; allow parallel source/evidence inspection without sharing mutable browser control.",
+        "outputs": "Children own separate evidence directories; coordinator owns stable central findings and coverage."
+      }
+    },
+    {
+      "kind": "outcome",
+      "split": "holdout",
+      "expected_skills": [
+        "orbyn-ux-audit"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write_product",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "id": "ux-audit-resume-stable-backlog",
+      "prompt": "Resume a read-only UX audit after the product revision changed and one child was interrupted. Existing UX-004 has two duplicate reports, performance has one slow run, and a child marked inaccessible macOS cases complete. Explain reconciliation and what gets saved for later fixes.",
+      "excluded": "Do not replay effectful actions, renumber existing findings silently or claim complete coverage from child completion.",
+      "rubric": {
+        "resume": "Reconcile revision and live slice ownership before continuing; retain interrupted/unavailable cases as gaps.",
+        "findings": "Deduplicate only established shared causes, retain variants and stable IDs or explicit supersession.",
+        "performance": "Treat a single slow run as a lead and require conditions/repeated measurements before a general performance claim.",
+        "handoff": "Save full coverage/evidence/backlog and defer implementation until explicit later scope."
+      }
+    },
+    {
+      "id": "ux-audit-adjacent-design-implementation",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Implement the approved settings redesign using our existing tokens and components. This is implementation, not a read-only audit.",
+      "expected_skills": [
+        "orbyn-ui-design"
+      ],
+      "forbidden_skills": [
+        "orbyn-ux-audit"
+      ],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not insert a comprehensive audit before the approved implementation."
     }
   ]
 }

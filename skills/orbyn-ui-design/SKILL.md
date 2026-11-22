@@ -67,6 +67,10 @@ cancellation and recovery. Resolve trade-offs around that outcome, preserving
 accessibility and authority. Use the [experience method](references/principles/experience-first.md)
 when a local visual improvement could make the end-to-end task harder.
 
+For a comprehensive read-only UI/UX defect audit across flows, use
+[orbyn-ux-audit](../orbyn-ux-audit/SKILL.md) for bounded agents, coverage and the
+complete backlog. Keep quick design critique and implementation review here.
+
 ## Review and deliver
 
 Follow the consuming project's visual-review policy and the changed surface. Read
