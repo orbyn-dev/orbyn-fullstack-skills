@@ -1682,7 +1682,7 @@
           "model": "claude-opus-5-5 (lead)",
           "effort": "medium",
           "date": "2026-11-23",
-          "scope": "Eval cases summarize-teammate-pr-direction and summarize-pr-adjacent-weekly-recap"
+          "scope": "Eval cases summarize-teammate-pr-direction and summarize-pr-adjacent-find-bugs"
         }
       ],
       "reviewed_inspiration": [

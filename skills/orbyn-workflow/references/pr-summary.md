@@ -54,11 +54,12 @@ after.
 
 Skip imports, routine argument checks, private helpers and test internals. When one
 edit repeats across many files, quote one and say how many follow it. When code only
-moved or changed name, say so in a line rather than quoting it as new; check the
-merge base before calling a function new, since extracted code can look new in a diff.
+moved or changed name, say so in a line rather than quoting it as new. A function
+can look new in a diff when it was only pulled out of a longer one: look for its
+lines in the old version before calling it new.
 
-Trim each quote to what matters, the same way on the old and new side, and keep the
-surrounding function or type name so the reader knows where it lives.
+When you quote both versions of something, cut them alike so only real differences
+stand out, and say which function or type each quote comes from.
 
 ## Report tests by what they assert
 
@@ -82,8 +83,8 @@ issue they raise is still present at the head; then say so.
 Write for someone who knows the product and the stack but not this project's
 vocabulary. Prefer plain names to identifiers outside code quotes, define a project
 term the first time it appears, and keep the author's wording where you reuse it,
-correcting only grammar and jargon. Leave out "CI is green", manual test steps and
-the story of how the task was assigned. Otherwise follow [short by default](../../unslop/references/short-by-default.md).
+correcting only grammar and jargon. Cut anything the reviewer cannot act on.
+Otherwise follow [short by default](../../unslop/references/short-by-default.md).
 
 ## After the PR changes
 
