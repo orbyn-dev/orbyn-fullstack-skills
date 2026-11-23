@@ -2,8 +2,8 @@
 
 For substantial work, the lead writes the key before implementation, so correctness
 is defined by something the implementer cannot change. Agent behaviour and whole
-outcomes are judged by the key; unit tests stay where
-[tdd](../../tdd/SKILL.md#do-we-need-a-unit-test-here) says they earn their place.
+outcomes are judged by the key; code tests follow [tdd's rule](../../tdd/SKILL.md#choose-the-test-black-box-first):
+black-box cases first, unit tests only where they earn their place.
 
 ## What a key holds
 

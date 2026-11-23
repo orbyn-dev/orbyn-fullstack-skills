@@ -51,8 +51,9 @@ the commands that prove success, the expected end state and the protected paths.
 worker's brief names the outcome, not the key; a separate verifier checks the
 committed candidate from a clean copy. Protected files are restored to their base before the
 checks run (adding tests is welcome), unless the key marks a path strict, where any change fails.
-Decide unit tests with tdd's [rule](../../tdd/SKILL.md#do-we-need-a-unit-test-here)
-and record the choice in one line (`Tests: none, docs only`).
+Choose tests with tdd's [rule](../../tdd/SKILL.md#choose-the-test-black-box-first)
+(black-box cases first, unit tests rarely) and record the choice in one line
+(`Tests: black-box, 3 cases` or `Tests: none, docs only`).
 
 ## Delegate within the current session
 
