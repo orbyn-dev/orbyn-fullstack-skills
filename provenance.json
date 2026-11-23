@@ -2990,6 +2990,13 @@
           "effort": "medium",
           "date": "2026-11-23",
           "scope": "Owner and long-term maintainer stance in Orbyn-owned repositories; maintainers own the design elsewhere"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-23",
+          "scope": "Owner stance applies to every maintained codebase, not only orbyn-dev; upstream contributions keep maintainer ownership"
         }
       ]
     },
