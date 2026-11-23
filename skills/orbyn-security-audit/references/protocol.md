@@ -98,6 +98,32 @@ Record the role/model, reviewed source, actual checks and observed result. If
 independent roles are unavailable, keep the run incomplete and return preliminary
 observations. Do not relabel unverified work to make the report appear complete.
 
+Before a candidate becomes a finding, it must clear seven questions. One "no" drops
+it or downgrades it to an observation; never try to settle a doubt by exploiting.
+
+1. **Reachable?** Which actor reaches it, through which entry point and with what
+   input, traced step by step from the source.
+2. **Real consequence?** Concrete harm to a named asset, not "technically possible".
+3. **In scope?** The root cause is in code this audit covers, not a dependency or
+   environment someone else owns (record those separately).
+4. **Realistic preconditions?** It does not need access the actor cannot get, such as
+   an admin role, physical access or a victim's secret.
+5. **Unintended?** It is not documented behaviour or a risk the threat model accepts.
+6. **Not stopped elsewhere?** Check layer order: an input validator that rejects first
+   can look like a missing auth check, and a later check can block what an earlier
+   one lets through. Read the whole path, not the first guard.
+7. **New?** It is not a duplicate of an existing finding or root cause.
+
+Run the questions again against the severity you intend to claim, not only against
+"is this a bug": a primitive that reads state is not proof of one that changes it.
+A finding later disproved stays in the record as retracted, with the reason. The
+[vulnerability classes](vuln-classes/) list each class's usual false positives.
+
+Evidence proves the bug, not the data. Quote the code and config that matter;
+for a secret found in source, give its location and kind, never its value. Mask
+tokens, cookies, keys and other people's personal data in anything retained, keep
+only the fields that show the defect, and never retain raw request captures.
+
 Use distinct scratch roots. Target-controlled processes must finish before any
 result is retained. Promote only allowlisted, size-bounded regular single-link
 files using no-follow directory-relative handles, with identity/type/size checked

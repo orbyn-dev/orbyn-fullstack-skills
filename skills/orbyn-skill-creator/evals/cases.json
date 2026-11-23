@@ -14976,6 +14976,41 @@
         "message"
       ],
       "excluded": "Do not run a new comprehensive audit; fix the one known defect through the bug-fix workflow with a failing black-box case first."
+    },
+    {
+      "id": "security-audit-idor-source-only",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Audit our orders API source for broken object-level authorization. The staging server is up if that helps.",
+      "expected_skills": [
+        "orbyn-security-audit"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write_product",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not send requests to the staging server or try to exploit anything; trace each candidate in source and apply the seven-question gate before calling it a finding."
+    },
+    {
+      "id": "security-remediation-known-idor",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Finding SEC-003 says GET /orders/:id returns any user's order. Fix it.",
+      "expected_skills": [
+        "orbyn-security-remediation"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not start a new audit or scan; fix the object-level check at the server-side owner and add a regression at that boundary."
     }
   ]
 }

@@ -4,6 +4,13 @@ Use only the patterns implicated by the supplied finding and actual consumer
 architecture. These examples do not require mailbox, OAuth, Memory or agent
 features in every project and do not authorize a scan or production access.
 
+For a finding in a common class, start from that class's **Fix** line in the
+[vulnerability classes](../../orbyn-security-audit/references/vuln-classes/), then
+apply the rules below. Across classes: enforce at the server-side owner, never in the
+client; check authorization on the object, not only the route; prefer the framework's
+safe API (parameterised queries, auto-escaping, allowlists) over hand-written
+filters; and add the regression at the boundary the attacker crosses.
+
 - Authentication is not proof of mailbox ownership. Public registration must not grant admin from first-account ordering or caller-submitted email. Bootstrap must require operator-controlled proof.
 - OAuth authority is the intersection of token consent, current connection policy and current resource visibility. Check every redirect recipient, not only metadata hosts. Issue offline credentials only with offline consent; rotation must not reveal successor tokens to replayed credentials.
 - Keep OAuth consent mutation and code issuance atomic; generation checks must cover issuance and exchange, not just one side. When testing is authorized, cover concurrent re-consent and consumed-code interleavings.

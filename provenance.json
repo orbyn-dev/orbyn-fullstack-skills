@@ -1264,6 +1264,13 @@
           "effort": "medium",
           "date": "2026-11-02",
           "scope": "Harness and security workflow revision"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead and two lead-tier children)",
+          "effort": "medium",
+          "date": "2026-11-23",
+          "scope": "Pointer from remediation patterns to class fix lines, with cross-class fix rules"
         }
       ]
     },
@@ -1732,6 +1739,13 @@
           "effort": "medium",
           "date": "2026-11-23",
           "scope": "UX audit eval cases now route to orbyn-ui-design; adjacent case targets the bug-fix workflow"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead and two lead-tier children)",
+          "effort": "medium",
+          "date": "2026-11-23",
+          "scope": "Eval cases security-audit-idor-source-only and security-remediation-known-idor"
         }
       ],
       "reviewed_inspiration": [
@@ -3905,6 +3919,114 @@
           "license_file": "skills/orbyn-security-audit/references/ecc-LICENSE.txt",
           "license_sha256": "326146379f01bb137c0a5d3c54770c1aa31076705c8b88a7f6b26a460f6221b2",
           "changes": "Static classification of npm, Python and Docker selectors as exact, range, tag or digest, with no execution; condensed, no CI script copied. Reviewed at the pinned ECC revision only; written in Orbyn voice with synthetic examples, nothing run from the source."
+        },
+        {
+          "relationship": "adapted",
+          "credit": "Sachin Sharma (elementalsouls), Claude-BugHunter; Orbyn adaptations by Anh Dang and contributors",
+          "copyright": "Copyright (c) 2026 Sachin Sharma",
+          "license": "CC-BY-4.0",
+          "source": "https://github.com/elementalsouls/Claude-BugHunter/tree/9ba66b1b3a7d84c501202a527cdc22b2051c5711",
+          "revision": "9ba66b1b3a7d84c501202a527cdc22b2051c5711",
+          "local_path": "skills/orbyn-security-audit/references/vuln-classes/access-control.md",
+          "license_file": "skills/orbyn-security-audit/references/vuln-classes/claude-bughunter-LICENSE.txt",
+          "license_sha256": "093b6fe272cc4e6dac6bc04f92a422fb0734f1aac35eae905146ce421cb018c2",
+          "changes": "Vulnerability-class knowledge (hunt-* skills and their false-positive traps) and the 7-question validation gate rewritten for read-only source review: where each class lives in code, proof at path:line, false positives and fix. No payloads, recon, live-testing steps, tooling or disclosed-report citations imported; nothing run from the source."
+        },
+        {
+          "relationship": "adapted",
+          "credit": "Sachin Sharma (elementalsouls), Claude-BugHunter; Orbyn adaptations by Anh Dang and contributors",
+          "copyright": "Copyright (c) 2026 Sachin Sharma",
+          "license": "CC-BY-4.0",
+          "source": "https://github.com/elementalsouls/Claude-BugHunter/tree/9ba66b1b3a7d84c501202a527cdc22b2051c5711",
+          "revision": "9ba66b1b3a7d84c501202a527cdc22b2051c5711",
+          "local_path": "skills/orbyn-security-audit/references/vuln-classes/accounts-sessions.md",
+          "license_file": "skills/orbyn-security-audit/references/vuln-classes/claude-bughunter-LICENSE.txt",
+          "license_sha256": "093b6fe272cc4e6dac6bc04f92a422fb0734f1aac35eae905146ce421cb018c2",
+          "changes": "Vulnerability-class knowledge (hunt-* skills and their false-positive traps) and the 7-question validation gate rewritten for read-only source review: where each class lives in code, proof at path:line, false positives and fix. No payloads, recon, live-testing steps, tooling or disclosed-report citations imported; nothing run from the source."
+        },
+        {
+          "relationship": "adapted",
+          "credit": "Sachin Sharma (elementalsouls), Claude-BugHunter; Orbyn adaptations by Anh Dang and contributors",
+          "copyright": "Copyright (c) 2026 Sachin Sharma",
+          "license": "CC-BY-4.0",
+          "source": "https://github.com/elementalsouls/Claude-BugHunter/tree/9ba66b1b3a7d84c501202a527cdc22b2051c5711",
+          "revision": "9ba66b1b3a7d84c501202a527cdc22b2051c5711",
+          "local_path": "skills/orbyn-security-audit/references/vuln-classes/client-side.md",
+          "license_file": "skills/orbyn-security-audit/references/vuln-classes/claude-bughunter-LICENSE.txt",
+          "license_sha256": "093b6fe272cc4e6dac6bc04f92a422fb0734f1aac35eae905146ce421cb018c2",
+          "changes": "Vulnerability-class knowledge (hunt-* skills and their false-positive traps) and the 7-question validation gate rewritten for read-only source review: where each class lives in code, proof at path:line, false positives and fix. No payloads, recon, live-testing steps, tooling or disclosed-report citations imported; nothing run from the source."
+        },
+        {
+          "relationship": "adapted",
+          "credit": "Sachin Sharma (elementalsouls), Claude-BugHunter; Orbyn adaptations by Anh Dang and contributors",
+          "copyright": "Copyright (c) 2026 Sachin Sharma",
+          "license": "CC-BY-4.0",
+          "source": "https://github.com/elementalsouls/Claude-BugHunter/tree/9ba66b1b3a7d84c501202a527cdc22b2051c5711",
+          "revision": "9ba66b1b3a7d84c501202a527cdc22b2051c5711",
+          "local_path": "skills/orbyn-security-audit/references/vuln-classes/injection.md",
+          "license_file": "skills/orbyn-security-audit/references/vuln-classes/claude-bughunter-LICENSE.txt",
+          "license_sha256": "093b6fe272cc4e6dac6bc04f92a422fb0734f1aac35eae905146ce421cb018c2",
+          "changes": "Vulnerability-class knowledge (hunt-* skills and their false-positive traps) and the 7-question validation gate rewritten for read-only source review: where each class lives in code, proof at path:line, false positives and fix. No payloads, recon, live-testing steps, tooling or disclosed-report citations imported; nothing run from the source."
+        },
+        {
+          "relationship": "adapted",
+          "credit": "Sachin Sharma (elementalsouls), Claude-BugHunter; Orbyn adaptations by Anh Dang and contributors",
+          "copyright": "Copyright (c) 2026 Sachin Sharma",
+          "license": "CC-BY-4.0",
+          "source": "https://github.com/elementalsouls/Claude-BugHunter/tree/9ba66b1b3a7d84c501202a527cdc22b2051c5711",
+          "revision": "9ba66b1b3a7d84c501202a527cdc22b2051c5711",
+          "local_path": "skills/orbyn-security-audit/references/vuln-classes/platforms.md",
+          "license_file": "skills/orbyn-security-audit/references/vuln-classes/claude-bughunter-LICENSE.txt",
+          "license_sha256": "093b6fe272cc4e6dac6bc04f92a422fb0734f1aac35eae905146ce421cb018c2",
+          "changes": "Vulnerability-class knowledge (hunt-* skills and their false-positive traps) and the 7-question validation gate rewritten for read-only source review: where each class lives in code, proof at path:line, false positives and fix. No payloads, recon, live-testing steps, tooling or disclosed-report citations imported; nothing run from the source."
+        },
+        {
+          "relationship": "adapted",
+          "credit": "Sachin Sharma (elementalsouls), Claude-BugHunter; Orbyn adaptations by Anh Dang and contributors",
+          "copyright": "Copyright (c) 2026 Sachin Sharma",
+          "license": "CC-BY-4.0",
+          "source": "https://github.com/elementalsouls/Claude-BugHunter/tree/9ba66b1b3a7d84c501202a527cdc22b2051c5711",
+          "revision": "9ba66b1b3a7d84c501202a527cdc22b2051c5711",
+          "local_path": "skills/orbyn-security-audit/references/vuln-classes/request-trust.md",
+          "license_file": "skills/orbyn-security-audit/references/vuln-classes/claude-bughunter-LICENSE.txt",
+          "license_sha256": "093b6fe272cc4e6dac6bc04f92a422fb0734f1aac35eae905146ce421cb018c2",
+          "changes": "Vulnerability-class knowledge (hunt-* skills and their false-positive traps) and the 7-question validation gate rewritten for read-only source review: where each class lives in code, proof at path:line, false positives and fix. No payloads, recon, live-testing steps, tooling or disclosed-report citations imported; nothing run from the source."
+        },
+        {
+          "relationship": "adapted",
+          "credit": "Sachin Sharma (elementalsouls), Claude-BugHunter; Orbyn adaptations by Anh Dang and contributors",
+          "copyright": "Copyright (c) 2026 Sachin Sharma",
+          "license": "CC-BY-4.0",
+          "source": "https://github.com/elementalsouls/Claude-BugHunter/tree/9ba66b1b3a7d84c501202a527cdc22b2051c5711",
+          "revision": "9ba66b1b3a7d84c501202a527cdc22b2051c5711",
+          "local_path": "skills/orbyn-security-audit/references/vuln-classes/server-fetch-and-files.md",
+          "license_file": "skills/orbyn-security-audit/references/vuln-classes/claude-bughunter-LICENSE.txt",
+          "license_sha256": "093b6fe272cc4e6dac6bc04f92a422fb0734f1aac35eae905146ce421cb018c2",
+          "changes": "Vulnerability-class knowledge (hunt-* skills and their false-positive traps) and the 7-question validation gate rewritten for read-only source review: where each class lives in code, proof at path:line, false positives and fix. No payloads, recon, live-testing steps, tooling or disclosed-report citations imported; nothing run from the source."
+        },
+        {
+          "relationship": "adapted",
+          "credit": "Sachin Sharma (elementalsouls), Claude-BugHunter; Orbyn adaptations by Anh Dang and contributors",
+          "copyright": "Copyright (c) 2026 Sachin Sharma",
+          "license": "CC-BY-4.0",
+          "source": "https://github.com/elementalsouls/Claude-BugHunter/tree/9ba66b1b3a7d84c501202a527cdc22b2051c5711",
+          "revision": "9ba66b1b3a7d84c501202a527cdc22b2051c5711",
+          "local_path": "skills/orbyn-security-audit/references/vuln-classes/state-and-logic.md",
+          "license_file": "skills/orbyn-security-audit/references/vuln-classes/claude-bughunter-LICENSE.txt",
+          "license_sha256": "093b6fe272cc4e6dac6bc04f92a422fb0734f1aac35eae905146ce421cb018c2",
+          "changes": "Vulnerability-class knowledge (hunt-* skills and their false-positive traps) and the 7-question validation gate rewritten for read-only source review: where each class lives in code, proof at path:line, false positives and fix. No payloads, recon, live-testing steps, tooling or disclosed-report citations imported; nothing run from the source."
+        },
+        {
+          "relationship": "adapted",
+          "credit": "Sachin Sharma (elementalsouls), Claude-BugHunter; Orbyn adaptations by Anh Dang and contributors",
+          "copyright": "Copyright (c) 2026 Sachin Sharma",
+          "license": "CC-BY-4.0",
+          "source": "https://github.com/elementalsouls/Claude-BugHunter/tree/9ba66b1b3a7d84c501202a527cdc22b2051c5711",
+          "revision": "9ba66b1b3a7d84c501202a527cdc22b2051c5711",
+          "local_path": "skills/orbyn-security-audit/references/protocol.md",
+          "license_file": "skills/orbyn-security-audit/references/vuln-classes/claude-bughunter-LICENSE.txt",
+          "license_sha256": "093b6fe272cc4e6dac6bc04f92a422fb0734f1aac35eae905146ce421cb018c2",
+          "changes": "Seven-question validation gate and evidence-redaction rules adapted from triage-validation and evidence-hygiene for read-only source review."
         }
       ],
       "authoring": [
@@ -3955,6 +4077,13 @@
           "effort": "medium",
           "date": "2026-11-16",
           "scope": "Grim Prompter 3642a31 to 2a94457: copyright holder now Manicode Security; privacy review scope, GDPR and CCPA/CPRA profiles, privacy records and checker rules; pin advanced"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead and two lead-tier children)",
+          "effort": "medium",
+          "date": "2026-11-23",
+          "scope": "Vulnerability-class references, seven-question gate and evidence rules adapted from Claude-BugHunter for read-only source review"
         }
       ]
     },
