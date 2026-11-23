@@ -14732,6 +14732,44 @@
         "message"
       ],
       "excluded": "Reviewing a written spec paraphrases the document as part of an adversarial review, not a restatement of the user's goal."
+    },
+    {
+      "id": "summarize-teammate-pr-direction",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Summarize PR 412 so I can check the direction without reading all 40 files. Don't post anything.",
+      "expected_skills": [
+        "orbyn-workflow"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write_product",
+        "test",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Gives what changed and why, use sites, contracts and tests in that order, reads each shown test body rather than trusting its name, shows open human review threads, and posts nothing or edits no PR description."
+    },
+    {
+      "id": "summarize-pr-adjacent-weekly-recap",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Give me a recap of everything I merged across our repos last week.",
+      "expected_skills": [
+        "orbyn-workflow"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write_product",
+        "test",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "A multi-PR work recap follows explanation and recaps (dates, authorship, actual diffs), not the single-PR reviewer summary."
     }
   ]
 }
