@@ -14692,6 +14692,46 @@
         "message"
       ],
       "excluded": "Do not run a scan."
+    },
+    {
+      "id": "restate-goal-own-words",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Before you touch anything: in your own words, what do you think I'm actually trying to achieve with this calendar sync rework, and what problem is it solving?",
+      "expected_skills": [
+        "orbyn-plan"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write_product",
+        "test",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Gives a short restatement of the goal and the problem behind it, separates what was said from what is inferred, ends with the one question that would most change the plan, and starts no work."
+    },
+    {
+      "id": "restate-adjacent-review-spec",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Here's the spec for the new sharing permissions. Poke holes in it before we build it.",
+      "expected_skills": [
+        "interrogate"
+      ],
+      "forbidden_skills": [
+        "orbyn-plan"
+      ],
+      "forbidden_actions": [
+        "write_product",
+        "test",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Reviewing a written spec paraphrases the document as part of an adversarial review, not a restatement of the user's goal."
     }
   ]
 }
