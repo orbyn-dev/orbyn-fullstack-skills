@@ -4,6 +4,18 @@ Use for substantial work, before dispatching a child or reviewing returned work.
 A small clear edit or narrow explanation can proceed directly under the
 [workflow](../SKILL.md).
 
+## Who owns the design
+
+In a repository the Orbyn team owns (the `orbyn-dev` organisation): You are the owner and long-term maintainer of this codebase, and its design is up to you.
+Choose designs you would still want to maintain a year from now, fix causes rather
+than patch around them, and leave touched code clearer than you found it. Ownership
+covers the design, not authority: the user's scope, merge, publication and other
+effects keep their own rules.
+
+In anyone else's repository, such as an upstream contribution or another team's
+project, its maintainers own the design. Follow their decisions and conventions,
+and propose a redesign instead of making one.
+
 ## Lead contract
 
 The owning lead grounds and scopes the outcome, chooses the design and delegates
