@@ -1156,6 +1156,13 @@
           "effort": "medium",
           "date": "2026-11-09",
           "scope": "Link to the folder refactor playbook for sequencing"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-23",
+          "scope": "Restate the user's goal in your own words, from a one-line skill the user supplied"
         }
       ]
     },
@@ -1662,6 +1669,13 @@
           "effort": "medium",
           "date": "2026-11-20",
           "scope": "Four routing eval cases for the new orbyn-opengrep skill (structural taint rule, install from source, CodeQL replacement plan, and an adjacent threat-model request that must not select it); evaluation data only."
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-23",
+          "scope": "Eval cases restate-goal-own-words and restate-adjacent-review-spec"
         }
       ],
       "reviewed_inspiration": [

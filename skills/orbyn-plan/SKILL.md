@@ -1,6 +1,6 @@
 ---
 name: orbyn-plan
-description: "Refine an engineering request or scope and sequence a change, migration or investigation. Use for prompt rewriting, explicit plans and complex changes; preserve the requested execution boundary. Use figure-it-out to carry out an authorized large migration."
+description: "Refine an engineering request or scope and sequence a change, migration or investigation. Use for prompt rewriting, restating the user's goal in your own words, plans and complex changes; keep the execution boundary. Use figure-it-out to carry out an authorized large migration."
 ---
 
 # Plan Orbyn work
@@ -10,6 +10,24 @@ Read the consuming project's instructions and stack guide. Use the
 only where guidance is missing.
 An explicit planning request always receives a plan, even for one file. A small
 clear implementation request can proceed directly without a separate artifact.
+
+## Restate the goal in your own words
+
+Do this when the user asks ("in your own words", "what do you think I'm after"), and
+before a large or ambiguous request where a misread would waste the work. Skip it
+for a small clear request.
+
+Write three to five plain sentences, not their phrasing echoed back:
+
+- the outcome they want and the problem behind it: why it matters now, and for whom;
+- what is out of scope, as far as you can tell;
+- which parts they said and which you inferred;
+- the one question whose answer would most change the plan.
+
+When the user asked only for the restatement, stop there and start nothing. Otherwise
+carry on with reversible work while they answer, unless the misread would be costly to
+undo. A document someone wrote is paraphrased the [interrogate](../interrogate/SKILL.md#paraphrase-a-document-first)
+way instead.
 
 ## Method
 
