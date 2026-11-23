@@ -1,6 +1,6 @@
 ---
 name: orbyn-workflow
-description: "Route engineering work through investigation, design, implementation and verification, including open-source contribution intake and bounded PR feedback/CI iteration. Follow the consuming project's instructions."
+description: "Route engineering work through investigation, design, implementation and verification, including open-source contribution intake, PR summaries and bounded PR feedback/CI iteration. Follow the consuming project's instructions."
 ---
 
 # Orbyn engineering workflow

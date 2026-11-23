@@ -14750,15 +14750,15 @@
         "merge",
         "message"
       ],
-      "excluded": "Gives what changed and why, use sites, contracts and tests in that order, reads each shown test body rather than trusting its name, shows open human review threads, and posts nothing or edits no PR description."
+      "excluded": "Do not post the summary, edit the PR description or describe a test from its name without reading its body."
     },
     {
-      "id": "summarize-pr-adjacent-weekly-recap",
+      "id": "summarize-pr-adjacent-find-bugs",
       "kind": "routing",
       "split": "development",
-      "prompt": "Give me a recap of everything I merged across our repos last week.",
+      "prompt": "Go through PR 412's retry logic and find the correctness bugs before it merges.",
       "expected_skills": [
-        "orbyn-workflow"
+        "interrogate"
       ],
       "forbidden_skills": [],
       "forbidden_actions": [
@@ -14769,7 +14769,7 @@
         "merge",
         "message"
       ],
-      "excluded": "A multi-PR work recap follows explanation and recaps (dates, authorship, actual diffs), not the single-PR reviewer summary."
+      "excluded": "Do not answer a defect hunt with a reviewer-direction summary; findings need concrete path:line evidence."
     }
   ]
 }

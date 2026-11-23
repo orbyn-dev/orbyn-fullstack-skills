@@ -2405,7 +2405,7 @@
         {
           "credit": "Pablo (MeLlamoPablo), summarize-pr skill",
           "source": "https://github.com/MeLlamoPablo/skills/blob/55b29eef96f2797acd179b75dfe937806dc25494/skills/summarize-pr/SKILL.md",
-          "relationship": "reviewed-inspiration observed 2026-11-23; repository states no licence, so ideas only; independently written, no text, template or scripts imported"
+          "relationship": "reviewed-inspiration observed 2026-11-23; repository states no licence, so nothing taken; independently written around our own reviewer questions, no text, template, scripts, structure or examples imported"
         }
       ],
       "incorporated_material": [
