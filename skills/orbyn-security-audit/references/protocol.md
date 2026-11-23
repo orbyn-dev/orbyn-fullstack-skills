@@ -98,6 +98,35 @@ Record the role/model, reviewed source, actual checks and observed result. If
 independent roles are unavailable, keep the run incomplete and return preliminary
 observations. Do not relabel unverified work to make the report appear complete.
 
+Before a candidate becomes `confirmed`, it must clear seven questions. A "no" you can
+show makes it `rejected`, with the reason; a question you cannot answer from the
+evidence leaves it `needs_validation`. Never try to settle a doubt by exploiting.
+
+1. **Reachable?** Which actor reaches it, through which entry point and with what
+   input, traced step by step from the source.
+2. **Real consequence?** Concrete harm to a named asset, not "technically possible".
+3. **In scope?** The root cause is in code this audit covers, not a dependency or
+   environment someone else owns (record those separately).
+4. **Realistic preconditions?** It does not need access the threat model does not give
+   this actor, such as a role above theirs, physical access or a victim's secret. An
+   actor using a role they do have to reach a higher one is still a finding.
+5. **Unintended?** It is not behaviour the owner intends and has accepted as a risk.
+   Documented behaviour can still be a finding when it breaks a security requirement.
+6. **Not stopped elsewhere?** Check layer order: an input validator that rejects first
+   can look like a missing auth check, and a later check can block what an earlier
+   one lets through. Read the whole path, not the first guard.
+7. **New?** It is not a duplicate of an existing finding or root cause.
+
+Run the questions again against the severity you intend to claim, not only against
+"is this a bug": a primitive that reads state is not proof of one that changes it.
+A finding later disproved becomes `rejected` with the reason, never silently removed.
+The [vulnerability classes](vuln-classes.md) list each class's usual false positives.
+
+Evidence proves the bug, not the data. Quote the code and config that matter;
+for a secret found in source, give its location and kind, never its value. Mask
+tokens, cookies, keys and other people's personal data in anything retained, keep
+only the fields that show the defect, and never retain raw request captures.
+
 Use distinct scratch roots. Target-controlled processes must finish before any
 result is retained. Promote only allowlisted, size-bounded regular single-link
 files using no-follow directory-relative handles, with identity/type/size checked
