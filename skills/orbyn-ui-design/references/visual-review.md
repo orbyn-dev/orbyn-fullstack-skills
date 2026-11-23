@@ -81,7 +81,9 @@ interaction; a source file or screenshot alone leaves that open.
 Use for "review/refine/clean up this UI" or a design handoff, not for a change
 you are verifying. Read-only on product source: write nothing except a plan
 folder the user names or approves, and record documentation changes in the plan
-for its executor.
+for its executor. This is a focused design-consistency critique; a comprehensive
+multi-flow fault inventory follows the [UX audit](ux-audit.md), which this method's
+three-finding limit does not truncate.
 
 1. **Select the surface.** Honor the stated scope; otherwise one deployable app
    and one surface family for a main task. Say what you picked. Trace from routes
