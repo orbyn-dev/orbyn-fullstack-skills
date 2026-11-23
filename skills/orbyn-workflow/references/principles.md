@@ -1,6 +1,6 @@
 # Conditional engineering methods
 
-The 20 former principle entrypoints and three later additions are maintained references under execution
+The 20 former principle entrypoints and four later additions are maintained references under execution
 owners. Essential rules appear in those owners; load only a method needed for a
 current decision. Each method retains its source attribution and local license.
 These are not discoverable skills or additional mandatory stages.
@@ -24,6 +24,7 @@ These are not discoverable skills or additional mandatory stages.
 - [outcome oriented execution](principles/outcome-oriented-execution.md): Complete an agreed migration without accumulating temporary compatibility debt.
 - [prove it works](principles/prove-it-works.md): Match a completion claim to direct evidence about the requested artifact.
 - [redesign from first principles](../../architect/references/principles/redesign-from-first-principles.md): Integrate a new requirement into a coherent design instead of layering patches.
+- [simplify in order](../../architect/references/principles/simplify-in-order.md): Question the requirement, delete, simplify, shorten the loop, then automate, in that order.
 - [separate before serializing shared state](principles/separate-before-serializing-shared-state.md): Prevent concurrent writers from corrupting a shared artifact or state object.
 - [sequence verifiable units](../../orbyn-plan/references/principles/sequence-verifiable-units.md): Order a multi-part change so failures are localized and delivery is understandable.
 - [subtract before you add](../../architect/references/principles/subtract-before-you-add.md): Reduce existing complexity before extending an affected design.

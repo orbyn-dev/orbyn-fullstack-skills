@@ -14770,6 +14770,25 @@
         "message"
       ],
       "excluded": "Do not answer a defect hunt with a reviewer-direction summary; findings need concrete path:line evidence."
+    },
+    {
+      "id": "simplify-in-order-retry-ticket",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Plan this ticket: add a nightly job that retries failed calendar syncs three times with backoff, and a dashboard of retry counts. Support filed it.",
+      "expected_skills": [
+        "orbyn-plan"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write_product",
+        "test",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not plan the retry job and dashboard before asking what support actually needs and whether the failure's cause can be removed; do not start building."
     }
   ]
 }
