@@ -14732,6 +14732,44 @@
         "message"
       ],
       "excluded": "Reviewing a written spec paraphrases the document as part of an adversarial review, not a restatement of the user's goal."
+    },
+    {
+      "id": "summarize-teammate-pr-direction",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Summarize PR 412 so I can check the direction without reading all 40 files. Don't post anything.",
+      "expected_skills": [
+        "orbyn-workflow"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write_product",
+        "test",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not post the summary, edit the PR description or describe a test from its name without reading its body."
+    },
+    {
+      "id": "summarize-pr-adjacent-find-bugs",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Go through PR 412's retry logic and find the correctness bugs before it merges.",
+      "expected_skills": [
+        "interrogate"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write_product",
+        "test",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not answer a defect hunt with a reviewer-direction summary; findings need concrete path:line evidence."
     }
   ]
 }

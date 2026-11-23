@@ -1676,6 +1676,13 @@
           "effort": "medium",
           "date": "2026-11-23",
           "scope": "Eval cases restate-goal-own-words and restate-adjacent-review-spec"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-23",
+          "scope": "Eval cases summarize-teammate-pr-direction and summarize-pr-adjacent-find-bugs"
         }
       ],
       "reviewed_inspiration": [
@@ -2394,6 +2401,11 @@
           "revision": "observed 2026-11-14",
           "license": "CC-BY-4.0",
           "relationship": "reviewed-inspiration; independently authored guidance and synthetic cases; no upstream text or code copied"
+        },
+        {
+          "credit": "Pablo (MeLlamoPablo), summarize-pr skill",
+          "source": "https://github.com/MeLlamoPablo/skills/blob/55b29eef96f2797acd179b75dfe937806dc25494/skills/summarize-pr/SKILL.md",
+          "relationship": "reviewed-inspiration observed 2026-11-23; repository states no licence, so nothing taken; independently written around our own reviewer questions, no text, template, scripts, structure or examples imported"
         }
       ],
       "incorporated_material": [
@@ -2964,6 +2976,13 @@
           "effort": "medium",
           "date": "2026-11-20",
           "scope": "Added 'Carry the owner's standing rules into every brief' to lead-contract.md, written in our own words from a pstack worker.md review and fitted to our consent model: the person's goal opens every brief and report, the stated bar is the whole bar, block only for a failing run or a user-facing bug, make undoable choices and ask only for what needs the person, long evidence goes in a file. Static check only."
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-23",
+          "scope": "PR summary reference for a human reviewer, ideas from summarize-pr"
         }
       ]
     },
