@@ -47,7 +47,7 @@ Use during an explicitly requested local source audit ([audit protocol](../proto
 
 ## postMessage and client-side trust
 
-Authority the client holds (hidden fields, role flags in storage, checks done only in the browser) belongs to [SPA-backed APIs trusting the client](access-control.md#spa-backed-apis-trusting-the-client).
+Authority the client holds (hidden fields, role flags in storage, checks done only in the browser) belongs to [SPA-backed APIs trusting the client](access-control.md#client-held-authority).
 
 - **Where it lives:** `message` event listeners, OAuth and payment popups, embedded widgets, browser extensions and iframes talking to a parent.
 - **Proof:** show a listener that acts on `event.data` without checking `event.origin` against an exact value, or with a weak check (`indexOf`, `endsWith` without a dot, a regex without anchors), and what it does: writes HTML, navigates, stores a token, calls an API. For a sender, show sensitive data posted with a `*` target origin to a window another site can control.
