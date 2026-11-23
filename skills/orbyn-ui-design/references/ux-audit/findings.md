@@ -1,7 +1,8 @@
 # Findings, coverage and handoff
 
 The coordinator owns one audit package for the selected revision. Keep it in the
-user-approved output location, outside tracked product source and public commits.
+project's documented artifact location or one the user approves, outside tracked
+source and never in a commit.
 Agents return separate drafts and sanitized evidence; only the coordinator combines
 and writes the canonical records. Do not include secrets, credentials, personal data,
 raw request/response bodies, private logs or unredacted captures.
@@ -76,11 +77,11 @@ A compact synthetic example, with no real account or product data:
 
 ## Severity and confidence
 
-Severity describes observed impact: critical blocks a critical journey or risks
+Use the product's own severity policy when it has one. Otherwise, severity describes
+observed impact: critical blocks a critical journey or risks
 loss of work; major materially prevents or misleads a core task with a limited
 workaround; minor adds recoverable friction; cosmetic concerns presentation
-without demonstrated task impact. Use the consuming product's severity policy
-when one exists. Confidence describes evidence: high means repeatable observation
+without demonstrated task impact. Confidence describes evidence: high means repeatable observation
 and a binding expected behavior, medium means a reproduced but narrowly qualified
 claim, low means a hypothesis needing verification. High potential impact does
 not turn a low-confidence hypothesis into a confirmed defect.

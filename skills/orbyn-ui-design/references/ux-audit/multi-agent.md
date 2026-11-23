@@ -1,9 +1,9 @@
 # Coordinate read-only audit agents
 
-Resolve the consuming repository's harness before dispatch. Use its native child
-roles, models, effort, naming, concurrency and depth; the library's defaults are
-not a portable entitlement. Never create sidebar chats unless the user requested
-those chats. Keep the coordinator responsible for scope, findings and effects.
+Follow the project's agent and delegation policy, if it has one: its roles, models,
+naming, concurrency and depth. Without one, audit solo. Only the top-level lead
+dispatches; children never delegate. Never open separate user-visible sessions
+unless the user asked for them. Keep the coordinator responsible for scope, findings and effects.
 
 ## Partition by journeys
 
@@ -18,7 +18,7 @@ Write a queue with slice ID, assigned routes/states/environments, child identity
 status, evidence directory and continuation cursor. Statuses are queued, inspecting,
 returned, verified, blocked or interrupted. Coordinator verification, not a child's
 completion message, determines coverage. Stop dispatch when the authorized time,
-resource or harness budget is reached and retain remaining slices as not tested.
+resource or delegation budget is reached and retain remaining slices as not tested.
 
 ## Give each child a bounded brief
 
@@ -47,10 +47,10 @@ Use isolated browser contexts, test identities, storage and evidence paths only
 when the tools actually provide them. Browser contexts isolate client storage,
 not shared server data. Do not share an active user's cookies or alter preferences.
 
-When native computer-use tools expose one active tab/window, serialize browser
+When a tool drives a single shared browser or desktop, serialize browser
 and OS interactions through one controller. Other children may inspect source or
 already captured evidence in parallel; they must not click or navigate that shared
-surface. Multiple agents on Windows cannot create real macOS/iOS coverage. Mark
+surface. Agents on one operating system cannot produce real coverage of another. Mark
 unavailable physical environments not tested.
 
 ## Reconcile findings and review

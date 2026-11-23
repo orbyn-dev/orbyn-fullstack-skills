@@ -14847,7 +14847,7 @@
       "kind": "outcome",
       "split": "development",
       "expected_skills": [
-        "orbyn-ux-audit"
+        "orbyn-ui-design"
       ],
       "forbidden_skills": [],
       "forbidden_actions": [
@@ -14871,7 +14871,7 @@
       "kind": "outcome",
       "split": "development",
       "expected_skills": [
-        "orbyn-ux-audit"
+        "orbyn-ui-design"
       ],
       "forbidden_skills": [],
       "forbidden_actions": [
@@ -14894,7 +14894,7 @@
       "kind": "outcome",
       "split": "development",
       "expected_skills": [
-        "orbyn-ux-audit"
+        "orbyn-ui-design"
       ],
       "forbidden_skills": [],
       "forbidden_actions": [
@@ -14917,7 +14917,7 @@
       "kind": "outcome",
       "split": "development",
       "expected_skills": [
-        "orbyn-ux-audit"
+        "orbyn-ui-design"
       ],
       "forbidden_skills": [],
       "forbidden_actions": [
@@ -14940,7 +14940,7 @@
       "kind": "outcome",
       "split": "holdout",
       "expected_skills": [
-        "orbyn-ux-audit"
+        "orbyn-ui-design"
       ],
       "forbidden_skills": [],
       "forbidden_actions": [
@@ -14968,9 +14968,7 @@
       "expected_skills": [
         "orbyn-ui-design"
       ],
-      "forbidden_skills": [
-        "orbyn-ux-audit"
-      ],
+      "forbidden_skills": [],
       "forbidden_actions": [
         "publish",
         "deploy",
@@ -14978,6 +14976,23 @@
         "message"
       ],
       "excluded": "Do not insert a comprehensive audit before the approved implementation."
+    },
+    {
+      "id": "ux-audit-adjacent-fix-known-finding",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Finding UX-004 from last week's audit says the settings save button submits twice on a double Enter. Fix it.",
+      "expected_skills": [
+        "orbyn-workflow"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not run a new comprehensive audit; fix the one known defect through the bug-fix workflow with a failing black-box case first."
     }
   ]
 }

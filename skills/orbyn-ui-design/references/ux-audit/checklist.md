@@ -1,6 +1,9 @@
 # Audit checklist: failures and evidence
 
-Use every applicable category for each assigned flow. Record the target's stated
+Use every applicable category for each assigned flow. Where a topic already has an
+owner, apply it rather than this summary: [accessibility](../accessibility.md),
+[design rules](../design-rules.md), [async states](../async-state.md),
+[localization and RTL](../localization-rtl.md) and [stress fixtures](../stress-fixtures.md). Record the target's stated
 contract, current design system or applicable standard before calling an observation
 a defect. Use heuristics as questions, not universal requirements. Log a category
 as blocked or not tested when its environment, data or permission is unavailable.
@@ -60,11 +63,16 @@ start external messages, purchases, irreversible actions or product fixes.
     evidence or the product's stated convention establishes the problem.
 11. **overlays** — Open relevant menus, pop-ups, drawers and dialogs. Check obstruction,
     dismissal, initial focus, keyboard containment, focus return and background
-    interaction for actual modal behavior. Capture keyboard steps and state. Initial
+    interaction for actual modal behavior. Keeping Tab inside an open modal is the
+    ARIA APG dialog pattern, not a WCAG rule; WCAG SC 2.1.2 (No Keyboard Trap, A) is
+    the separate requirement that focus can always leave a component. Capture keyboard steps and state. Initial
     focus depends on content; do not demand one fixed target for every dialog.
-12. **accessibility** — Check keyboard reachability, visible focus, focus obscured by
-    sticky content, names/roles, error identification, contrast, target size, zoom and
-    reduced motion as relevant. Cite each applicable WCAG criterion and level with
+12. **accessibility** — Check keyboard reachability, visible focus, focus hidden by
+    sticky content (SC 2.4.11, AA), names and roles, error identification (SC 3.3.1,
+    A), text and non-text contrast (SC 1.4.3 and 1.4.11, AA), target size of at least
+    24 CSS px (SC 2.5.8, AA) and reflow at 320 CSS px (SC 1.4.10, AA) as relevant.
+    Reduced motion is WCAG only at AAA (SC 2.3.3, interaction-triggered animation);
+    otherwise report it as a usability proposal or against the product's own rule. Cite each applicable WCAG criterion and level with
     its exceptions. Inspect the accessibility tree; mark screen-reader or other
     assistive-technology behavior untested unless actually exercised. Automated or
     source-only checks cannot establish overall WCAG conformance.

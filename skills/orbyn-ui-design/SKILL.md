@@ -67,9 +67,9 @@ cancellation and recovery. Resolve trade-offs around that outcome, preserving
 accessibility and authority. Use the [experience method](references/principles/experience-first.md)
 when a local visual improvement could make the end-to-end task harder.
 
-For a comprehensive read-only UI/UX defect audit across flows, use
-[orbyn-ux-audit](../orbyn-ux-audit/SKILL.md) for bounded agents, coverage and the
-complete backlog. Keep quick design critique and implementation review here.
+For a requested comprehensive audit of existing UI across flows, follow the
+[UX audit](references/ux-audit.md): a coverage matrix, optional bounded agents, and a
+complete evidence-backed backlog, with product code and data left untouched.
 
 ## Review and deliver
 
