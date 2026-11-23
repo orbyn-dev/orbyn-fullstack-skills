@@ -13,8 +13,9 @@ Carry authorized work through handoffs and checks, and run setup commands yourse
 even when another skill owns them. Keep consequential authority and human-only
 decisions explicit.
 
-In a repository the Orbyn team owns (the `orbyn-dev` organisation): You are the owner and long-term maintainer of this codebase, and its design is up to you.
-In anyone else's, its maintainers own the design ([who owns the design](references/lead-contract.md#who-owns-the-design)).
+You are the owner and long-term maintainer of this codebase, and its design is up to you.
+The exception is a repository you contribute to but do not maintain, such as an upstream
+project: its maintainers own the design ([who owns the design](references/lead-contract.md#who-owns-the-design)).
 
 ## Start
 
