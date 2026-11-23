@@ -5,7 +5,7 @@ Use during an explicitly requested local source audit ([audit protocol](../proto
 ## GraphQL
 
 - **Where it lives:** resolvers, field and type directives (`@auth`), schema-level middleware, DataLoader batching, and server setup for introspection, depth, complexity and batching limits.
-- **Proof:** show a resolver for a sensitive field or mutation that loads by an argument id without checking the caller owns it, or that relies on a parent resolver's check that does not run on another path to the same type (a nested edge, a node lookup, a different query). For cost, show no depth or complexity limit and a resolver whose work grows with the query.
+- **Proof:** show a resolver for a sensitive field or mutation that loads by an argument id without checking the caller owns it, or that relies on a parent resolver's check that does not run on another path to the same type (a nested edge, a node lookup, a different query). For cost, show no depth or complexity limit and a resolver whose work grows with the query. For rate limits, show that a limit counted per HTTP request lets aliases or batched operations make many login, OTP or reset attempts in one request.
 - **False-positive traps:**
   - Introspection on its own exposes structure, not data.
   - Batched aliases may run one after another; a unique constraint still stops a double effect.
@@ -36,7 +36,7 @@ Use during an explicitly requested local source audit ([audit protocol](../proto
 ## LLM and RAG features
 
 - **Where it lives:** prompt assembly, tool and function definitions, agent loops, retrieval queries against vector stores, ingestion pipelines, and code that renders or executes model output.
-- **Proof:** trace attacker-controlled text (a document, web page, email, ticket, tool result) into the model context, then to a tool call or output sink that has an effect: a write, a fetch to a model-chosen URL, a Markdown image that loads an external URL, HTML rendered unsanitized, a shell or SQL string. For retrieval, show the query not filtered by tenant or document permissions. Use [tool credential boundaries](../threat-model/tool-credential-boundaries.md) for tool authority and the [RAG](../threat-model/architectures/rag.md) and [agentic AI](../threat-model/architectures/agentic-ai.md) checks.
+- **Proof:** trace attacker-controlled text (a document, page, email, tool result) into the model context, then to a tool call or sink with an effect: a write, a fetch to a model-chosen URL, a Markdown image loading an external URL, unsanitized HTML, a shell or SQL string. For retrieval, show the query not filtered by tenant or document permissions. Use [tool credential boundaries](../threat-model/tool-credential-boundaries.md) for tool authority and the [RAG](../threat-model/architectures/rag.md) and [agentic AI](../threat-model/architectures/agentic-ai.md) checks.
 - **False-positive traps:**
   - The model saying something it should not, with no tool, data or sink behind it.
   - A "leaked system prompt" in a test transcript is usually made up; check the prompt source.
@@ -47,8 +47,9 @@ Use during an explicitly requested local source audit ([audit protocol](../proto
 ## CI/CD
 
 - **Where it lives:** workflow files (`.github/workflows`, `.gitlab-ci.yml`, Jenkinsfiles), reusable actions, self-hosted runner config, OIDC trust policies, cache and artifact steps.
-- **Proof:** show untrusted input from a fork or issue reaching a privileged context: `pull_request_target` or `workflow_run` checking out and running PR code with secrets or a write token, or `${{ github.event.* }}` expanded directly into a `run:` script. Also: third-party actions pinned by tag, not commit SHA, in jobs with secrets; broad `permissions`; secrets printed or uploaded as artifacts; OIDC trust that accepts any branch.
+- **Proof:** show fork or issue input reaching a privileged context: `pull_request_target` or `workflow_run` running PR code with secrets or a write token, or `${{ github.event.* }}` expanded into a `run:` script. Also: actions pinned by tag, not SHA, in jobs with secrets; broad `permissions`; secrets in logs or artifacts; OIDC trust accepting any branch.
 - **False-positive traps:**
+  - `pull_request_target` that checks out only the base ref and never builds, installs or runs PR code is safe; the trigger alone is not a finding.
   - `pull_request` from forks runs without secrets.
   - The expression is passed through `env:` and quoted in the shell.
   - Untrusted fields used only in an `if:` condition.
@@ -58,7 +59,7 @@ Use during an explicitly requested local source audit ([audit protocol](../proto
 ## Kubernetes and cloud config
 
 - **Where it lives:** manifests, Helm charts, Terraform and CloudFormation, IAM and bucket policies, RBAC roles and bindings, network policies.
-- **Proof:** cite the resource that grants it: a `ClusterRole` with wildcard verbs or `secrets` access bound to a workload service account, privileged pods or `hostPath` mounts of the container socket, a bucket policy with a public principal, IAM wildcards on sensitive actions, or instance metadata reachable without IMDSv2 from a workload that fetches URLs.
+- **Proof:** cite the granting resource: a role with wildcard verbs or `secrets` access bound to a workload service account, privileged pods or a `hostPath` mount of the container socket, a public bucket principal, IAM wildcards on sensitive actions, or metadata reachable without IMDSv2 from a workload that fetches URLs.
 - **False-positive traps:**
   - Read-only public buckets meant for public assets.
   - A sample or dev overlay not used in deployment; cite which overlay ships.
@@ -68,11 +69,15 @@ Use during an explicitly requested local source audit ([audit protocol](../proto
 
 ## Framework pitfalls
 
-- **Next.js:** server actions and route handlers are public endpoints and need their own auth; middleware-only auth is fragile; `NEXT_PUBLIC_` values ship to the client; `images.remotePatterns` too broad turns the image optimizer into a fetcher.
-- **Node:** merging request objects into plain objects (prototype pollution), `child_process` with a shell string, `trust proxy` set too wide so `X-Forwarded-For` spoofs IPs.
-- **Spring Boot:** actuator endpoints exposed on the main port (`env`, `heapdump`), SpEL evaluated from input, H2 console enabled, mass binding to entities.
-- **Laravel:** `APP_DEBUG` on in production, `APP_KEY` leaked (cookie and signed-URL forgery), `$guarded = []` mass assignment, Telescope or Horizon without a gate.
-- **ASP.NET:** ViewState without MAC or with a known machine key, `trace.axd` or `elmah.axd` reachable, `customErrors` off, `Html.Raw` on user data.
+Exposed debug endpoints, actuators and client-bundled environment variables belong to [source and secret leaks](server-fetch-and-files.md#source-and-secret-leaks).
+
+- **Where it lives:** Next.js server actions, route handlers and `images.remotePatterns`; Node object merges, `child_process` and Express `trust proxy`; Spring SpEL; Laravel `$fillable` or `$guarded`; ASP.NET ViewState and machine keys.
+- **Proof:** attacker input reaching the feature: a server action with no auth of its own (middleware-only checks miss other paths); request data merged so `__proto__` reaches shared state; a shell string built from input; `trust proxy` wide enough to spoof an IP check; SpEL parsed from input; `$guarded = []` on a model saved from the request; ViewState without MAC or with a committed machine key.
+- **False-positive traps:**
+  - The pattern sits in code no route reaches.
+  - The framework version pinned in the lockfile already closes it; check the version, not the docs you remember.
+  - A schema or DTO picks fields before the merge or save.
+- **Fix:** close it in the framework's config or one shared helper: auth inside each action, a null-prototype or schema-validated merge, argument arrays instead of shell strings, an exact proxy count, explicit `$fillable`, and a secret machine key with MAC on.
 
 ## TLS and network config
 

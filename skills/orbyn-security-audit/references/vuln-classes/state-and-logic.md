@@ -9,7 +9,7 @@ Use during an explicitly requested local source audit ([audit protocol](../proto
 - **False-positive traps:**
   - Two requests in a row is not a race; if a sequential repeat also succeeds, it is a logic bug.
   - A database unique constraint or conditional update rejects the second write even when the check is racy.
-  - The handler runs on a single-threaded worker or behind a per-key queue that serializes it.
+  - All writes for the key go through one queue or actor that processes them one at a time, across every instance. A single-threaded runtime is not enough: async code that awaits between check and write still interleaves, and so do several instances.
   - The duplicate effect is only in a response, and the ledger records one change.
 - **Fix:** make the check and the write atomic in the store: a conditional update, a lock on the row, or a unique constraint, plus an idempotency key on the request.
 

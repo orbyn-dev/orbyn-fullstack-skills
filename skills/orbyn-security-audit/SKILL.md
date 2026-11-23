@@ -64,5 +64,5 @@ Use local source and bundled references offline. Without isolation, keep inspect
 - For depth, modes, the read-only rules, the run folder and the baseline questions, read [the threat-model method](references/threat-model.md).
 - For the artifact files and the JSON the checker enforces, read [the artifact contract](references/threat-model/artifact-contract.md).
 - For GDPR or CCPA/CPRA questions, once [privacy review](references/threat-model/privacy.md#choose-profiles) selects one, read [GDPR](references/threat-model/privacy-gdpr.md) or [CCPA/CPRA](references/threat-model/privacy-ccpa-cpra.md).
-- For a vulnerability class in source (proof, false positives, fix), read the matching [class file](references/vuln-classes/access-control.md); the folder covers access control, accounts, request trust, injection, server fetch and files, client side, state and logic, and platforms.
+- For a vulnerability class in source (where it lives, proof, false positives, fix), read the [class index](references/vuln-classes.md).
 - For agents, RAG, tools or supply chain, read the matching file in `references/threat-model/architectures/` and [tool credential boundaries](references/threat-model/tool-credential-boundaries.md).

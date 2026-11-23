@@ -4027,6 +4027,18 @@
           "license_file": "skills/orbyn-security-audit/references/vuln-classes/claude-bughunter-LICENSE.txt",
           "license_sha256": "093b6fe272cc4e6dac6bc04f92a422fb0734f1aac35eae905146ce421cb018c2",
           "changes": "Seven-question validation gate and evidence-redaction rules adapted from triage-validation and evidence-hygiene for read-only source review."
+        },
+        {
+          "relationship": "adapted",
+          "credit": "Sachin Sharma (elementalsouls), Claude-BugHunter; Orbyn adaptations by Anh Dang and contributors",
+          "copyright": "Copyright (c) 2026 Sachin Sharma",
+          "license": "CC-BY-4.0",
+          "source": "https://github.com/elementalsouls/Claude-BugHunter/tree/9ba66b1b3a7d84c501202a527cdc22b2051c5711",
+          "revision": "9ba66b1b3a7d84c501202a527cdc22b2051c5711",
+          "local_path": "skills/orbyn-security-audit/references/vuln-classes.md",
+          "license_file": "skills/orbyn-security-audit/references/vuln-classes/claude-bughunter-LICENSE.txt",
+          "license_sha256": "093b6fe272cc4e6dac6bc04f92a422fb0734f1aac35eae905146ce421cb018c2",
+          "changes": "Index of the adapted vulnerability-class references."
         }
       ],
       "authoring": [

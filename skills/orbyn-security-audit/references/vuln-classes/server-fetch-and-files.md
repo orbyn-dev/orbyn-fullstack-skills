@@ -4,7 +4,7 @@ Use during an explicitly requested local source audit ([audit protocol](../proto
 
 ## Server-side request forgery (SSRF)
 
-- **Where it lives:** any server code that builds an outbound request from caller input: URL previews, webhook registration and delivery, import-from-URL, avatar or feed fetchers, PDF and HTML renderers (headless browsers, wkhtmltopdf), image proxies such as `/_next/image`, XML parsers that load external entities, and RPC arguments that carry a host or URL.
+- **Where it lives:** any server code that builds an outbound request from caller input: URL previews, webhook registration and delivery, import-from-URL, avatar or feed fetchers, PDF and HTML renderers (headless browsers, wkhtmltopdf), image proxies such as `/_next/image`, and RPC arguments that carry a host or URL. XML parsers that load external entities are covered under [XML external entities](injection.md#xml-external-entities).
 - **Proof:** trace the caller-controlled URL, host or path fragment to the HTTP client, socket or renderer call, and show what validation sits between them. An allowlist only counts if it checks the address the client actually connects to. Name the internal target the server could reach: cloud metadata, loopback admin ports, cluster services.
 - **False-positive traps:**
   - The URL is only parsed, logged or echoed in an error, and no network call follows on that path.

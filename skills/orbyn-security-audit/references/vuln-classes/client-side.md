@@ -9,7 +9,7 @@ Use during an explicitly requested local source audit ([audit protocol](../proto
 - **False-positive traps:**
   - The engine escapes by default and the value is printed in plain text context.
   - The response is `application/json` or `text/plain` with `nosniff`, so the browser never renders it.
-  - Input blocking (a request validator or WAF) is not output encoding, but neither is it a sink; find a path that reaches output unescaped.
+  - Not a trap: a WAF or input filter in front of the sink is never a reason to dismiss it. Only correct output encoding or sanitizing at the sink closes the path.
   - The value passes through a maintained sanitizer with a strict allowlist before rendering.
 - **Fix:** keep auto-escaping on and escape for the exact output context in the template layer; sanitize only where rich HTML is a product need. A strict CSP limits damage but does not replace encoding.
 
@@ -18,7 +18,7 @@ Use during an explicitly requested local source audit ([audit protocol](../proto
 - **Where it lives:** client code reading `location`, `document.referrer`, `window.name`, storage, `postMessage` data or API responses, and writing them to `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`, `eval`, `new Function`, `setTimeout` with a string, jQuery `.html()` or `$(...)` with markup, or a navigation sink such as `location.href` or `src`.
 - **Proof:** show the source, every transformation, and the sink at `path:line`, all in shipped code. For a URL sink, show the scheme is not restricted, so a `javascript:` URL reaches it. For DOM clobbering, show the clobbered global actually reaches a sink.
 - **False-positive traps:**
-  - The value goes through `textContent`, `setAttribute` on a non-URL attribute, or a framework binding that escapes.
+  - The value goes through `textContent`, a framework binding that escapes, or `setAttribute` on an attribute that is not a URL, an `on*` event handler or `srcdoc` (those three are sinks).
   - The source is not attacker-controlled, such as a constant or a server value the user cannot set.
   - Trusted Types or a sanitizer runs before the sink.
   - The code is dead or only in a development build.
@@ -36,7 +36,7 @@ Use during an explicitly requested local source audit ([audit protocol](../proto
 
 ## Unsafe rendering in frameworks
 
-- **Where it lives:** escape hatches: React `dangerouslySetInnerHTML`, Vue `v-html`, Angular `bypassSecurityTrustHtml`, `bypassSecurityTrustUrl` and related `bypassSecurityTrust*` calls, Svelte `{@html}`, Markdown renderers with HTML enabled, and `href` or `src` bound to user data (React and Vue do not block every `javascript:` URL).
+- **Where it lives:** escape hatches: React `dangerouslySetInnerHTML`, Vue `v-html`, Angular `bypassSecurityTrustHtml`, `bypassSecurityTrustUrl` and related `bypassSecurityTrust*` calls, Svelte `{@html}`, Markdown renderers with HTML enabled, and `href` or `src` bound to user data. Whether a `javascript:` URL is blocked depends on the framework version (React 19 blocks it, earlier React only warns), so check the version pinned in the lockfile.
 - **Proof:** show attacker-controlled content reaching the escape hatch at `path:line` with no sanitizer on that path. For client-side template injection, show user input compiled as a template (Angular or Vue rendering server HTML that contains template syntax).
 - **False-positive traps:**
   - The bound value is a constant, translation string or trusted CMS field only staff can edit; state who can write it.
@@ -47,14 +47,15 @@ Use during an explicitly requested local source audit ([audit protocol](../proto
 
 ## postMessage and client-side trust
 
-- **Where it lives:** `message` event listeners, OAuth and payment popups, embedded widgets, browser extensions, iframes talking to a parent, and any client code that grants authority from data the client holds: hidden fields, role flags in storage, feature checks done only in the browser.
-- **Proof:** show a listener that acts on `event.data` without checking `event.origin` against an exact value, or with a weak check (`indexOf`, `endsWith` without a dot, a regex without anchors), and what it does: writes HTML, navigates, stores a token, calls an API. For client trust, show the server endpoint accepting the action without its own check.
+Authority the client holds (hidden fields, role flags in storage, checks done only in the browser) belongs to [SPA-backed APIs trusting the client](access-control.md#spa-backed-apis-trusting-the-client).
+
+- **Where it lives:** `message` event listeners, OAuth and payment popups, embedded widgets, browser extensions and iframes talking to a parent.
+- **Proof:** show a listener that acts on `event.data` without checking `event.origin` against an exact value, or with a weak check (`indexOf`, `endsWith` without a dot, a regex without anchors), and what it does: writes HTML, navigates, stores a token, calls an API. For a sender, show sensitive data posted with a `*` target origin to a window another site can control.
 - **False-positive traps:**
   - The listener only accepts a fixed message type with no effect beyond display.
   - The origin is compared exactly to a configured constant.
-  - The server re-checks the authority the client claims; a hidden button is not a bypass.
   - `postMessage` sends with a `*` target but the data is not sensitive.
-- **Fix:** check the exact origin and message schema in the listener, send with an explicit target origin, and enforce every authority decision on the server.
+- **Fix:** check the exact origin and message schema in the listener, and send with an explicit target origin.
 
 ## Source
 

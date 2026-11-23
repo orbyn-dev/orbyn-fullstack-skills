@@ -5,7 +5,7 @@ architecture. These examples do not require mailbox, OAuth, Memory or agent
 features in every project and do not authorize a scan or production access.
 
 For a finding in a common class, start from that class's **Fix** line in the
-[vulnerability classes](../../orbyn-security-audit/references/vuln-classes/), then
+[vulnerability classes](../../orbyn-security-audit/references/vuln-classes.md), then
 apply the rules below. Across classes: enforce at the server-side owner, never in the
 client; check authorization on the object, not only the route; prefer the framework's
 safe API (parameterised queries, auto-escaping, allowlists) over hand-written
