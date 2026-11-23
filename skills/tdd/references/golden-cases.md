@@ -29,24 +29,34 @@ For a job, the input state and the state it must leave behind.
 #!/usr/bin/env bash
 # Runs every case against the built program; prints a diff and fails on any change.
 set -u
-fail=0
+fail=0; ran=0
 for dir in tests/cases/*/; do
-  name=$(basename "$dir")
+  [ -d "$dir" ] || continue
+  name=$(basename "$dir"); ran=$((ran + 1))
   args=()
-  while IFS= read -r line; do args+=("$line"); done < "${dir}cmd"
+  if [ -f "${dir}cmd" ]; then
+    while IFS= read -r line || [ -n "$line" ]; do args+=("$line"); done < "${dir}cmd"
+  fi
   stdin="${dir}stdin"; [ -f "$stdin" ] || stdin=/dev/null
   out=$(mktemp); err=$(mktemp)
   ./bin/tool ${args[@]+"${args[@]}"} < "$stdin" > "$out" 2> "$err"
   code=$?
+  if [ -f tests/mask.sed ]; then  # e.g. s/[0-9a-f]{8}-[0-9a-f-]{27}/<id>/g
+    for f in "$out" "$err"; do sed -E -f tests/mask.sed "$f" > "$f.m" && mv "$f.m" "$f"; done
+  fi
   if ! diff -u "${dir}expected.out" "$out" ||
      ! diff -u "${dir}expected.err" "$err" ||
-     [ "$code" != "$(cat "${dir}expected.code")" ]; then
+     [ "$code" != "$(cat "${dir}expected.code" 2>/dev/null)" ]; then
     echo "FAIL $name (exit $code)"; fail=1
   fi
   rm -f "$out" "$err"
 done
+[ "$ran" -gt 0 ] || { echo "no cases ran"; exit 1; }
 exit $fail
 ```
+
+This one compares stdout, stderr and the exit code. Extend it for the other effects a
+case pins, such as files written or rows in a disposable database.
 
 Use the project's own language and test runner if it already has one that can do
 this. The shape matters, not the tool.
@@ -54,8 +64,8 @@ this. The shape matters, not the tool.
 ## Keep the expected files honest
 
 - **Values that change by themselves** (timestamps, generated ids, temporary paths)
-  are masked in the expected file, for example as `<id>`, by a replacement the runner
-  applies to the actual output. Never change the program to make output stable.
+  are masked: write `<id>` in the expected file and add the matching replacement to
+  `tests/mask.sed`, which the runner applies to the actual output. Never change the program to make output stable.
   Before trusting a case, run it twice: anything that differs between runs needs a
   mask ([rewrite parity](../../figure-it-out/references/rewrite-parity.md#record-from-the-outside)
   covers runs that vary).

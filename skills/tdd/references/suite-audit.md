@@ -27,12 +27,14 @@ Tighten before deleting: a weak test over a real risk is worth more fixed than r
 
 ## Move behaviour to the edge, then cut
 
-Most generated suites are unit tests of helpers. For each group, name the behaviour it
+Once the person approves the audit list, work through it. Most generated suites are
+unit tests of helpers. For each group, name the behaviour it
 protects and check whether a [golden case](golden-cases.md) at the program's edge covers
 it. If none does, add that case first, see it fail on the broken behaviour, then delete
 the unit tests it covers in the same change. Keep a unit test only when it meets the
 three conditions in [SKILL.md](../SKILL.md#choose-the-test-black-box-first). A behaviour
-must never be left with no test between the two steps.
+must never be left with no test between the two steps, and required repository
+checks stay unless their owner agrees.
 
 ## Keep by risk, not by count
 

@@ -14813,7 +14813,8 @@
       "split": "development",
       "prompt": "CI takes 25 minutes on every PR and the suite is mostly generated unit tests. Should we pay for bigger runners?",
       "expected_skills": [
-        "orbyn-ci-design"
+        "orbyn-ci-design",
+        "tdd"
       ],
       "forbidden_skills": [],
       "forbidden_actions": [

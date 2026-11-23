@@ -13,10 +13,12 @@ grants no production or live-provider authority.
 
 ## Choose the test: black box first
 
-Test what the program does, not how. Unit tests are the exception.
+Test what the program does, not how. Unit tests are the exception. The repository's
+own test policy, or its `verification.test_layer` in the harness, comes first where
+it says otherwise.
 
 1. **Default: a black-box case at the program's edge.** Feed a real input to the CLI,
-   endpoint, job or screen and compare what comes out with an expected file: output,
+   endpoint, job, screen or, for a library, its public API and compare what comes out with an expected file: output,
    exit code, error, and the effects someone can see (rows written, files changed,
    requests sent to outside systems). One case per behaviour a user or caller relies
    on, failures included. How to build the harness: [golden cases](references/golden-cases.md).

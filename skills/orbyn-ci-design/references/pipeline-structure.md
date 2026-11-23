@@ -62,9 +62,11 @@ with deploy secrets. Promotion stays the deliberate decision in
 Measure first: the slowest step, and how long a PR waits to turn green. Then:
 
 - **Cut the suite before buying speed.** A suite grown from many unit tests of helpers
-  is usually the slowest part. Move their behaviour to black-box cases and delete the
-  redundant tests ([suite audit](../../tdd/references/suite-audit.md)) before tuning
-  caches, splitting jobs or paying for faster runners.
+  is usually the slowest part. Audit it, and with the person's approval move its
+  behaviour to black-box cases and delete the redundant tests
+  ([suite audit](../../tdd/references/suite-audit.md)), before tuning caches,
+  splitting jobs or paying for faster runners. Required checks stay unless their
+  owner agrees.
 - **PRs run one lane.** Run the runtime and platform production uses on PRs, and the
   full version and OS matrix on the main branch, nightly and before a release. Require
   only the PR lane, so a PR never waits for a lane that does not run on it.
