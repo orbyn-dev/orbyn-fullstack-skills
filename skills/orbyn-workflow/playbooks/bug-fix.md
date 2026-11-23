@@ -19,7 +19,9 @@ investigation and implementation under the parent [workflow](../SKILL.md).
    could recur (for example, an awaited call missing in a loop). If so, climb the
    [ladder in encode lessons in structure](../../architect/references/principles/encode-lessons-in-structure.md#the-ladder-highest-level-that-works):
    architecture, types, then a lint rule in the project's existing linter whose
-   message names the fix, then a test. Prove the new check fails on this bug.
+   message names the fix, then a test: a black-box case at the edge, or a unit test
+   only under [tdd's three conditions](../../tdd/SKILL.md#choose-the-test-black-box-first).
+   Prove the new check fails on this bug.
 
 Make the check pass by fixing the code. Never loosen lint, format, type or test
 configuration, or delete or weaken a test, to get green; a needed configuration

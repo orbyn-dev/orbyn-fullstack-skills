@@ -22,7 +22,8 @@ reviews and verifies the result under the parent [workflow](../SKILL.md).
 4. Inspect the diff and affected callers. If the design remains contested, use
    `interrogate` for a bounded challenge within the same model/child limits. Route corrections to the same child.
 5. Perform authorized checks proportional to the changed contract and inspect
-   the requested flow. Report missing surface/runtime evidence explicitly.
+   the requested flow. New behaviour gets black-box cases at its edge, not tests of
+   its helpers ([choose the test](../../tdd/SKILL.md#choose-the-test-black-box-first)). Report missing surface/runtime evidence explicitly.
 
 Small clear work stays direct. A child completes its owned implementation
 without further delegation. Delivery remains within the user's requested scope.

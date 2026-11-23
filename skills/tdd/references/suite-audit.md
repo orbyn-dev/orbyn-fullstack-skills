@@ -25,6 +25,15 @@ survives.
 
 Tighten before deleting: a weak test over a real risk is worth more fixed than removed.
 
+## Move behaviour to the edge, then cut
+
+Most generated suites are unit tests of helpers. For each group, name the behaviour it
+protects and check whether a [golden case](golden-cases.md) at the program's edge covers
+it. If none does, add that case first, see it fail on the broken behaviour, then delete
+the unit tests it covers in the same change. Keep a unit test only when it meets the
+three conditions in [SKILL.md](../SKILL.md#choose-the-test-black-box-first). A behaviour
+must never be left with no test between the two steps.
+
 ## Keep by risk, not by count
 
 Before judging tests, list the risks this suite must guard, using the project's own:
@@ -38,7 +47,8 @@ fixtures match.
 
 Keep a short ledger: group removed, why, the risk it touched, what still covers it and
 what is now untested. Behavior outside the risk list that loses its test is a decision
-to state, not a hidden loss. When claiming speed, compare required-check wall time and
+to state, not a hidden loss. Measure before you cut: which tests take the time, and
+which overlap. When claiming speed, compare test count, required-check wall time and
 runner minutes before and after, and say the gain came from the whole cleanup (deleting,
 merging, rebalancing), not from deletion alone.
 

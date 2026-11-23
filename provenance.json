@@ -1027,6 +1027,13 @@
           "effort": "medium",
           "date": "2026-11-20",
           "scope": "CI design: keep main visible (alert on a red main run, merge-queue cost), retry-policy and time-budget wording, p50/p95 phase audit, save caches only from the default branch, self-hosted runner measurement, planted-change selector proof, opt-in pre-push hook. Evidence from one project's CI work; all examples measured there, none copied."
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-23",
+          "scope": "Cut the suite before buying CI speed"
         }
       ]
     },
@@ -1704,6 +1711,13 @@
           "effort": "medium",
           "date": "2026-11-23",
           "scope": "Eval case simplify-in-order-retry-ticket"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-23",
+          "scope": "Eval cases cli-tests-golden-cases, slow-ci-prune-first, rounding-table-unit-test"
         }
       ],
       "reviewed_inspiration": [
@@ -3025,6 +3039,13 @@
           "effort": "medium",
           "date": "2026-11-23",
           "scope": "Principles index entry for simplify in order"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-23",
+          "scope": "Feature and bug-fix playbooks default to black-box cases"
         }
       ]
     },
@@ -3606,6 +3627,13 @@
           "effort": "medium",
           "date": "2026-11-20",
           "scope": "New suite-audit reference for reviewing and pruning an existing test suite (weak-test patterns, keep-by-risk rule, coverage ledger); routing eval cases. Reviewed inspiration only: the blog post 'I deleted half our backend tests' (avilag.dev, observed 2026-11-21); no text or code copied, all examples synthetic."
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-23",
+          "scope": "Black-box tests first: unit tests only under three conditions; golden cases reference; suite audit moves behaviour to the edge before cutting"
         }
       ]
     },

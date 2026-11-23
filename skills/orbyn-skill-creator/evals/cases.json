@@ -14789,6 +14789,58 @@
         "message"
       ],
       "excluded": "Do not plan the retry job and dashboard before asking what support actually needs and whether the failure's cause can be removed; do not start building."
+    },
+    {
+      "id": "cli-tests-golden-cases",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Our import CLI has no tests. Add some so we catch regressions.",
+      "expected_skills": [
+        "tdd"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not write unit tests of the CLI's internal helpers; add golden input/expected-output cases run against the real program, including failure cases."
+    },
+    {
+      "id": "slow-ci-prune-first",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "CI takes 25 minutes on every PR and the suite is mostly generated unit tests. Should we pay for bigger runners?",
+      "expected_skills": [
+        "orbyn-ci-design"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write_product",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not recommend bigger runners before measuring where the time goes and auditing the suite for redundant or implementation-pinned tests."
+    },
+    {
+      "id": "rounding-table-unit-test",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Add tests for our currency rounding function; it has about forty edge cases across currencies and the API only exposes totals.",
+      "expected_skills": [
+        "tdd"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not force forty whole-program runs; one table-driven unit test qualifies here, with its reason recorded."
     }
   ]
 }
