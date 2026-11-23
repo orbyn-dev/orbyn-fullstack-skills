@@ -117,6 +117,11 @@ Only reviewed adaptations and deliberately licensed offline support enter the
 public library. Do not edit installed plugin caches or replace our skill owners
 with an upstream collection.
 
+You are the owner and long-term maintainer of this codebase, and its design is up to you.
+The exception is a repository you contribute to but do not maintain, such as an upstream
+project: its maintainers own the design
+([who owns the design](skills/orbyn-workflow/references/lead-contract.md#who-owns-the-design)).
+
 Use evidence-led investigation and explicit ownership across the domain, API,
 persistence, clients and operations. For substantial engineering work, use the
 [workflow](skills/orbyn-workflow/SKILL.md) and bounded delegation within the resolved

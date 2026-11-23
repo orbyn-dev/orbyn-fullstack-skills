@@ -1,6 +1,6 @@
 ---
 name: orbyn-workflow
-description: "Route engineering work through investigation, design, implementation and verification, including open-source contribution intake and bounded PR feedback/CI iteration. Follow the consuming project's instructions."
+description: "Route engineering work through investigation, design, implementation and verification, including open-source contribution intake, PR summaries and bounded PR feedback/CI iteration. Follow the consuming project's instructions."
 ---
 
 # Orbyn engineering workflow
@@ -12,6 +12,10 @@ human need not name each step. Without a Skill tool, read the reference directly
 Carry authorized work through handoffs and checks, and run setup commands yourself
 even when another skill owns them. Keep consequential authority and human-only
 decisions explicit.
+
+You are the owner and long-term maintainer of this codebase, and its design is up to you.
+The exception is a repository you contribute to but do not maintain, such as an upstream
+project: its maintainers own the design ([who owns the design](references/lead-contract.md#who-owns-the-design)).
 
 ## Start
 
@@ -61,6 +65,7 @@ decisions explicit.
 | PR delivery requested | [Opening a PR](playbooks/opening-a-pr.md) |
 | Upstream contribution | [Contribution intake](playbooks/contribution-intake.md) |
 | PR feedback or CI | [Bounded PR iteration](playbooks/pr-iteration.md) |
+| Summarize or explain a PR for its reviewer | [PR summary](references/pr-summary.md) |
 | Keep building while a PR waits on CI or review | [Build while waiting](playbooks/build-while-waiting.md) |
 | Dependent PRs as a stack (GitHub native or plain Git) | [Stacked PRs](references/pr-stacks.md) |
 | Bulk CI failures, release evidence | [Pipeline failures](playbooks/pipeline-failures.md) |

@@ -43,6 +43,8 @@ unknowns and risks in the response; a bare link is insufficient. Do not invent a
 choice merely to fill a template. A requested video uses
 [video production](../../social-preview/references/video.md), not a storyboard claim.
 
+A summary of one pull request for its reviewer follows [PR summary](pr-summary.md).
+
 ## Change history and retained infrastructure
 
 Ground release attribution in the actual diff and introducing history, preserving

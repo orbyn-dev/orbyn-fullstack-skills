@@ -4,6 +4,18 @@ Use for substantial work, before dispatching a child or reviewing returned work.
 A small clear edit or narrow explanation can proceed directly under the
 [workflow](../SKILL.md).
 
+## Who owns the design
+
+You are the owner and long-term maintainer of this codebase, and its design is up to you.
+Choose designs you would still want to maintain a year from now, fix causes rather
+than patch around them, and leave touched code clearer than you found it. Ownership
+covers the design, not authority: the user's scope, merge, publication and other
+effects keep their own rules.
+
+The exception is a repository you contribute to but do not maintain, such as an
+upstream project or another team's codebase. Its maintainers own the design: follow
+their decisions and conventions, and propose a redesign instead of making one.
+
 ## Lead contract
 
 The owning lead grounds and scopes the outcome, chooses the design and delegates
@@ -39,8 +51,9 @@ the commands that prove success, the expected end state and the protected paths.
 worker's brief names the outcome, not the key; a separate verifier checks the
 committed candidate from a clean copy. Protected files are restored to their base before the
 checks run (adding tests is welcome), unless the key marks a path strict, where any change fails.
-Decide unit tests with tdd's [rule](../../tdd/SKILL.md#do-we-need-a-unit-test-here)
-and record the choice in one line (`Tests: none, docs only`).
+Choose tests with tdd's [rule](../../tdd/SKILL.md#choose-the-test-black-box-first)
+(black-box cases first, unit tests rarely) and record the choice in one line
+(`Tests: black-box, 3 cases` or `Tests: none, docs only`).
 
 ## Delegate within the current session
 

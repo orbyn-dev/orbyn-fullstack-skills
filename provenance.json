@@ -419,6 +419,13 @@
           "effort": "medium",
           "date": "2026-11-20",
           "scope": "Adapter made cross-platform: the platform check no longer requires /bin/sh, Windows process listing through PowerShell, taskkill for the last-resort tree kill, a new process group and Ctrl-Break handling, TEMP/TMP for the compiler; a CI job runs the adapter and the real compiler on Windows and Linux. Qualified in CI on windows-latest and ubuntu-24.04 (one runner image each; the symlink-loop test is skipped on Windows); a path-separator bug found by the first Windows run is fixed; docs and the verification record state the result and its limits."
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-23",
+          "scope": "Simplify-in-order principle: question the requirement, delete, simplify, shorten the loop, automate"
         }
       ]
     },
@@ -1020,6 +1027,13 @@
           "effort": "medium",
           "date": "2026-11-20",
           "scope": "CI design: keep main visible (alert on a red main run, merge-queue cost), retry-policy and time-budget wording, p50/p95 phase audit, save caches only from the default branch, self-hosted runner measurement, planted-change selector proof, opt-in pre-push hook. Evidence from one project's CI work; all examples measured there, none copied."
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-23",
+          "scope": "Cut the suite before buying CI speed"
         }
       ]
     },
@@ -1156,6 +1170,20 @@
           "effort": "medium",
           "date": "2026-11-09",
           "scope": "Link to the folder refactor playbook for sequencing"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-23",
+          "scope": "Restate the user's goal in your own words, from a one-line skill the user supplied"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-23",
+          "scope": "Pointer to simplify in order before scoping sizeable work"
         }
       ]
     },
@@ -1662,6 +1690,34 @@
           "effort": "medium",
           "date": "2026-11-20",
           "scope": "Four routing eval cases for the new orbyn-opengrep skill (structural taint rule, install from source, CodeQL replacement plan, and an adjacent threat-model request that must not select it); evaluation data only."
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-23",
+          "scope": "Eval cases restate-goal-own-words and restate-adjacent-review-spec"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-23",
+          "scope": "Eval cases summarize-teammate-pr-direction and summarize-pr-adjacent-find-bugs"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-23",
+          "scope": "Eval case simplify-in-order-retry-ticket"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-23",
+          "scope": "Eval cases cli-tests-golden-cases, slow-ci-prune-first, rounding-table-unit-test"
         },
         {
           "tool": "Codex desktop (shell, web research and native subagents)",
@@ -2394,6 +2450,11 @@
           "revision": "observed 2026-11-14",
           "license": "CC-BY-4.0",
           "relationship": "reviewed-inspiration; independently authored guidance and synthetic cases; no upstream text or code copied"
+        },
+        {
+          "credit": "Pablo (MeLlamoPablo), summarize-pr skill",
+          "source": "https://github.com/MeLlamoPablo/skills/blob/55b29eef96f2797acd179b75dfe937806dc25494/skills/summarize-pr/SKILL.md",
+          "relationship": "reviewed-inspiration observed 2026-11-23; repository states no licence, so nothing taken; independently written around our own reviewer questions, no text, template, scripts, structure or examples imported"
         }
       ],
       "incorporated_material": [
@@ -2964,6 +3025,41 @@
           "effort": "medium",
           "date": "2026-11-20",
           "scope": "Added 'Carry the owner's standing rules into every brief' to lead-contract.md, written in our own words from a pstack worker.md review and fitted to our consent model: the person's goal opens every brief and report, the stated bar is the whole bar, block only for a failing run or a user-facing bug, make undoable choices and ask only for what needs the person, long evidence goes in a file. Static check only."
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-23",
+          "scope": "PR summary reference for a human reviewer, ideas from summarize-pr"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-23",
+          "scope": "Owner and long-term maintainer stance in Orbyn-owned repositories; maintainers own the design elsewhere"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-23",
+          "scope": "Owner stance applies to every maintained codebase, not only orbyn-dev; upstream contributions keep maintainer ownership"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-23",
+          "scope": "Principles index entry for simplify in order"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-23",
+          "scope": "Feature and bug-fix playbooks default to black-box cases"
         }
       ]
     },
@@ -3545,6 +3641,13 @@
           "effort": "medium",
           "date": "2026-11-20",
           "scope": "New suite-audit reference for reviewing and pruning an existing test suite (weak-test patterns, keep-by-risk rule, coverage ledger); routing eval cases. Reviewed inspiration only: the blog post 'I deleted half our backend tests' (avilag.dev, observed 2026-11-21); no text or code copied, all examples synthetic."
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-23",
+          "scope": "Black-box tests first: unit tests only under three conditions; golden cases reference; suite audit moves behaviour to the edge before cutting"
         }
       ]
     },
@@ -4150,12 +4253,12 @@
           "relationship": "reviewed-inspiration; independently authored local synthesis, no source text imported"
         },
         {
-          "credit": "Anthropic — effective agents",
+          "credit": "Anthropic \u2014 effective agents",
           "source": "https://www.anthropic.com/research/building-effective-agents",
           "relationship": "reviewed-inspiration; independently authored local synthesis, no source text imported"
         },
         {
-          "credit": "Anthropic — context engineering",
+          "credit": "Anthropic \u2014 context engineering",
           "source": "https://www.anthropic.com/research/effective-context-engineering-for-ai-agents",
           "relationship": "reviewed-inspiration; independently authored local synthesis, no source text imported"
         },
@@ -4165,12 +4268,12 @@
           "relationship": "reviewed-inspiration; independently authored local synthesis, no source text imported"
         },
         {
-          "credit": "Microsoft — Azure search security-filter limitations",
+          "credit": "Microsoft \u2014 Azure search security-filter limitations",
           "source": "https://learn.microsoft.com/en-us/azure/search/search-security-trimming-for-azure-search",
           "relationship": "reviewed-inspiration; independently authored local synthesis, no source text imported"
         },
         {
-          "credit": "Anthropic — tool design",
+          "credit": "Anthropic \u2014 tool design",
           "source": "https://www.anthropic.com/research/writing-tools-for-agents",
           "relationship": "reviewed-inspiration; independently authored local synthesis, no source text imported"
         },
@@ -4185,7 +4288,7 @@
           "relationship": "reviewed-inspiration; independently authored local synthesis, no source text imported"
         },
         {
-          "credit": "Anthropic — agent evaluations, January 2026",
+          "credit": "Anthropic \u2014 agent evaluations, January 2026",
           "source": "https://www.anthropic.com/research/demystifying-evals-for-ai-agents",
           "relationship": "reviewed-inspiration; independently authored local synthesis, no source text imported"
         },
@@ -4298,7 +4401,7 @@
       "license": "MIT",
       "source": "https://github.com/wheresryan22/anatomy/tree/1482e8469b0a9e0d8cc18ea2740a01423d29ae80",
       "revision": "1482e8469b0a9e0d8cc18ea2740a01423d29ae80",
-      "changes": "Orbyn-authored guidance adapting Anatomy’s model-driven illustration methods, with conditional output references. Selected licensed runtime/tests/fixtures adapted with explicit failure-sensitive browser, output preservation, resource ownership and packaging contracts; no active upstream skill, publisher, session harvesting or experimental renderers. Original and maintained fingerprints retained separately. Runtime qualification is finite and separately reported. Added independently authored spatial review adapter, original synthetic V12/timeline sources, strict schema-2 model and shared trusted save-bridge reuse, focused fixtures and development cases. Prepared packages reuse existing pinned Anatomy MIT support with notices; no duplicate upstream renderer is tracked. Reviewed Scenario motion method as inspiration only; no source code, fonts, media, runtime or provider imported. Added independently authored authorable motion-film specs, fourteen deterministic DOM/SVG/CSS-3D primitives, original generated raster studies, shared preview/export renderer, bounded MP4/audio/caption/effects pipeline and failure/qualification tests. No reviewed Scenario ZIP code, fonts or media copied; existing Anatomy lineage retained. Replaced active local-kinetic wording with motion films. Added independently authored code-driven motion composition/time/track/component/inspector contracts, rational film compatibility, source-bound motion review profile and development controls. Reviewed external methods inform the design; no Remotion skills, OBS/LosslessCut implementation, external authored assets or model weights imported. Optional runtime dependency profiles retain their own licenses/notices and qualify separately. Added independently authored lyric-performance guidance and synthetic development cases covering representative previews, bounded local puppeting, registered blink review, motion pacing, actual typography raster checks and cadence/mux evidence. No consumer scripts, media, lyrics or reports imported; historical source lineage is unchanged. Added an independently authored code-only rule, character animation and 3D world methods, a dependency-free rig kit with a procedural film and a source check; five public music videos were reviewed for timing and technique only, with no frames, art, audio or characters copied.",
+      "changes": "Orbyn-authored guidance adapting Anatomy\u2019s model-driven illustration methods, with conditional output references. Selected licensed runtime/tests/fixtures adapted with explicit failure-sensitive browser, output preservation, resource ownership and packaging contracts; no active upstream skill, publisher, session harvesting or experimental renderers. Original and maintained fingerprints retained separately. Runtime qualification is finite and separately reported. Added independently authored spatial review adapter, original synthetic V12/timeline sources, strict schema-2 model and shared trusted save-bridge reuse, focused fixtures and development cases. Prepared packages reuse existing pinned Anatomy MIT support with notices; no duplicate upstream renderer is tracked. Reviewed Scenario motion method as inspiration only; no source code, fonts, media, runtime or provider imported. Added independently authored authorable motion-film specs, fourteen deterministic DOM/SVG/CSS-3D primitives, original generated raster studies, shared preview/export renderer, bounded MP4/audio/caption/effects pipeline and failure/qualification tests. No reviewed Scenario ZIP code, fonts or media copied; existing Anatomy lineage retained. Replaced active local-kinetic wording with motion films. Added independently authored code-driven motion composition/time/track/component/inspector contracts, rational film compatibility, source-bound motion review profile and development controls. Reviewed external methods inform the design; no Remotion skills, OBS/LosslessCut implementation, external authored assets or model weights imported. Optional runtime dependency profiles retain their own licenses/notices and qualify separately. Added independently authored lyric-performance guidance and synthetic development cases covering representative previews, bounded local puppeting, registered blink review, motion pacing, actual typography raster checks and cadence/mux evidence. No consumer scripts, media, lyrics or reports imported; historical source lineage is unchanged. Added an independently authored code-only rule, character animation and 3D world methods, a dependency-free rig kit with a procedural film and a source check; five public music videos were reviewed for timing and technique only, with no frames, art, audio or characters copied.",
       "incorporated_material": [
         {
           "source": "https://github.com/wheresryan22/anatomy/tree/1482e8469b0a9e0d8cc18ea2740a01423d29ae80",
@@ -4690,8 +4793,8 @@
       "changes": "Orbyn skill for using affectUI's free React components: copy the reviewed pinned file, restyle through its CSS variables, drive it from real state, verify; updates only through upstream review. Bundles the unmodified free items as a pinned, hash-checked snapshot under references/upstream/affectui/.",
       "reviewed_sources": [
         {
-          "credit": "Florian Höller (adfects), affectUI",
-          "copyright": "Copyright (c) 2026 Florian Höller (adfects)",
+          "credit": "Florian H\u00f6ller (adfects), affectUI",
+          "copyright": "Copyright (c) 2026 Florian H\u00f6ller (adfects)",
           "source": "https://github.com/flohoeller/affectui/tree/3c5df43893d870ee42d81fad4a4ba3ad72ba1b99",
           "revision": "3c5df43893d870ee42d81fad4a4ba3ad72ba1b99",
           "license": "MIT",
