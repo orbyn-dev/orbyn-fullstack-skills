@@ -14961,23 +14961,6 @@
       }
     },
     {
-      "id": "ux-audit-adjacent-design-implementation",
-      "kind": "routing",
-      "split": "development",
-      "prompt": "Implement the approved settings redesign using our existing tokens and components. This is implementation, not a read-only audit.",
-      "expected_skills": [
-        "orbyn-ui-design"
-      ],
-      "forbidden_skills": [],
-      "forbidden_actions": [
-        "publish",
-        "deploy",
-        "merge",
-        "message"
-      ],
-      "excluded": "Do not insert a comprehensive audit before the approved implementation."
-    },
-    {
       "id": "ux-audit-adjacent-fix-known-finding",
       "kind": "routing",
       "split": "development",

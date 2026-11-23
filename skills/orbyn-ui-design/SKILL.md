@@ -1,6 +1,6 @@
 ---
 name: orbyn-ui-design
-description: "Design, implement, or review product UI and UX across web, desktop, and mobile: task flows, concise copy, responsive layouts, overlays, and AI interactions. Use for visible product flows; not backend-only work."
+description: "Design, implement, review or audit product UI and UX across web, desktop, and mobile: task flows, concise copy, responsive layouts, overlays, and AI interactions. Use for visible product flows; not backend-only work."
 ---
 
 # Orbyn UI and UX Design
