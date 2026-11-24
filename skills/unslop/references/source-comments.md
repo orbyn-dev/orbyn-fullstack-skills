@@ -49,7 +49,7 @@ Suppressions are comments with power. Check every `eslint-disable`, `@ts-ignore`
 like that the diff adds. One that hides a correctness, type-safety or security rule
 is a finding to fix, not to justify. A negative type test that uses
 `@ts-expect-error` to prove a bad call is rejected is the check itself, not a
-suppression. One that silences a style rule needs a short
+suppression. A suppression that silences a style rule needs a short
 reason beside it and the narrowest scope the tool allows: one line and one rule,
 never a whole file.
 
