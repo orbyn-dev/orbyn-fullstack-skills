@@ -1746,6 +1746,13 @@
           "effort": "medium",
           "date": "2026-11-23",
           "scope": "Eval cases security-audit-idor-source-only and security-remediation-known-idor"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-25",
+          "scope": "Eval case for the comment pass in unslop"
         }
       ],
       "reviewed_inspiration": [
