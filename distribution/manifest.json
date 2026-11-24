@@ -687,7 +687,7 @@
     "skills/orbyn-skill-creator/assets/contribution-lab/project/tools/forge.py": "095fed55870b90647a12900a9d537c3cf56118f8aaae01e4d639f91f68d4b21a",
     "skills/orbyn-skill-creator/evals/baselines/2026-10-24-55-skills.json": "0bd32833b884f715816e4b03c021c28120266aae8b31e429aa588341b13b7f14",
     "skills/orbyn-skill-creator/evals/baselines/2026-10-25-54-skills.json": "744d9724f0a8719bc0689ebade403d2452c8ffa0a8f19d47c8b5d7fdaa3659e6",
-    "skills/orbyn-skill-creator/evals/cases.json": "d075f3136aaf8482a0fc0a6290c0fbe160c5be58b3c0a78c9730b774f95a637c",
+    "skills/orbyn-skill-creator/evals/cases.json": "2ae8819879756c7307b52ba28915209dc28a2c3b5635291177f9105c8687ff75",
     "skills/orbyn-skill-creator/evals/executable/background-job-no-poll/case.json": "060041ff8a6c0ddfe54cb6f8977795d65292ace084f8f67a9fb642820dee6aec",
     "skills/orbyn-skill-creator/evals/executable/background-job-no-poll/fake/bad.json": "dfa3d6745222735094f5b5b753b187c002ac60b4f6f70d38c4c8e13cabf9d490",
     "skills/orbyn-skill-creator/evals/executable/background-job-no-poll/fake/good.json": "74e76524c58205199caf8d0f0d9b06a2b9a8413c18899fa828b4e8dfde95e7b2",
@@ -1594,7 +1594,7 @@
     "skills/unslop/LICENSE": "9c31ea886ff0fdc36aab948579bbb74a2e44bcb5a9c8a165cabc1b38e24175d4",
     "skills/unslop/SKILL.md": "e7d26ad741e0f663ab35400159942864ad2fbe1562677164011bbcbc9f3887fa",
     "skills/unslop/references/short-by-default.md": "1599d8070c1cd61aa4d0642e2c7894386fda4c06a9232636686c33397bbb49f6",
-    "skills/unslop/references/source-comments.md": "e5d34648c9d9431ce7e57df8805ab64fba1cf470359fdfecf182722bde854f49",
+    "skills/unslop/references/source-comments.md": "3371e120f7f79d9aabf0ac367bc81b454ee0a517f7bf44b143f9064fa39a2444",
     "skills/why/LICENSE": "9c31ea886ff0fdc36aab948579bbb74a2e44bcb5a9c8a165cabc1b38e24175d4",
     "skills/why/SKILL.md": "56cf1aef0d624a2568c5f999bdca459a5194ed92f82688e9b65257b505bca6ac"
   },

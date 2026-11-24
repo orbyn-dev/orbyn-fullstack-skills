@@ -24,6 +24,41 @@ operation.
 - Comments are claims, not enforcement. Critical behavior still needs the
   appropriate code structure, assertion or regression.
 
+## Comment pass on a diff
+
+Run this only when a review is asked for or the project's rules call for it. It is a
+separate read of the diff, by a reviewer who did not write it, looking only at
+comments and suppressions. Every comment the diff adds or touches gets one verdict:
+
+- **Cut** when it restates the code, narrates history ("changed from X"), tracks
+  work ("TODO later" with no owner or issue) or explains a name that could be
+  renamed instead.
+- **Keep** only with a reason the reviewer can state: it records something the code
+  cannot change or show, such as an external API's quirk, a protocol or compatibility
+  constraint, a legal notice or a measured trade-off. "It might help someone" is not
+  a reason.
+- **Fix the code instead** when the comment describes a workaround ("retry because
+  this sometimes fails", "guard against null here just in case"). A workaround note
+  points at a cause; find it with [fix root causes](../../how/references/principles/fix-root-causes.md)
+  rather than keeping the guard and its explanation. A retry with backoff for a
+  failure the boundary really has, such as a network timeout or a rate limit, is
+  recovery, not a workaround, when repeating the call is safe: keep it and name the
+  failure it handles and what makes the repeat safe (an idempotency key,
+  deduplication or reconciliation). Without that, see
+  [make operations idempotent](../../orbyn-backend-design/references/principles/make-operations-idempotent.md).
+
+Suppressions are comments with power. Check every `eslint-disable`, `@ts-ignore`,
+`@ts-expect-error`, `# noqa`, `# type: ignore`, `#[allow(...)]`, `//nolint` and the
+like that the diff adds. One that hides a correctness, type-safety or security rule
+is a finding to fix, not to justify. A negative type test that uses
+`@ts-expect-error` to prove a bad call is rejected is the check itself, not a
+suppression. A suppression that silences a style rule needs a short
+reason beside it and the narrowest scope the tool allows: one line and one rule,
+never a whole file.
+
+Report the verdicts as review findings; the author applies them. A clean pass may
+remove most new comments, and that is a normal result, not a target.
+
 With authorized edits, move durable review reasoning into clearer code or a source
 comment; review-only work changes neither. Use the
 [review feedback contract](../../orbyn-workflow/references/engineering-scope.md#actionable-review-feedback)
