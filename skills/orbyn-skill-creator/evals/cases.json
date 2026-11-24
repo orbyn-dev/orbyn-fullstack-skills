@@ -5963,7 +5963,7 @@
       "prompt": "Review only the comments and suppressions in this synthetic diff someone else wrote, as a local findings list. It adds: (A) '// loop over users' above a for-each over users. (B) '// Stripe returns 200 with an error body for declined cards; check body.error' above that check. (C) '// retry 3 times because the save sometimes fails' around a save call. (D) '// @ts-ignore' above a call passing a string where the type expects a number. (E) '/* eslint-disable */' at the top of a file to silence one max-len warning. Give a verdict for each. Do not edit source or claim test execution.",
       "rubric": {
         "verdicts": "Cuts A as narration; keeps B because it records an external API quirk the code cannot change.",
-        "root_cause": "Treats C as a workaround pointing at a cause to investigate and fix, not a comment to keep beside a retry guard.",
+        "root_cause": "Treats C as a workaround pointing at a cause to investigate, since 'sometimes fails' names no transient boundary failure; would keep a retry that names a real timeout or rate limit.",
         "suppressions": "Flags D as a type-safety suppression to fix, not justify; narrows E to one line and one rule with a reason.",
         "scope": "Reports findings for the author; no edits, no blanket comment ban and no claim that comments enforce behaviour."
       }

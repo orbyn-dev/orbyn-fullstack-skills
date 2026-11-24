@@ -40,12 +40,16 @@ comments and suppressions. Every comment the diff adds or touches gets one verdi
 - **Fix the code instead** when the comment describes a workaround ("retry because
   this sometimes fails", "guard against null here just in case"). A workaround note
   points at a cause; find it with [fix root causes](../../how/references/principles/fix-root-causes.md)
-  rather than keeping the guard and its explanation.
+  rather than keeping the guard and its explanation. A retry with backoff for a
+  failure the boundary really has, such as a network timeout or a rate limit, is
+  recovery, not a workaround: keep it and name the failure it handles.
 
 Suppressions are comments with power. Check every `eslint-disable`, `@ts-ignore`,
 `@ts-expect-error`, `# noqa`, `# type: ignore`, `#[allow(...)]`, `//nolint` and the
 like that the diff adds. One that hides a correctness, type-safety or security rule
-is a finding to fix, not to justify. One that silences a style rule needs a short
+is a finding to fix, not to justify. A negative type test that uses
+`@ts-expect-error` to prove a bad call is rejected is the check itself, not a
+suppression. One that silences a style rule needs a short
 reason beside it and the narrowest scope the tool allows: one line and one rule,
 never a whole file.
 
