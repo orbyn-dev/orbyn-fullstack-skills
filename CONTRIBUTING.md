@@ -163,6 +163,20 @@ repository's MIT terms and include required third-party notices. No CLA or DCO
 signature requirement is currently imposed. Security reports go through
 [private reporting](SECURITY.md), not public issues.
 
+## Releases
+
+The library uses semantic versions on Git tags (`v1.2.3`), cut from `main` by the
+maintainer. A release adds a `CHANGELOG.md` entry and updates `version` and
+`date-released` in `CITATION.cff` in one PR, then tags the merged commit and
+publishes a GitHub release with the same notes.
+
+- **Major:** a skill is removed or renamed, or a skill's contract changes so that
+  existing prompts, evals or consumer pins stop working.
+- **Minor:** a new skill, a new reference or a new helper script.
+- **Patch:** corrections, wording and pin refreshes that change no contract.
+
+Consumers pin a tag. `main` between tags is unreleased.
+
 ## Evidence for skill evaluations
 
 CI validates case structure and tests the evaluator with synthetic files. It does
