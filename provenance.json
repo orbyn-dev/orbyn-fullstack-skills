@@ -3855,6 +3855,13 @@
           "effort": "medium",
           "date": "2026-11-05",
           "scope": "Short by default: chat replies, PRs, issues and checklists answer first, in bullets, with word targets"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-25",
+          "scope": "Comment pass on a diff: cut/keep/fix verdicts, workaround comments point at root causes, suppression audit"
         }
       ]
     },
