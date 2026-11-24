@@ -42,7 +42,10 @@ comments and suppressions. Every comment the diff adds or touches gets one verdi
   points at a cause; find it with [fix root causes](../../how/references/principles/fix-root-causes.md)
   rather than keeping the guard and its explanation. A retry with backoff for a
   failure the boundary really has, such as a network timeout or a rate limit, is
-  recovery, not a workaround: keep it and name the failure it handles.
+  recovery, not a workaround, when repeating the call is safe: keep it and name the
+  failure it handles and what makes the repeat safe (an idempotency key,
+  deduplication or reconciliation). Without that, see
+  [make operations idempotent](../../orbyn-backend-design/references/principles/make-operations-idempotent.md).
 
 Suppressions are comments with power. Check every `eslint-disable`, `@ts-ignore`,
 `@ts-expect-error`, `# noqa`, `# type: ignore`, `#[allow(...)]`, `//nolint` and the
