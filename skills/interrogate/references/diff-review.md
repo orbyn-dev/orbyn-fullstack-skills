@@ -16,14 +16,18 @@ Resolve the mode first and keep it for every later command:
 
 | Mode | Base | Diff command |
 | --- | --- | --- |
-| Range (branch or PR) | `git merge-base <from> <to>` | `git --no-pager diff --no-ext-diff --no-textconv --no-color <merge_base>..<to> -- "<path>"` |
-| Commit | its first parent, `<commit>^1` | `git --no-pager diff --no-ext-diff --no-textconv --no-color <commit>^1 <commit> -- "<path>"`; for a root commit, list files against the empty tree (`git diff --name-status $(git hash-object -t tree /dev/null) <commit>`) and read each patch with `git --no-pager show --no-ext-diff --no-textconv --no-color <commit> -- "<path>"` |
-| Workspace | `HEAD` | `git --no-pager diff --no-ext-diff --no-textconv --no-color HEAD -- "<path>"`; read untracked files whole |
+| Range (branch or PR) | `git merge-base <from> <to>` | `git --literal-pathspecs --no-pager diff --no-ext-diff --no-textconv --no-color <merge_base>..<to> -- "<path>"` |
+| Commit | its first parent, `<commit>^1` | `git --literal-pathspecs --no-pager diff --no-ext-diff --no-textconv --no-color <commit>^1 <commit> -- "<path>"`; for a root commit, list files against the empty tree (`git --literal-pathspecs diff --name-status $(git hash-object -t tree /dev/null) <commit>`) and read each patch with `git --literal-pathspecs --no-pager show --no-ext-diff --no-textconv --no-color <commit> -- "<path>"` |
+| Workspace | `HEAD` | `git --literal-pathspecs --no-pager diff --no-ext-diff --no-textconv --no-color HEAD -- "<path>"`; read untracked files whole |
 
 `<to>` is `HEAD` unless given. A range compares the merge-base with the target and
 ignores staged, unstaged and untracked work. Always pass `--no-ext-diff`,
 `--no-textconv` and `--no-color` so you read plain patches, not a configured diff
-tool's output. List the files in the same mode with two calls,
+tool's output. Pass `--literal-pathspecs` too, so a path such as `:!notes.md`
+is read as a file name, not as Git pathspec magic that could pull in other files,
+secret ones included. For a rename row, read the patch with both paths
+(`-- "<old_path>" "<new_path>"`), or a guard removed during the rename shows up as
+a plain addition. List the files in the same mode with two calls,
 `git diff --name-status` and `git diff --numstat` (one call with both flags prints
 only the first); in workspace mode add `git ls-files --others --exclude-standard`
 for untracked files.
