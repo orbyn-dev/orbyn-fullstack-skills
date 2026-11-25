@@ -120,8 +120,11 @@ LOCAL_GIT_ENV = frozenset({"GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_CONFIG", "GI
 
 
 def child_env(**extra: str) -> dict:
-    """The inherited environment without repository-location variables or a `gh` repository override."""
-    env = {k: v for k, v in os.environ.items() if k not in LOCAL_GIT_ENV and k != "GH_REPO"}
+    """The inherited environment without repository-location variables or a `gh` repository or host override.
+
+    Origins are always github.com (see `github_origin`), so `GH_HOST` must not send `gh` elsewhere.
+    """
+    env = {k: v for k, v in os.environ.items() if k not in LOCAL_GIT_ENV and k not in ("GH_REPO", "GH_HOST")}
     env.update(extra)
     return env
 
@@ -271,7 +274,7 @@ class Gh:
 
     def default_branch(self, repo):
         origin = self.origin(repo)
-        value = self.query(repo, "repo", "view", origin, "--json", "defaultBranchRef") if origin else None
+        value = self.query(repo, "repo", "view", "github.com/" + origin, "--json", "defaultBranchRef") if origin else None
         ref = value.get("defaultBranchRef") if isinstance(value, dict) else None
         return ref.get("name") if isinstance(ref, dict) else None
 
@@ -284,13 +287,13 @@ class Gh:
             number = pr_number(pr, origin)
             if not number:
                 return None
-            raw = self.query(repo, "pr", "view", number, "--repo", origin, "--json", fields)
+            raw = self.query(repo, "pr", "view", number, "--repo", "github.com/" + origin, "--json", fields)
             return [pull_ref(raw)] if isinstance(raw, dict) else None
         if state == "open":
             result = []
             page = 1
             while True:
-                raw = self.query(repo, "api", f"repos/{origin}/pulls?state=open&per_page=100&page={page}")
+                raw = self.query(repo, "api", "--hostname", "github.com", f"repos/{origin}/pulls?state=open&per_page=100&page={page}")
                 if not isinstance(raw, list):
                     return None
                 for p in raw:
@@ -305,7 +308,7 @@ class Gh:
                 page += 1
         if head and split_head(head) and split_head(head).get("owner"):
             return None  # `gh pr list --head` takes a branch only; a fork head needs its PR number.
-        args = ["pr", "list", "--state", state, "--repo", origin, "--json", fields, "--limit", "100"]
+        args = ["pr", "list", "--state", state, "--repo", "github.com/" + origin, "--json", fields, "--limit", "100"]
         if head:
             args += ["--head", head]
         raw = self.query(repo, *args)
@@ -315,7 +318,7 @@ class Gh:
         origin = self.origin(repo)
         if not origin:
             return None  # Deployment evidence stays unverified rather than read from another repository.
-        return self.query(repo, "run", "list", "--repo", origin, "--workflow", workflow, "--branch", branch,
+        return self.query(repo, "run", "list", "--repo", "github.com/" + origin, "--workflow", workflow, "--branch", branch,
                           "--status", "success", "--json", "headSha", "--limit", "100")
 
 
@@ -497,6 +500,9 @@ def build_state(frame: dict, facts: dict | None = None) -> dict:
                 out["merged"] = merged["mergedAt"]
         return out
     if tip:
+        if facts.get("diverged"):
+            # The branch was reset or rewritten: its commits no longer describe the recorded build.
+            return {"state": "building", "reason": f"Branch {build['branch']} no longer contains the recorded commit; record it again"}
         return {"state": "building", "reason": "Branch not merged yet"}
     closed = next((p for p in pulls or [] if p["state"] == "closed"), None)
     if closed:
@@ -536,6 +542,7 @@ def build_facts(git: Git, gh, repo: Path, build: dict, default_branch=None) -> d
                          and not same_sha(base_sha, sha) and git.is_ancestor(repo, base_sha, sha))
     return {"tip": tip, "onDefault": bool(tip and base and git.is_ancestor(repo, tip, base)),
             "ownCommits": has_own_commits(commits, first), "recordedMerged": non_first_parent or distinct_base,
+            "diverged": bool(tip and valid_sha(sha) and not in_history),
             "pulls": pulls, **({"renamedBranch": current} if current != branch else {})}
 
 
@@ -566,12 +573,13 @@ def current_pull_ref(git: Git, repo: Path, pr: dict) -> str | None:
     """The commit a same-repository PR's remote-tracking ref points at, only when it is the PR's head commit.
 
     After a force-push the local ref keeps the old commit until the next fetch; its content is not PR evidence.
+    A PR without a valid head SHA cannot be verified, so its content is never read.
     The commit, not the ref name, is returned so a fetch during the check cannot change what is read next.
     """
-    if pr.get("fork") or not valid_branch(pr.get("branch", "")):
+    if pr.get("fork") or not valid_branch(pr.get("branch", "")) or not valid_sha(pr.get("headSha")):
         return None
     tip = git.rev(repo, "refs/remotes/origin/" + pr["branch"])
-    if not tip or (pr.get("headSha") and not same_sha(tip, pr["headSha"])):
+    if not tip or not same_sha(tip, pr["headSha"]):
         return None
     return tip
 
@@ -617,7 +625,8 @@ def extra_frames(git: Git, root: Path, project: dict, known: set[str], prs_by_re
             branch = pr.get("branch")
             ref = current_pull_ref(git, repo, pr)
             if not ref:
-                if branch and not pr.get("fork") and valid_branch(branch) and git.rev(repo, "refs/remotes/origin/" + branch) and notes is not None:
+                # Missing ref, missing or invalid head SHA, or a ref behind the PR head: say so instead of skipping quietly.
+                if branch and not pr.get("fork") and valid_branch(branch) and notes is not None:
                     notes.append(f"{project['key']}: PR #{pr.get('number')} content unverified; run `git fetch origin` in {repo}")
                 continue
             base = git.default_ref(repo, project.get("defaultBranch"), gh)

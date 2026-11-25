@@ -244,7 +244,9 @@ class BuildStateTests(Fixture):
         set_origin_main(self.app)
         git(self.app, "branch", "-f", "feat/p-one", side)  # reset onto a merged commit unrelated to the recording
         self.set_status({self.key(): {"build": self.build(sha=recorded)}})
-        self.assertEqual(self.frame()[0]["build"], "building")
+        row = self.frame()[0]
+        self.assertEqual(row["build"], "building")
+        self.assertEqual(row["buildInfo"]["reason"], "Branch feat/p-one no longer contains the recorded commit; record it again")
         # Still implemented when the recorded commit is in the merged tip's history.
         git(self.app, "checkout", "-q", "feat/p-one")
         git(self.app, "reset", "-q", "--hard", recorded)
@@ -313,7 +315,8 @@ class DesignStateTests(Fixture):
         git(self.designs, "update-ref", "refs/remotes/origin/design/x", "design/x")
         git(self.designs, "checkout", "-q", "main")
         self.edit("on branch")  # same edit, uncommitted on main
-        prs = [{"headRefName": "design/x", "state": "OPEN", "url": "https://example.test/pr/2"}]
+        prs = [{"headRefName": "design/x", "state": "OPEN", "url": "https://example.test/pr/2",
+                "headRefOid": git(self.designs, "rev-parse", "design/x")}]
         self.assertEqual(self.state(gh=FakeGh(True, prs)), "publishing")
         self.assertEqual(self.state(gh=FakeGh(False)), "designed")
 
@@ -322,7 +325,7 @@ class DesignStateTests(Fixture):
         self.edit("y")
         commit_all(self.designs, "y")
         git(self.designs, "update-ref", "refs/remotes/origin/design/y", "design/y")
-        prs = [{"headRefName": "design/y", "state": "OPEN", "url": "u"}]
+        prs = [{"headRefName": "design/y", "state": "OPEN", "url": "u", "headRefOid": git(self.designs, "rev-parse", "design/y")}]
         self.assertEqual(self.state(gh=FakeGh(True, prs)), "publishing")
 
     def test_section_only_on_open_pr_branch_is_an_extra_publishing_frame(self):
@@ -331,7 +334,8 @@ class DesignStateTests(Fixture):
         commit_all(self.designs, "three")
         git(self.designs, "update-ref", "refs/remotes/origin/design/z", "design/z")
         git(self.designs, "checkout", "-q", "main")
-        prs = [{"headRefName": "design/z", "state": "OPEN", "url": "https://example.test/pr/3"}]
+        prs = [{"headRefName": "design/z", "state": "OPEN", "url": "https://example.test/pr/3",
+                "headRefOid": git(self.designs, "rev-parse", "design/z")}]
         _, result = self.frame(gh=FakeGh(True, prs))
         extra = result["projects"][0]["extra"]
         self.assertEqual([(e["id"], e["design"], e["branch"]) for e in extra], [("p/three", "publishing", "design/z")])
@@ -340,6 +344,13 @@ class DesignStateTests(Fixture):
         _, result = self.frame(gh=FakeGh(True, stale))
         self.assertEqual(result["projects"][0]["extra"], [])
         self.assertTrue(any("PR #3 content unverified" in n for n in result["notes"]))
+        # Without a valid head SHA the content cannot be verified, and neither can a PR with no tracking ref.
+        for pr in (dict(prs[0], number=4, headRefOid=None), dict(prs[0], number=5, headRefOid="not-a-sha"),
+                   dict(prs[0], number=6, headRefName="design/never-fetched")):
+            with self.subTest(pr=pr["number"]):
+                _, result = self.frame(gh=FakeGh(True, [pr]))
+                self.assertEqual(result["projects"][0]["extra"], [])
+                self.assertTrue(any(f"PR #{pr['number']} content unverified" in n for n in result["notes"]))
 
     def test_pr_only_file_with_non_ascii_name_in_a_directory_source(self):
         self.write_projects([{"repo": "../designs", "dir": "artifacts"}])
@@ -348,7 +359,7 @@ class DesignStateTests(Fixture):
         commit_all(self.designs, "cafe")
         git(self.designs, "update-ref", "refs/remotes/origin/design/cafe", "design/cafe")
         git(self.designs, "checkout", "-q", "main")
-        prs = [{"headRefName": "design/cafe", "state": "OPEN", "url": "u"}]
+        prs = [{"headRefName": "design/cafe", "state": "OPEN", "url": "u", "headRefOid": git(self.designs, "rev-parse", "design/cafe")}]
         extra = self.frame(gh=FakeGh(True, prs))[1]["projects"][0]["extra"]
         self.assertEqual([e["key"] for e in extra], ["designs:artifacts/café.html#menu"])
 

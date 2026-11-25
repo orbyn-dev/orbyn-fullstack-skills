@@ -80,6 +80,20 @@ class ParityTests(Fixture):
         pr = {"branch": "design/a", "state": "open", "number": 5, "headSha": head}
         self.assertEqual(ds.current_pull_ref(ds.Git(), self.designs, pr), head)
         self.assertIsNone(ds.current_pull_ref(ds.Git(), self.designs, dict(pr, headSha="3" * 40)))
+        for missing in (None, "", "not-a-sha"):
+            self.assertIsNone(ds.current_pull_ref(ds.Git(), self.designs, dict(pr, headSha=missing)))
+
+    def test_every_gh_lookup_names_the_github_com_host(self):
+        gh = ds.Gh()
+        gh.origin = lambda repo: "owner/app"
+        calls = []
+        gh.query = lambda repo, *args: calls.append(args) or ([] if args[0] != "pr" or args[1] != "view" else {})
+        with unittest.mock.patch.dict("os.environ", {"GH_HOST": "ghe.example.test"}):
+            gh.default_branch("repo"); gh.prs("repo", pr="3"); gh.prs("repo", state="open"); gh.prs("repo", head="b"); gh.runs("repo", "d.yml", "main")
+        for args in calls:
+            with self.subTest(args=args[:3]):
+                self.assertTrue("github.com/owner/app" in args or args[:3] == ("api", "--hostname", "github.com"), args)
+        self.assertEqual(len(calls), 5)
 
     def test_deploy_ship_checks_ancestry_and_default_branch(self):
         self.merged()
@@ -268,7 +282,7 @@ class GhAdapterTests(unittest.TestCase):
         gh.query = lambda repo, *args: calls.append(args) or []
         gh.origin = lambda repo: "owner/app"
         gh.runs("repo", "deploy.yml", "main")
-        self.assertEqual(calls[0][:4], ("run", "list", "--repo", "owner/app"))
+        self.assertEqual(calls[0][:4], ("run", "list", "--repo", "github.com/owner/app"))
         gh.origin = lambda repo: None
         self.assertIsNone(gh.runs("repo", "deploy.yml", "main"))
         self.assertEqual(len(calls), 1)
@@ -280,9 +294,10 @@ class GhAdapterTests(unittest.TestCase):
         self.assertIsNone(gh.prs("repo", head="alice:feat/x"))
 
     def test_child_env_drops_repository_location_and_gh_repo(self):
-        with unittest.mock.patch.dict("os.environ", {"GIT_DIR": "x", "GIT_INDEX_FILE": "y", "GH_REPO": "fork/app", "KEEP": "1"}):
+        with unittest.mock.patch.dict("os.environ", {"GIT_DIR": "x", "GIT_INDEX_FILE": "y", "GH_REPO": "fork/app",
+                                                     "GH_HOST": "ghe.example.test", "KEEP": "1"}):
             env = ds.child_env(GIT_TERMINAL_PROMPT="0")
-        self.assertFalse({"GIT_DIR", "GIT_INDEX_FILE", "GH_REPO"} & set(env))
+        self.assertFalse({"GIT_DIR", "GIT_INDEX_FILE", "GH_REPO", "GH_HOST"} & set(env))
         self.assertEqual((env["KEEP"], env["GIT_TERMINAL_PROMPT"]), ("1", "0"))
 
     def test_pr_reference_validation_is_shared(self):
