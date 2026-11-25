@@ -2,7 +2,7 @@
 
 Select this path for a source-linked finite TLA+ check and a generated diagram,
 not for an ordinary design sketch. The bundled compiler is unmodified pstack
-runtime source at `bf0c7cd80abdbf7fe47b634978a7d1b4071f71a7` (plugin 0.15.42),
+runtime source at `d42aff08aa58965d2735c4ead61a9af82b89d0d0` (plugin 0.15.46),
 with exact [hashes and license](upstream/pstack-statechart/snapshot.json).
 There is no bootstrap, active imported skill, network lookup or package install.
 The independently authored adapter and view guard live under `../scripts/`.
@@ -26,12 +26,18 @@ python3 "$library/skills/architect/scripts/check-statechart.py" doctor \
   --node "$node_bin" --java "$java_bin" --tlc "$tlc_jar"
 ```
 
-Doctor reads/hashes the complete 26-file runtime closure, its notice, the local
+Doctor reads/hashes the complete 28-file runtime closure, its notice, the local
 ESM package boundary and the exact jar; it probes tool versions without writing
 outputs or installing anything. It establishes readiness, not model correctness.
-The pinned lifecycle uses POSIX shell/process-group signals: Windows is blocked.
-macOS is locally qualified; Linux has the required execution primitives but
-needs its own runtime and interruption qualification. Never edit a home/global
+Platforms: macOS was qualified locally. Windows and Linux are qualified by a CI job
+(`statechart-compiler` in `validate.yml`) that runs the adapter's tests and the real
+compiler against the pinned jar on `windows-latest` and `ubuntu-24.04`, with Node 22.23,
+Java 17 and the pinned TLC jar. That is one runner image each: another Node, Java or
+Windows version is not covered. On Windows give explicit paths to `node.exe` and
+`java.exe`; the adapter lists processes through PowerShell, stops the tree with
+`taskkill`, and is cancelled with Ctrl-Break (a console process group cannot be sent
+SIGTERM). Not covered on Windows: refusing a symlink loop, which needs a privilege the
+runner lacks. Node must be 22.18 or later (or 23.6 or later). Never edit a home/global
 `package.json` to make TypeScript imports work.
 
 ## Run and retain the actual result

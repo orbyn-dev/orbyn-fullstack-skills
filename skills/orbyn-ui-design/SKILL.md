@@ -1,6 +1,6 @@
 ---
 name: orbyn-ui-design
-description: "Design, implement, or review product UI and UX across web, desktop, and mobile: task flows, concise copy, responsive layouts, overlays, and AI interactions. Use for visible product flows; not backend-only work."
+description: "Design, implement, review or audit product UI and UX across web, desktop, and mobile: task flows, concise copy, responsive layouts, overlays, and AI interactions. Use for visible product flows; not backend-only work."
 ---
 
 # Orbyn UI and UX Design
@@ -66,6 +66,10 @@ Evaluate the complete task from the person's starting state through success,
 cancellation and recovery. Resolve trade-offs around that outcome, preserving
 accessibility and authority. Use the [experience method](references/principles/experience-first.md)
 when a local visual improvement could make the end-to-end task harder.
+
+For a requested comprehensive audit of existing UI across flows, follow the
+[UX audit](references/ux-audit.md): a coverage matrix, optional bounded agents, and a
+complete evidence-backed backlog, with product code and data left untouched.
 
 ## Review and deliver
 

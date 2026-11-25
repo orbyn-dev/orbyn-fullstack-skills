@@ -11,12 +11,14 @@ bundled, and they may carry other licences. Generated from `provenance.json` by
 | Source | Credit | Licence | Used in |
 | --- | --- | --- | --- |
 | [affaan-m/ECC](https://github.com/affaan-m/ECC) | Affaan Mustafa (affaan-m, ECC); Orbyn adaptations by Anh Dang and contributors | MIT | how, interrogate, language-best-practices, orbyn-ai-application, orbyn-ci-design, orbyn-security-audit, orbyn-ui-design, orbyn-workflow, tdd |
+| [alibaba/open-code-review](https://github.com/alibaba/open-code-review) | Copyright 2026 alibaba/open-code-review Contributors | Apache-2.0 | interrogate |
 | [anthropics/skills](https://github.com/anthropics/skills) | anthropics | Apache-2.0 | orbyn-documents, orbyn-mcp-builder, orbyn-webapp-testing, social-preview |
 | [benjitaylor/skills](https://github.com/benjitaylor/skills) | 2026 Benji Taylor | MIT | product-illustration |
 | [caru-ini/stack-diagram](https://github.com/caru-ini/stack-diagram) | 2026 caru-ini | MIT | stack-diagram |
 | [cloudflare/security-audit-skill](https://github.com/cloudflare/security-audit-skill) | 2025-2026 Cloudflare, Inc. | MIT | orbyn-security-audit |
 | [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) | 2025 Corey Haines | MIT | orbyn-research, social-content |
 | [cursor/plugins](https://github.com/cursor/plugins) | 2026 Lauren Tan | MIT | architect, arena, automate-me, figure-it-out, how, interrogate, language-best-practices, orbyn-backend-design, orbyn-plan, orbyn-setup, orbyn-skill-creator, orbyn-ui-design, orbyn-workflow, reflect, show-me-your-work, tdd, unslop, why |
+| [elementalsouls/Claude-BugHunter](https://github.com/elementalsouls/Claude-BugHunter) | Sachin Sharma (elementalsouls), Claude-BugHunter; Orbyn adaptations by Anh Dang and contributors | CC-BY-4.0 | orbyn-security-audit |
 | [emilkowalski/skills](https://github.com/emilkowalski/skills) | 2026 Emil Kowalski | MIT | language-best-practices, orbyn-ui-design, tdd |
 | [erkamyaman/rust-anything](https://github.com/erkamyaman/rust-anything) | Erkam Yaman (erkamyaman, rust-anything); Orbyn adaptations by Anh Dang and contributors | MIT | figure-it-out, language-best-practices |
 | [expo/skills](https://github.com/expo/skills) | 2025-present 650 Industries, Inc. (aka Expo) | MIT | architect, language-best-practices, orbyn-backend-design, orbyn-ci-design, orbyn-ui-design, orbyn-workflow, tdd |
@@ -49,7 +51,11 @@ bundled, and they may carry other licences. Generated from `provenance.json` by
 | [google/elephant-goldfish-model](https://github.com/google/elephant-goldfish-model) | Google LLC (Elephant-Goldfish Model) | See source | architect, how, interrogate, orbyn-ui-design, orbyn-workflow |
 | [google/eng-practices](https://github.com/google/eng-practices) | Google Engineering Practices contributors | See source | orbyn-workflow, unslop |
 | https://aclanthology.org/2024.eacl-demo.16/ | RAGAs, EACL 2024 | See source | orbyn-ai-application |
+| https://design-system.service.gov.uk/components/back-link/ | GOV.UK back link | Unverified; review only, no copied material | orbyn-ui-design |
+| https://design-system.service.gov.uk/components/error-summary/ | GOV.UK error summary | Unverified; review only, no copied material | orbyn-ui-design |
 | https://dev.to/nark3d/a-three-tier-folder-structure-for-long-lived-codebases-3a3l | Adam Lewis (Three-Tier Hoisting) | See source | architect, language-best-practices |
+| https://developer.android.com/develop/adaptive-apps/guides/use-window-size-classes | Android window size classes | Unverified; review only, no copied material | orbyn-ui-design |
+| https://developer.apple.com/design/human-interface-guidelines/layout | Apple layout guidance | Unverified; review only, no copied material | orbyn-ui-design |
 | https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage | MDN Web Docs and Playwright documentation | See source | orbyn-ui-design |
 | https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/merging-stacked-pull-requests | GitHub documentation contributors | CC-BY-4.0 | orbyn-skill-creator, orbyn-workflow |
 | https://docs.github.com/en/rest/pulls/pulls | GitHub documentation contributors | CC-BY-4.0 | orbyn-skill-creator, orbyn-workflow |
@@ -59,6 +65,7 @@ bundled, and they may carry other licences. Generated from `provenance.json` by
 | https://genai.owasp.org/llmrisk/llm062025-excessive-agency/ | OWASP LLM06:2025 | See source | orbyn-ai-application |
 | https://githubnext.com/projects/pdd-kit/ | GitHub Next and Microsoft Research | See source | tdd |
 | https://learn.microsoft.com/en-us/azure/search/search-security-trimming-for-azure-search | Microsoft — Azure search security-filter limitations | See source | orbyn-ai-application |
+| https://learn.microsoft.com/en-us/windows/apps/get-started/best-practices | Microsoft Windows app guidance | Unverified; review only, no copied material | orbyn-ui-design |
 | https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-lockfileex | Microsoft Learn (Windows API documentation) | CC-BY-4.0 | orbyn-worktree |
 | https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/ne-shobjidl_core-_transfer_source_flags | Microsoft Learn (Windows API documentation) | CC-BY-4.0 | orbyn-worktree |
 | https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifileoperation-setoperationflags | Microsoft Learn (Windows API documentation) | CC-BY-4.0 | orbyn-worktree |
@@ -67,16 +74,27 @@ bundled, and they may carry other licences. Generated from `provenance.json` by
 | https://learn.microsoft.com/en-us/windows/win32/fileio/creating-and-opening-files | Microsoft Learn (Windows API documentation) | CC-BY-4.0 | orbyn-worktree |
 | https://pair.withgoogle.com/chapter/feedback-controls/ | Google PAIR feedback/control | See source | orbyn-ai-application |
 | https://pair.withgoogle.com/chapter/user-needs/ | Google PAIR user needs | See source | orbyn-ai-application |
+| https://playwright.dev/docs/emulation | Playwright emulation | Unverified; review only, no copied material | orbyn-ui-design |
 | https://research.google/pubs/how-developers-search-for-code-a-case-study/ | Google Research, Caitlin Sadowski, Kathryn T. Stolee and Sebastian Elbaum | See source | orbyn-research |
 | https://research.swtch.com/deps | Russ Cox | See source | orbyn-research |
+| https://web.dev/articles/defining-core-web-vitals-thresholds | web.dev Core Web Vitals | Unverified; review only, no copied material | orbyn-ui-design |
 | https://www.anthropic.com/research/building-effective-agents | Anthropic — effective agents | See source | orbyn-ai-application |
 | https://www.anthropic.com/research/demystifying-evals-for-ai-agents | Anthropic — agent evaluations, January 2026 | See source | orbyn-ai-application |
 | https://www.anthropic.com/research/effective-context-engineering-for-ai-agents | Anthropic — context engineering | See source | orbyn-ai-application |
 | https://www.anthropic.com/research/writing-tools-for-agents | Anthropic — tool design | See source | orbyn-ai-application |
+| https://www.carbondesignsystem.com/building-blocks/core/patterns/empty-states | IBM Carbon empty states | Unverified; review only, no copied material | orbyn-ui-design |
 | https://www.gov.uk/service-manual/agile-delivery/how-the-alpha-phase-works | GOV.UK Agile delivery community | See source | orbyn-research |
+| https://www.nngroup.com/articles/error-message-guidelines/ | Nielsen Norman Group error messages | Unverified; review only, no copied material | orbyn-ui-design |
+| https://www.nngroup.com/articles/ten-usability-heuristics/ | Nielsen Norman Group usability heuristics | Unverified; review only, no copied material | orbyn-ui-design |
 | https://www.scenario.com/explorations/kinetic-film/ | Scenario | See source | technical-illustration |
 | https://www.sei.cmu.edu/library/architecture-tradeoff-analysis-method-collection/ | Software Engineering Institute | See source | orbyn-research |
 | https://www.ssw.com.au/rules/write-agents-md | SSW Rules (Eddie Kranz, Daniel MacKay, Gordon Beeming, Michael Qiu) | See source | orbyn-setup |
+| https://www.w3.org/International/questions/qa-html-dir.en | W3C internationalization | Unverified; review only, no copied material | orbyn-ui-design |
+| https://www.w3.org/TR/WCAG22/ | W3C WCAG 2.2 | Unverified; review only, no copied material | orbyn-ui-design |
+| https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/ | W3C ARIA APG modal dialogs | Unverified; review only, no copied material | orbyn-ui-design |
+| https://www.w3.org/WAI/tutorials/forms/validation/ | W3C form validation | Unverified; review only, no copied material | orbyn-ui-design |
+| https://www.w3.org/WAI/WCAG22/Understanding/error-identification | W3C error identification | Unverified; review only, no copied material | orbyn-ui-design |
+| https://www.w3.org/WAI/WCAG22/Understanding/reflow | W3C reflow | Unverified; review only, no copied material | orbyn-ui-design |
 | https://x.com/tobiadonadon_/status/2106430529113301163 | Tobi (@tobiadonadon_) | See source | orbyn-ui-design |
 | [Illyism/seo-skills](https://github.com/Illyism/seo-skills) | Ilias Ism | MIT (stated in README and plugin.json; the repository has no LICENSE file) | orbyn-seo |
 | [kevintngo/statechart-art](https://github.com/kevintngo/statechart-art) | Kevin Ngo | MIT | architect, technical-illustration |
@@ -84,6 +102,7 @@ bundled, and they may carry other licences. Generated from `provenance.json` by
 | [luannn010/orbyn-designer](https://github.com/luannn010/orbyn-designer) | Listed in provenance | See source | orbyn-design-status, orbyn-ui-design |
 | [macro-inc/macro](https://github.com/macro-inc/macro) | Macro contributors | See source | architect, language-best-practices, orbyn-ai-application, orbyn-backend-design, orbyn-ci-design, orbyn-content-design, orbyn-ui-design, orbyn-workflow, tdd |
 | [mattpocock/skills](https://github.com/mattpocock/skills) | Matt Pocock | See source | architect, how, interrogate, orbyn-plan, orbyn-workflow, tdd |
+| [MeLlamoPablo/skills](https://github.com/MeLlamoPablo/skills) | Pablo (MeLlamoPablo), summarize-pr skill | See source | orbyn-workflow |
 | [microsoft/TokenEconomizer](https://github.com/microsoft/TokenEconomizer) | Microsoft Research and UC Berkeley (TokenEconomizer) | Apache-2.0 | orbyn-workflow, reflect |
 | [microsoft/vscode](https://github.com/microsoft/vscode) | Microsoft and VS Code contributors | See source | orbyn-ui-design |
 | [obra/superpowers](https://github.com/obra/superpowers) | Jesse Vincent (obra/superpowers) | MIT | how, orbyn-workflow, tdd |

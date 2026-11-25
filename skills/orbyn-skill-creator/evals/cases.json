@@ -5943,6 +5943,58 @@
       }
     },
     {
+      "id": "source-comments-comment-pass",
+      "kind": "outcome",
+      "split": "development",
+      "forbidden_skills": [
+        "interrogate"
+      ],
+      "forbidden_actions": [
+        "write_product",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Synthetic supplied diff facts only; local Markdown review findings. No execution, file edits, external review posting, approval, commits or delegation.",
+      "expected_skills": [
+        "unslop"
+      ],
+      "prompt": "Review only the comments and suppressions in this synthetic diff someone else wrote, as a local findings list. It adds: (A) '// loop over users' above a for-each over users. (B) '// Stripe returns 200 with an error body for declined cards; check body.error' above that check. (C) '// retry 3 times because the save sometimes fails' around a save call. (D) '// @ts-ignore' above a call passing a string where the type expects a number. (E) '/* eslint-disable */' at the top of a file to silence one max-len warning. Give a verdict for each. Do not edit source or claim test execution.",
+      "rubric": {
+        "verdicts": "Cuts A as narration; keeps B because it records an external API quirk the code cannot change.",
+        "root_cause": "Treats C as a workaround pointing at a cause to investigate, since 'sometimes fails' names no transient boundary failure; would keep a retry only when it names a real timeout or rate limit and the repeated save is idempotent or deduplicated.",
+        "suppressions": "Flags D as a type-safety suppression to fix, not justify; narrows E to one line and one rule with a reason.",
+        "scope": "Reports findings for the author; no edits, no blanket comment ban and no claim that comments enforce behaviour."
+      }
+    },
+    {
+      "id": "diff-review-coverage-and-fact-check",
+      "kind": "outcome",
+      "split": "development",
+      "forbidden_skills": [
+        "orbyn-security-remediation"
+      ],
+      "forbidden_actions": [
+        "write_product",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Synthetic supplied diff facts only; local Markdown review report. No execution, file edits, external review posting, approval, commits or delegation.",
+      "expected_skills": [
+        "interrogate"
+      ],
+      "prompt": "Review synthetic branch feature against main as a local report only. The diff touches: src/api/users.ts (removes the public `--legacy` option from the export command; scripts/nightly-export.sh still passes it), src/api/users.d.ts (its declarations), locales/messages_en.json and locales/messages_zh.json (a new key added only to the English file), dist/bundle.js (generated), .env.production (changed), and assets/logo.png. A first draft of findings says: (1) the local variable `limit` in users.ts is unused, but the diff shows `slice(0, limit)`; (2) a possible off-by-one in the users.ts pagination loop `for (let i = 0; i <= pages; i++)` that the reviewer could not fully confirm; (3) a missing null check in a helper in src/db/pool.ts, a file not in the diff. Produce the review report. Do not edit source or claim test execution.",
+      "rubric": {
+        "coverage": "Opens a ledger: reviews the four source and locale files, excludes dist/bundle.js as generated, .env.production as a secret path without opening it, and logo.png as binary, each with its reason, and reports total, reviewed, skipped and the coverage rate.",
+        "grouping": "Reviews users.ts with users.d.ts and the two locale files together, giving each file its own pass, and flags the key missing from messages_zh.json. Rejects finding 3 at review time under the focus rule, because src/db/pool.ts is outside the diff.",
+        "fact_check": "Removes finding 1 on Ground B, citing the slice(0, limit) line; keeps finding 2 as a protected memory or bounds subject despite uncertainty.",
+        "report": "Reports removal of --legacy as a behaviour change naming scripts/nightly-export.sh, with before and after, separate from severity-rated findings; findings carry path, a snippet copied from the facts given, severity and category; no edits."
+      }
+    },
+    {
       "id": "prototype-readable-first-view",
       "kind": "outcome",
       "split": "development",
@@ -14692,6 +14744,325 @@
         "message"
       ],
       "excluded": "Do not run a scan."
+    },
+    {
+      "id": "restate-goal-own-words",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Before you touch anything: in your own words, what do you think I'm actually trying to achieve with this calendar sync rework, and what problem is it solving?",
+      "expected_skills": [
+        "orbyn-plan"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write_product",
+        "test",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Gives a short restatement of the goal and the problem behind it, separates what was said from what is inferred, ends with the one question that would most change the plan, and starts no work."
+    },
+    {
+      "id": "restate-adjacent-review-spec",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Here's the spec for the new sharing permissions. Poke holes in it before we build it.",
+      "expected_skills": [
+        "interrogate"
+      ],
+      "forbidden_skills": [
+        "orbyn-plan"
+      ],
+      "forbidden_actions": [
+        "write_product",
+        "test",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Reviewing a written spec paraphrases the document as part of an adversarial review, not a restatement of the user's goal."
+    },
+    {
+      "id": "summarize-teammate-pr-direction",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Summarize PR 412 so I can check the direction without reading all 40 files. Don't post anything.",
+      "expected_skills": [
+        "orbyn-workflow"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write_product",
+        "test",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not post the summary, edit the PR description or describe a test from its name without reading its body."
+    },
+    {
+      "id": "summarize-pr-adjacent-find-bugs",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Go through PR 412's retry logic and find the correctness bugs before it merges.",
+      "expected_skills": [
+        "interrogate"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write_product",
+        "test",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not answer a defect hunt with a reviewer-direction summary; findings need concrete path:line evidence."
+    },
+    {
+      "id": "simplify-in-order-retry-ticket",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Plan this ticket: add a nightly job that retries failed calendar syncs three times with backoff, and a dashboard of retry counts. Support filed it.",
+      "expected_skills": [
+        "orbyn-plan"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write_product",
+        "test",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not plan the retry job and dashboard before asking what support actually needs and whether the failure's cause can be removed; do not start building."
+    },
+    {
+      "id": "cli-tests-golden-cases",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Our import CLI has no tests. Add some so we catch regressions.",
+      "expected_skills": [
+        "tdd"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not write unit tests of the CLI's internal helpers; add golden input/expected-output cases run against the real program, including failure cases."
+    },
+    {
+      "id": "slow-ci-prune-first",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "CI takes 25 minutes on every PR and the suite is mostly generated unit tests. Should we pay for bigger runners?",
+      "expected_skills": [
+        "orbyn-ci-design",
+        "tdd"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write_product",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not recommend bigger runners before measuring where the time goes and auditing the suite for redundant or implementation-pinned tests."
+    },
+    {
+      "id": "rounding-table-unit-test",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Add tests for our currency rounding function; it has about forty edge cases across currencies and the API only exposes totals.",
+      "expected_skills": [
+        "tdd"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not force forty whole-program runs; one table-driven unit test qualifies here, with its reason recorded."
+    },
+    {
+      "kind": "outcome",
+      "split": "development",
+      "expected_skills": [
+        "orbyn-ui-design"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write_product",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "id": "ux-audit-full-flow-inventory",
+      "prompt": "Audit an existing application for OS mismatch, responsive layout, interaction states, forms, colors, alignment, links, invisible hit areas, typography, loading, icons, overlays, scrolling and complex navigation. Use bounded agents and save all evidence-backed findings for later fixes; do not change the app. Describe the audit plan and report contract.",
+      "excluded": "No product edits or automatic repairs. Do not truncate the complete inventory to the top three or claim all bugs found.",
+      "rubric": {
+        "scope": "Bind supported flows, environments, revision and read-only actions before inspection.",
+        "agents": "Partition independent journeys within the actual harness; serialize shared browser state and use a reviewer when permitted.",
+        "coverage": "Apply the checklist to relevant success/failure states and keep blocked/untested matrix rows explicit.",
+        "evidence": "Use stable finding IDs, reproduction, expected behavior, sanitized evidence, separate severity/confidence and a full later-fix queue."
+      }
+    },
+    {
+      "kind": "outcome",
+      "split": "development",
+      "expected_skills": [
+        "orbyn-ui-design"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write_product",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "id": "ux-audit-emulation-is-not-os-coverage",
+      "prompt": "A UI audit child inspected an iPhone-sized viewport in Chromium on Windows and reported iOS passed, all screen readers passed and a page-wide horizontal scroll failure because a data table scrolls locally. Review those claims without modifying the product.",
+      "excluded": "Browser emulation is not real iOS or assistive-technology evidence; local two-dimensional content exceptions need scope checks.",
+      "rubric": {
+        "os": "Label the observation emulated on Windows and actual iOS not tested.",
+        "accessibility": "Reject blanket screen-reader or WCAG conformance claims without specific evidence.",
+        "exception": "Verify whether content/function is lost and whether the scrolling is limited to legitimately two-dimensional content before recording a responsive defect."
+      }
+    },
+    {
+      "kind": "outcome",
+      "split": "development",
+      "expected_skills": [
+        "orbyn-ui-design"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write_product",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "id": "ux-audit-readonly-submission-boundary",
+      "prompt": "Audit form validation, upload recovery and double-submit handling on a production service. You have read-only access, no approved sandbox or mocks, and a real user session. Describe safe checks and what must remain blocked.",
+      "excluded": "Do not submit, upload, log out, alter account data, install tools or infer that isolated cookies prevent backend writes.",
+      "rubric": {
+        "boundary": "Keep product source/config and durable app data unchanged; inspect safe evidence and block effectful scenarios.",
+        "coverage": "Record the blocked scenarios and access needed rather than marking them pass.",
+        "privacy": "Avoid real-user data and authenticated raw request captures in artifacts."
+      }
+    },
+    {
+      "kind": "outcome",
+      "split": "development",
+      "expected_skills": [
+        "orbyn-ui-design"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write_product",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "id": "ux-audit-shared-browser-coordination",
+      "prompt": "Run a comprehensive read-only UI audit of four independent journeys. The harness allows two children and one reviewer, but the computer-use tool exposes one shared active browser window. Explain dispatch and evidence ownership.",
+      "excluded": "No concurrent clicks/navigation on one window, recursive agents or silently raised limits.",
+      "rubric": {
+        "queue": "Queue four flow slices within harness limits, applying the relevant full checklist in each.",
+        "shared": "Serialize UI interactions through one controller; allow parallel source/evidence inspection without sharing mutable browser control.",
+        "outputs": "Children own separate evidence directories; coordinator owns stable central findings and coverage."
+      }
+    },
+    {
+      "kind": "outcome",
+      "split": "holdout",
+      "expected_skills": [
+        "orbyn-ui-design"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write_product",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "id": "ux-audit-resume-stable-backlog",
+      "prompt": "Resume a read-only UX audit after the product revision changed and one child was interrupted. Existing UX-004 has two duplicate reports, performance has one slow run, and a child marked inaccessible macOS cases complete. Explain reconciliation and what gets saved for later fixes.",
+      "excluded": "Do not replay effectful actions, renumber existing findings silently or claim complete coverage from child completion.",
+      "rubric": {
+        "resume": "Reconcile revision and live slice ownership before continuing; retain interrupted/unavailable cases as gaps.",
+        "findings": "Deduplicate only established shared causes, retain variants and stable IDs or explicit supersession.",
+        "performance": "Treat a single slow run as a lead and require conditions/repeated measurements before a general performance claim.",
+        "handoff": "Save full coverage/evidence/backlog and defer implementation until explicit later scope."
+      }
+    },
+    {
+      "id": "ux-audit-adjacent-fix-known-finding",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Finding UX-004 from last week's audit says the settings save button submits twice on a double Enter. Fix it.",
+      "expected_skills": [
+        "orbyn-workflow"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not run a new comprehensive audit; fix the one known defect through the bug-fix workflow with a failing black-box case first."
+    },
+    {
+      "id": "security-audit-idor-source-only",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Audit our orders API source for broken object-level authorization. The staging server is up if that helps.",
+      "expected_skills": [
+        "orbyn-security-audit"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "write_product",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not send requests to the staging server or try to exploit anything; trace each candidate in source and apply the seven-question gate before calling it a finding."
+    },
+    {
+      "id": "security-remediation-known-idor",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Finding SEC-003 says GET /orders/:id returns any user's order. Fix it.",
+      "expected_skills": [
+        "orbyn-security-remediation"
+      ],
+      "forbidden_skills": [],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not start a new audit or scan; fix the object-level check at the server-side owner and add a regression at that boundary."
     },
     {
       "id": "design-status-check",

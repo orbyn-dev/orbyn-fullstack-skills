@@ -10,7 +10,8 @@
       "observed": "2026-11-21",
       "use": "The engine. Built from this pinned source; reviewed for ideas only, no text copied (copyleft).",
       "build": {
-        "ocaml": "5.5.0",
+        "ocaml": "5.5.1",
+        "ocaml_note": "the opam file requires >= 5.2.1; the engine's own release scripts and Makefile use 5.5.1; its INSTALL.md says 5.5.0",
         "tools": [
           "opam",
           "dune",
@@ -18,9 +19,13 @@
           "git",
           "cc"
         ],
+        "bash_min": 5,
         "libraries": [
-          "pcre",
-          "gmp"
+          "pcre2",
+          "gmp",
+          "libev",
+          "coreutils",
+          "gettext"
         ],
         "steps": [
           [
@@ -39,7 +44,12 @@
             "core"
           ]
         ],
-        "binary": "bin/opengrep"
+        "binary": "bin/opengrep",
+        "linux": {
+          "image": "alpine:3.22@sha256:49340b346798875b5592e5d420241f2f9cfba5f47e62ebb1446a1b34734e898f",
+          "script": "scripts/build_linux_in_alpine.sh",
+          "note": "Ubuntu 24.04 ships libpcre2 10.42 and the engine needs >= 10.43; install the engine's libraries without apk --no-cache"
+        }
       }
     },
     {

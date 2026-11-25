@@ -1,6 +1,6 @@
 ---
 name: interrogate
-description: "Challenge a specified design, patch or claim for concrete correctness, ownership and evidence gaps. Use for adversarial review, not every routine edit."
+description: "Challenge a specified design, patch or claim for concrete correctness, ownership and evidence gaps, or review a diff, PR or commit file by file with full coverage and fact-checked findings. Use for adversarial and code review, not every routine edit."
 ---
 
 # Interrogate
@@ -18,6 +18,14 @@ Follow the consuming project's instructions and requested scope; use the
 6. **Return findings first,** then checked assumptions and unverified scope, with a supported verdict and its limitations.
 
 For an approval change, ask whether a revoked user or stale client can still apply it and whether a retry duplicates the effect. Return a concrete reproducing state and the affected owner. Keep missing runtime evidence separate from a proven code defect: missing native evidence is an evidence gap, and it is not automatically a source-code defect.
+
+## Review a diff
+
+To review a diff, PR, commit or branch range for defects, follow the
+[diff review](references/diff-review.md) pipeline: a ledger that accounts for every
+file, related files reviewed together, rules matched to file types, a location
+check on every finding and a [fact check](references/diff-review/fact-check.md)
+that removes only findings the diff proves wrong. The report leads with coverage.
 
 ## Paraphrase a document first
 

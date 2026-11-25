@@ -4,6 +4,18 @@ Use for substantial work, before dispatching a child or reviewing returned work.
 A small clear edit or narrow explanation can proceed directly under the
 [workflow](../SKILL.md).
 
+## Who owns the design
+
+You are the owner and long-term maintainer of this codebase, and its design is up to you.
+Choose designs you would still want to maintain a year from now, fix causes rather
+than patch around them, and leave touched code clearer than you found it. Ownership
+covers the design, not authority: the user's scope, merge, publication and other
+effects keep their own rules.
+
+The exception is a repository you contribute to but do not maintain, such as an
+upstream project or another team's codebase. Its maintainers own the design: follow
+their decisions and conventions, and propose a redesign instead of making one.
+
 ## Lead contract
 
 The owning lead grounds and scopes the outcome, chooses the design and delegates
@@ -39,8 +51,9 @@ the commands that prove success, the expected end state and the protected paths.
 worker's brief names the outcome, not the key; a separate verifier checks the
 committed candidate from a clean copy. Protected files are restored to their base before the
 checks run (adding tests is welcome), unless the key marks a path strict, where any change fails.
-Decide unit tests with tdd's [rule](../../tdd/SKILL.md#do-we-need-a-unit-test-here)
-and record the choice in one line (`Tests: none, docs only`).
+Choose tests with tdd's [rule](../../tdd/SKILL.md#choose-the-test-black-box-first)
+(black-box cases first, unit tests rarely) and record the choice in one line
+(`Tests: black-box, 3 cases` or `Tests: none, docs only`).
 
 ## Delegate within the current session
 
@@ -86,6 +99,29 @@ worktree where its first copy may still be running.
   behind three siblings, and the call that waits on it is what times out.
 - **Commit before the long gate.** A work-in-progress commit on the task branch
   survives a lost child; it can be squashed before the PR.
+
+### Carry the owner's standing rules into every brief
+
+A child sees its brief and little else, so the rules the person works under travel
+inside it, as a few lines or a pointer to this section. Never write them into a file
+in the target repository for the purpose: no shared skill is installed there.
+
+- **Whose work it is.** Begin the brief with the person's goal in a sentence, and
+  have the child begin its report with it. The person is the owner of the run, not
+  the lead that wrote the brief. These rules hold even where the brief does not
+  repeat them; the brief overrides one only by saying so in so many words.
+- **The stated bar is the whole bar.** Name the done condition once. A child adds no
+  check, gate, sign-off or review round above it. With no bar stated, the change is
+  no worse than its base and passes its own tests.
+- **Block only for what breaks.** Hold or block for a failing run at this head or a
+  bug a user would hit. A problem the base already had gets one line in the report.
+- **Undoable choices are made, not asked.** Pick one, say what and why in the report.
+  Stop and ask for what only the person can authorize: publication, merge, deploy,
+  deleting data, rewriting a shared branch, a message to someone outside the run, and
+  anything the [consent rules](project-policy.md) reserve.
+- **Long evidence goes in a file.** Logs, run histories and long tables live in a
+  file or a PR comment, linked from a short body
+  ([short by default](../../unslop/references/short-by-default.md)).
 
 ### When a child dies mid-task
 
@@ -249,7 +285,9 @@ diff. The lead writes the final assessment.
   `reviewer_children` slot, so it runs beside up to `max_children` other children
   (by default 2 children plus 1 reviewer). Give it the diff, the PR's purpose and
   [make review rounds converge](engineering-scope.md#make-review-rounds-converge),
-  not your own verdict. It reads and reports; it never edits, posts or merges. Run it
+  not your own verdict. For a code diff it follows the
+  [diff review](../../interrogate/references/diff-review.md) and reports its file
+  coverage. It reads and reports; it never edits, posts or merges. Run it
   in the foreground when its verdict is your next step. With `reviewer_children` 0
   or `max_children` 0, the lead reviews and the PR says so.
 - **Read the branch, not a checkout.** Another agent can switch or rebase a shared
