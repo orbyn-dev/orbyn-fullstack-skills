@@ -90,3 +90,8 @@ Run these in order for each finding and stop at the first that applies:
 
 Return either the removed findings, each with the diff line that disproves it, or
 "keep all". Nothing else: no new findings, no rewording, no reprioritising.
+
+Adapted from the review-filter prompts in Alibaba's [Open Code Review](https://github.com/alibaba/open-code-review/tree/9007ae84e0de7b84d72f9833f6b12a2a731d5cbd)
+at commit `9007ae8`, Apache-2.0 ([licence](open-code-review-LICENSE.txt)). Changed:
+reworded for a reader instead of a tool call, findings for comments, and the output
+returned as text.

@@ -5,11 +5,10 @@ pipeline: the steps that must not go wrong (which files, which rules, where a
 finding points, whether it is true) are mechanical, and judgement goes only into
 the review itself. A general agent left to "review this" skips files on large
 diffs, drifts line numbers and varies with the prompt; each step below closes one
-of those gaps. It favours precision over recall: fewer findings, each one real and
-correctly placed.
+of those gaps.
 
-Steps 1, 4 and 5 run every time. Grouping, planning, the location check and the
-fact-check pass scale with the diff; on a one-file change they take seconds.
+Every step runs every time; on a small diff grouping is one group and the fact
+check takes seconds.
 
 ## 1. Select files and open the ledger
 
@@ -21,22 +20,25 @@ Resolve the mode first and keep it for every later command:
 | Commit | the commit's parent | `git --no-pager show --no-ext-diff --no-textconv --no-color <commit> -- "<path>"` |
 | Workspace | `HEAD` | `git --no-pager diff --no-ext-diff --no-textconv --no-color HEAD -- "<path>"`; read untracked files whole |
 
-`--to` defaults to `HEAD`. A range compares the merge-base with the target and
+`<to>` is `HEAD` unless given. A range compares the merge-base with the target and
 ignores staged, unstaged and untracked work. Always pass `--no-ext-diff`,
 `--no-textconv` and `--no-color` so you read plain patches, not a configured diff
-tool's output. List the files with `--name-status --numstat` in the same mode.
+tool's output. List the files in the same mode with two calls,
+`git diff --name-status` and `git diff --numstat` (one call with both flags prints
+only the first); in workspace mode add `git ls-files --others --exclude-standard`
+for untracked files.
 
 Exclude a file only for one of these reasons, and record the reason:
 
 | Reason | Rule |
 | --- | --- |
 | `binary` | Git reports it as binary. |
-| `secret` | The old or new path looks like a credential file (`.env`, keys, keystores). Never open it. |
-| `user-excluded` | Matches a pattern the user or project gave. An explicit include beats the next three rules. |
+| `secret` | The old or new path is a credential file: `.env` or `.env.*` (but not `.env.example`, `.env.sample` or `.env.template`), `.ssh/`, `id_rsa`, `id_dsa`, `id_ecdsa`, `id_ed25519`, `.netrc`, `_netrc`, `.npmrc`, `.pypirc`, `.dockercfg`. No include rule admits it. Never open it. |
+| `user-excluded` | Matches a pattern the user or project gave. An explicit include beats the next two rules. |
 | `extension` | Not a source, config, query, markup or build file. |
-| `default-path` | Generated, vendored, lock or build output (`node_modules/`, `dist/`, `vendor/`, lockfiles). |
+| `default-path` | Test files, snapshots, fixtures and `testdata/`; generated code (`*.generated.*`, `*.pb.go`, `*.gen.go`, minified bundles); dependency and build output (`node_modules/`, `vendor/`, `dist/`, `target/`, `.venv/`, `Pods/`, framework caches); lockfiles. Review tests only when the user or project includes them. |
 | `deleted` | Removed. Not reviewed, but its old side stays available as context, because a removed interface can still break callers. |
-| `too-large` | Too big to read at once. Write the diff to a file outside the repository with `--output=<absolute path>`, read it all in chunks, then delete it. Exclude only if that also fails. |
+| `too-large` | Too big to read at once. Write the diff to a file outside the repository with `--output=<absolute path>`, read it all in chunks, then delete it. If Git fails or times out, retry, then mark the row `skipped: <error>`. |
 
 Open a ledger with one row per remaining file, keyed by `(path, status)`; a
 workspace can list one path twice, as a staged deletion and an untracked
@@ -60,8 +62,8 @@ Every file belongs to exactly one group, a group may hold one file, and no group
 holds more than ten. Split a group that would not fit one reader's context. Each
 group is reviewed with its own context, so groups can run as parallel reviewer
 children within the [harness limits](../../orbyn-workflow/references/project-policy.md#delegation-and-host-configuration),
-or one after another. Skip grouping when the whole diff is small enough for one
-pass.
+or one after another. A small diff is one group (OCR labels it "small change
+set"), still split at ten files.
 
 ## 3. Match the rules to each group
 
@@ -86,7 +88,10 @@ have, instead of a generic list on every file.
 
 ## 4. Plan, then review each group
 
-For a group with real risk, write a short plan before reading context:
+Give the reviewer of each group: the group's diffs, the list of other changed files
+not in this group, the requirement background if there is one, the group's rules
+and the findings already confirmed in earlier groups. Then write a short plan
+before reading context:
 
 ```text
 Summary: what this change does and how far it reaches
@@ -174,5 +179,8 @@ at commit `9007ae8`: the delegation-mode skill, the planning, review, grouping,
 re-location and review-filter prompts, the default rule document and the file
 selection logic. Apache-2.0; see [the licence](diff-review/open-code-review-LICENSE.txt).
 Changed for Orbyn: rewritten as host-agent steps with no `ocr` CLI or model
-provider, mapped to our language, security and harness owners. The native pipeline
+provider, mapped to our language, security and harness owners; `snippet`, `severity`
+and `category` made required; OCR's "discard likely false positives silently"
+dropped, because removal belongs to the fact check, which keeps what it cannot
+disprove. The native pipeline
 drops a too-large file; we use the delegation skill's chunked read instead.
