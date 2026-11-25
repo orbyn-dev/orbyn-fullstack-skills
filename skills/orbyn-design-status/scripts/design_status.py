@@ -563,17 +563,17 @@ def section_map(html: str | None) -> dict:
 
 
 def current_pull_ref(git: Git, repo: Path, pr: dict) -> str | None:
-    """The remote-tracking ref for a same-repository PR, only when it still points at the PR's head commit.
+    """The commit a same-repository PR's remote-tracking ref points at, only when it is the PR's head commit.
 
     After a force-push the local ref keeps the old commit until the next fetch; its content is not PR evidence.
+    The commit, not the ref name, is returned so a fetch during the check cannot change what is read next.
     """
     if pr.get("fork") or not valid_branch(pr.get("branch", "")):
         return None
-    ref = "refs/remotes/origin/" + pr["branch"]
-    tip = git.rev(repo, ref)
+    tip = git.rev(repo, "refs/remotes/origin/" + pr["branch"])
     if not tip or (pr.get("headSha") and not same_sha(tip, pr["headSha"])):
         return None
-    return ref
+    return tip
 
 
 def gather_design(git: Git, gh, repo: Path, file: str, section: str, planned: bool,
@@ -677,9 +677,13 @@ def scan_markers(git: Git, repo: Path) -> list[tuple[str, str]]:
     return found
 
 
+# Comment terminators and sentence punctuation after a marker; a lone `-` is a valid id character.
+MARKER_TAIL = re.compile(r"""(?:-->|\*/|[.,;:)*/>'"`])+$""")
+
+
 def marker_tokens(line: str) -> list[str]:
     """`design:` marker values on one line, with or without a space after the colon."""
-    return [m.group(1).rstrip(".,;:)*/>'\"`-") for m in MARKER.finditer(line)]
+    return [MARKER_TAIL.sub("", m.group(1)) for m in MARKER.finditer(line)]
 
 
 def confirmed_markers(git: Git, repo: Path, sha: str, key: str, short: str | None) -> list[str]:
@@ -794,7 +798,10 @@ def check(root: Path, project_key: str | None = None, git: Git | None = None, gh
             if info["state"] == "implemented":
                 info["unconfirmed"] = not markers
                 merged = info.get("pr") if isinstance(info.get("pr"), dict) and info["pr"].get("state") == "merged" else {}
-                merge = merged.get("mergeCommit") or (facts.get("tip") if facts and facts["onDefault"] else None)
+                # The proven commit: the PR's merge, a live tip on the default branch, or the recorded commit
+                # that recordedMerged showed on the default branch (its branch may be deleted).
+                merge = (merged.get("mergeCommit") or (facts.get("tip") if facts and facts["onDefault"] else None)
+                         or (build.get("sha") if facts and facts.get("recordedMerged") else None))
                 if app and merge and shipped(git, gh, app, merge, project, base):
                     info["state"] = "shipped"
             mine = sorted({loc for tok, loc in suggestions if tok == f.key or (short and tok == short)})
@@ -846,35 +853,50 @@ def render_markdown(result: dict) -> str:
 
 # ---------------------------------------------------------------- record and clear
 
+def _try_lock(fh) -> bool:
+    try:
+        if os.name == "nt":
+            import msvcrt
+            fh.seek(0)
+            msvcrt.locking(fh.fileno(), msvcrt.LK_NBLCK, 1)
+        else:
+            import fcntl
+            fcntl.flock(fh.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        return True
+    except OSError:
+        return False
+
+
+def _unlock(fh) -> None:
+    if os.name == "nt":
+        import msvcrt
+        fh.seek(0)
+        msvcrt.locking(fh.fileno(), msvcrt.LK_UNLCK, 1)
+    else:
+        import fcntl
+        fcntl.flock(fh.fileno(), fcntl.LOCK_UN)
+
+
 @contextlib.contextmanager
-def status_lock(root: Path, key: str, timeout: float = 30.0, abandoned: float = 120.0):
+def status_lock(root: Path, key: str, timeout: float = 30.0):
     """Serialize one project's status read-modify-write across `record` and `clear` processes.
 
-    Waits up to `timeout`. The lock lives in the temp directory, never in the Designer workspace, so a crash
-    cannot leave a file there for Publish to stage. A lock older than `abandoned` seconds is from a crashed run.
+    An OS file lock (flock, or msvcrt on Windows) held on an open handle: only its holder can release it, and
+    the system releases it when a process exits, so no run ever has to judge or delete an abandoned lock.
+    The lock file lives in the temp directory, never in the Designer workspace, and is never removed.
     """
     digest = hashlib.sha256(str(status_path(root, key).resolve()).encode("utf-8")).hexdigest()[:24]
     lock = Path(tempfile.gettempdir()) / f"orbyn-design-status-{digest}.lock"
     deadline = time.monotonic() + timeout
-    while True:
-        try:
-            fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-            os.close(fd)
-            break
-        except FileExistsError:
-            try:
-                if time.time() - lock.stat().st_mtime > abandoned:
-                    lock.unlink(missing_ok=True)
-                    continue
-            except OSError:
-                continue
+    with open(lock, "a+b") as fh:
+        while not _try_lock(fh):
             if time.monotonic() > deadline:
-                raise SystemExit(f"Status for {key} is being changed by another process; try again") from None
+                raise SystemExit(f"Status for {key} is being changed by another process; try again")
             time.sleep(0.05)
-    try:
-        yield
-    finally:
-        lock.unlink(missing_ok=True)
+        try:
+            yield
+        finally:
+            _unlock(fh)
 
 
 def record(root: Path, ident: str, branch: str, repo: str | None = None, pr: str | None = None,

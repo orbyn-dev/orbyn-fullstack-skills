@@ -55,6 +55,32 @@ class ParityTests(Fixture):
         self.settings(releaseTagPattern="v[0-9].?")
         self.assertEqual(self.frame()[0]["build"], "shipped")
 
+    def test_recorded_merge_with_deleted_branch_can_ship(self):
+        tip = self.branch("feat/x")
+        git(self.app, "merge", "-q", "--no-ff", "feat/x", "-m", "merged")
+        git(self.app, "branch", "-D", "feat/x")
+        set_origin_main(self.app)
+        git(self.app, "tag", "v1", "main")
+        self.set_status({self.key(): {"build": {"repo": "../app", "branch": "feat/x", "sha": tip}}})
+        gh = FakeGh(True)  # no pull requests at all: the recorded commit alone is the evidence
+        self.assertEqual(self.frame(gh=gh)[0]["build"], "implemented")
+        self.settings(releaseTagPattern="v*")
+        self.assertEqual(self.frame(gh=gh)[0]["build"], "shipped")
+
+    def test_marker_ids_keep_a_trailing_hyphen(self):
+        self.assertEqual(ds.marker_tokens("// design: p/one-"), ["p/one-"])
+        for line in ("// design: p/one", "<!-- design: p/one -->", "<!-- design:p/one-->", "/* design: p/one */",
+                     "design: p/one.", "(design: p/one)", "`design: p/one`"):
+            with self.subTest(line=line):
+                self.assertEqual(ds.marker_tokens(line), ["p/one"])
+
+    def test_pull_content_is_read_from_the_checked_commit(self):
+        git(self.designs, "update-ref", "refs/remotes/origin/design/a", "main")
+        head = git(self.designs, "rev-parse", "main")
+        pr = {"branch": "design/a", "state": "open", "number": 5, "headSha": head}
+        self.assertEqual(ds.current_pull_ref(ds.Git(), self.designs, pr), head)
+        self.assertIsNone(ds.current_pull_ref(ds.Git(), self.designs, dict(pr, headSha="3" * 40)))
+
     def test_deploy_ship_checks_ancestry_and_default_branch(self):
         self.merged()
         self.settings(deployWorkflow="deploy.yml")

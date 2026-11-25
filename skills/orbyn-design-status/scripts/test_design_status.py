@@ -416,6 +416,23 @@ class RecordClearTests(Fixture):
             pass
         self.assertEqual([p.name for p in (self.root / "workspace" / "status").iterdir() if p.name.endswith(".lock")], [])
 
+    def test_lock_held_by_another_process_blocks_and_frees_on_exit(self):
+        script = ("import sys, time; sys.path.insert(0, sys.argv[1]); import design_status as ds; from pathlib import Path\n"
+                  "with ds.status_lock(Path(sys.argv[2]), 'p'):\n    print('held', flush=True); time.sleep(30)\n")
+        child = subprocess.Popen([sys.executable, "-c", script, str(Path(ds.__file__).parent), str(self.root)],
+                                 stdout=subprocess.PIPE, text=True)
+        try:
+            self.assertEqual(child.stdout.readline().strip(), "held")
+            with self.assertRaisesRegex(SystemExit, "another process"):
+                with ds.status_lock(self.root, "p", timeout=0.3):
+                    pass
+        finally:
+            child.kill()
+            child.wait()
+            child.stdout.close()
+        with ds.status_lock(self.root, "p", timeout=5):  # the system released the dead process's lock
+            pass
+
     def test_record_keeps_designer_base_sha_on_other_frames(self):
         base = git(self.app, "rev-parse", "main")
         self.set_status({self.key("two"): {"build": {"repo": "../app", "branch": "feat/b", "sha": base,
