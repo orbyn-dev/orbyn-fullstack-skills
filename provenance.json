@@ -743,6 +743,13 @@
           "effort": "medium",
           "date": "2026-11-09",
           "scope": "Paraphrase a design document before listing findings; an unrestatable section is a blocker"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-25",
+          "scope": "Diff review pipeline and fact check adapted from Alibaba Open Code Review 9007ae8"
         }
       ],
       "incorporated_material": [
@@ -769,6 +776,28 @@
           "license_file": "skills/interrogate/references/ecc-LICENSE.txt",
           "license_sha256": "326146379f01bb137c0a5d3c54770c1aa31076705c8b88a7f6b26a460f6221b2",
           "changes": "Dual-review loop idea only; the slash command and outside-model reviewer are not adopted. Reviewed at the pinned ECC revision only; written in Orbyn voice with synthetic examples, nothing run from the source."
+        },
+        {
+          "source": "https://github.com/alibaba/open-code-review/tree/9007ae84e0de7b84d72f9833f6b12a2a731d5cbd",
+          "revision": "9007ae84e0de7b84d72f9833f6b12a2a731d5cbd",
+          "license": "Apache-2.0",
+          "local_path": "skills/interrogate/references/diff-review.md",
+          "license_file": "skills/interrogate/references/diff-review/open-code-review-LICENSE.txt",
+          "relationship": "selected-maintained-adaptation",
+          "copyright": "Copyright 2026 alibaba/open-code-review Contributors",
+          "license_sha256": "1945665fdb6968a66ea29438ddee0aee23035365c862e5c4a75b62b303340acf",
+          "changes": "Rewritten as host-agent steps with no ocr CLI or model provider; mapped to Orbyn language, security and harness owners; snippet, severity and category required; silent false-positive discard dropped in favour of the fact check; too-large files read in chunks as in the delegation skill. Removed guards reportable with old-side lines; commit mode diffs against the first parent."
+        },
+        {
+          "source": "https://github.com/alibaba/open-code-review/tree/9007ae84e0de7b84d72f9833f6b12a2a731d5cbd",
+          "revision": "9007ae84e0de7b84d72f9833f6b12a2a731d5cbd",
+          "license": "Apache-2.0",
+          "local_path": "skills/interrogate/references/diff-review/fact-check.md",
+          "license_file": "skills/interrogate/references/diff-review/open-code-review-LICENSE.txt",
+          "relationship": "selected-maintained-adaptation",
+          "copyright": "Copyright 2026 alibaba/open-code-review Contributors",
+          "license_sha256": "1945665fdb6968a66ea29438ddee0aee23035365c862e5c4a75b62b303340acf",
+          "changes": "Rewritten as host-agent steps with no ocr CLI or model provider; mapped to Orbyn language, security and harness owners; snippet, severity and category required; silent false-positive discard dropped in favour of the fact check; too-large files read in chunks as in the delegation skill. Removed guards reportable with old-side lines; commit mode diffs against the first parent."
         }
       ]
     },
@@ -1753,6 +1782,13 @@
           "effort": "medium",
           "date": "2026-11-25",
           "scope": "Eval case for the comment pass in unslop"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-25",
+          "scope": "Link or eval case for the diff review pipeline"
         }
       ],
       "reviewed_inspiration": [
@@ -3214,6 +3250,13 @@
           "effort": "medium",
           "date": "2026-11-23",
           "scope": "Feature and bug-fix playbooks default to black-box cases"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-25",
+          "scope": "Link or eval case for the diff review pipeline"
         }
       ]
     },
@@ -4501,6 +4544,13 @@
           "effort": "medium",
           "date": "2026-11-18",
           "scope": "Rust porting traps adapted from rust-anything (MIT)"
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5 (lead)",
+          "effort": "medium",
+          "date": "2026-11-25",
+          "scope": "Link or eval case for the diff review pipeline"
         }
       ],
       "reviewed_inspiration": [

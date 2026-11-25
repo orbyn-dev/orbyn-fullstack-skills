@@ -285,7 +285,9 @@ diff. The lead writes the final assessment.
   `reviewer_children` slot, so it runs beside up to `max_children` other children
   (by default 2 children plus 1 reviewer). Give it the diff, the PR's purpose and
   [make review rounds converge](engineering-scope.md#make-review-rounds-converge),
-  not your own verdict. It reads and reports; it never edits, posts or merges. Run it
+  not your own verdict. For a code diff it follows the
+  [diff review](../../interrogate/references/diff-review.md) and reports its file
+  coverage. It reads and reports; it never edits, posts or merges. Run it
   in the foreground when its verdict is your next step. With `reviewer_children` 0
   or `max_children` 0, the lead reviews and the PR says so.
 - **Read the branch, not a checkout.** Another agent can switch or rebase a shared

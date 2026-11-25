@@ -5969,6 +5969,32 @@
       }
     },
     {
+      "id": "diff-review-coverage-and-fact-check",
+      "kind": "outcome",
+      "split": "development",
+      "forbidden_skills": [
+        "orbyn-security-remediation"
+      ],
+      "forbidden_actions": [
+        "write_product",
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Synthetic supplied diff facts only; local Markdown review report. No execution, file edits, external review posting, approval, commits or delegation.",
+      "expected_skills": [
+        "interrogate"
+      ],
+      "prompt": "Review synthetic branch feature against main as a local report only. The diff touches: src/api/users.ts (removes the public `--legacy` option from the export command; scripts/nightly-export.sh still passes it), src/api/users.d.ts (its declarations), locales/messages_en.json and locales/messages_zh.json (a new key added only to the English file), dist/bundle.js (generated), .env.production (changed), and assets/logo.png. A first draft of findings says: (1) the local variable `limit` in users.ts is unused, but the diff shows `slice(0, limit)`; (2) a possible off-by-one in the users.ts pagination loop `for (let i = 0; i <= pages; i++)` that the reviewer could not fully confirm; (3) a missing null check in a helper in src/db/pool.ts, a file not in the diff. Produce the review report. Do not edit source or claim test execution.",
+      "rubric": {
+        "coverage": "Opens a ledger: reviews the four source and locale files, excludes dist/bundle.js as generated, .env.production as a secret path without opening it, and logo.png as binary, each with its reason, and reports total, reviewed, skipped and the coverage rate.",
+        "grouping": "Reviews users.ts with users.d.ts and the two locale files together, giving each file its own pass, and flags the key missing from messages_zh.json. Rejects finding 3 at review time under the focus rule, because src/db/pool.ts is outside the diff.",
+        "fact_check": "Removes finding 1 on Ground B, citing the slice(0, limit) line; keeps finding 2 as a protected memory or bounds subject despite uncertainty.",
+        "report": "Reports removal of --legacy as a behaviour change naming scripts/nightly-export.sh, with before and after, separate from severity-rated findings; findings carry path, a snippet copied from the facts given, severity and category; no edits."
+      }
+    },
+    {
       "id": "prototype-readable-first-view",
       "kind": "outcome",
       "split": "development",

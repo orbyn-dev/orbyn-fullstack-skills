@@ -125,6 +125,7 @@ Search callers first, including reflection, configuration and public APIs.
 Give each change one purpose. Read the full diff as a reviewer before finishing.
 
 - Do: check that every hunk is needed, debug output is gone, failure paths work and all callers moved.
+- Do: for someone else's diff, or one larger than a few files, use the [diff review](../../interrogate/references/diff-review.md) so no file is skipped and each finding is placed and fact-checked.
 - Do: run the formatter and relevant checks your task authorizes, then report what you ran and skipped under [prove it works](../../orbyn-workflow/references/principles/prove-it-works.md).
 - Avoid: reformatting untouched lines, drive-by renames, or claiming success from a clean compile.
 
