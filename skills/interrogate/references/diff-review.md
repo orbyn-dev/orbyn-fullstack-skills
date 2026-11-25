@@ -18,18 +18,22 @@ Resolve the mode first and keep it for every later command:
 | --- | --- | --- |
 | Range (branch or PR) | `git merge-base <from> <to>` | `git --literal-pathspecs --no-pager diff --no-ext-diff --no-textconv --no-color <merge_base>..<to> -- "<path>"` |
 | Commit | its first parent, `<commit>^1` | `git --literal-pathspecs --no-pager diff --no-ext-diff --no-textconv --no-color <commit>^1 <commit> -- "<path>"`; for a root commit, list files against the empty tree (`git --literal-pathspecs diff --name-status $(git hash-object -t tree /dev/null) <commit>`) and read each patch with `git --literal-pathspecs --no-pager show --no-ext-diff --no-textconv --no-color <commit> -- "<path>"` |
-| Workspace | `HEAD` | `git --literal-pathspecs --no-pager diff --no-ext-diff --no-textconv --no-color HEAD -- "<path>"`; read untracked files whole |
+| Workspace | `HEAD` | Staged: `git --literal-pathspecs --no-pager diff --cached --no-ext-diff --no-textconv --no-color HEAD -- "<path>"`. Unstaged: `git --literal-pathspecs --no-pager diff --no-ext-diff --no-textconv --no-color -- "<path>"` (working tree against the index). Review both when both exist, since staged content is what gets committed even if the working copy was reverted. Read untracked files whole |
 
 `<to>` is `HEAD` unless given. A range compares the merge-base with the target and
 ignores staged, unstaged and untracked work. Always pass `--no-ext-diff`,
 `--no-textconv` and `--no-color` so you read plain patches, not a configured diff
 tool's output. Pass `--literal-pathspecs` too, so a path such as `:!notes.md`
 is read as a file name, not as Git pathspec magic that could pull in other files,
-secret ones included. For a rename row, read the patch with both paths
-(`-- "<old_path>" "<new_path>"`), or a guard removed during the rename shows up as
-a plain addition. List the files in the same mode with two calls,
+secret ones included. For a rename row, read the patch with both paths, or a guard
+removed during the rename shows up as a plain addition. Name them exactly and shut
+out anything below them, since a literal path still matches a directory's files
+(rename `config` to `config.old` and add `config/.env`, and a plain two-path diff
+prints the `.env`): drop `--literal-pathspecs` for this one command and pass
+`-- ":(literal)<old_path>" ":(literal)<new_path>" ":(exclude,literal)<old_path>/" ":(exclude,literal)<new_path>/"`. List the files in the same mode with two calls,
 `git diff --name-status` and `git diff --numstat` (one call with both flags prints
-only the first); in workspace mode add `git ls-files --others --exclude-standard`
+only the first); in workspace mode list staged (`--cached`) and unstaged changes
+separately, as their own ledger rows, and add `git ls-files --others --exclude-standard`
 for untracked files.
 
 Exclude a file only for one of these reasons, and record the reason:
