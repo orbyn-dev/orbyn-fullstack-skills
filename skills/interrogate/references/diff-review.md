@@ -53,9 +53,10 @@ Exclude a file only for one of these reasons, and record the reason:
 | `deleted` | Removed. Not reviewed, but its old side stays available as context, because a removed interface can still break callers. |
 | `too-large` | Too big to read at once. Write the diff to a file outside the repository with `--output=<absolute path>`, read it all in chunks, then delete it. If Git fails or times out, retry, then mark the row `skipped: <error>`. |
 
-Open a ledger with one row per remaining file, keyed by `(path, status)`; a
-workspace can list one path twice, as a staged deletion and an untracked
-re-creation. Every row must end as `reviewed` or `skipped: <concrete reason>`
+Open a ledger with one row per remaining file, keyed by `(path, status, layer)`,
+where `layer` is `staged`, `unstaged` or `untracked` in workspace mode and `commit`
+otherwise. A workspace can list one path twice: a staged and an unstaged edit, or a
+staged deletion and an untracked re-creation. Every row must end as `reviewed` or `skipped: <concrete reason>`
 (for example, the diff command failed and a retry also failed). Never omit a row
 silently. If a diff comes back unexpectedly empty, list the files again before
 believing it.
