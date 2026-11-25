@@ -786,7 +786,7 @@
           "relationship": "selected-maintained-adaptation",
           "copyright": "Copyright 2026 alibaba/open-code-review Contributors",
           "license_sha256": "1945665fdb6968a66ea29438ddee0aee23035365c862e5c4a75b62b303340acf",
-          "changes": "Rewritten as host-agent steps with no ocr CLI or model provider; mapped to Orbyn language, security and harness owners; snippet, severity and category required; silent false-positive discard dropped in favour of the fact check; too-large files read in chunks as in the delegation skill."
+          "changes": "Rewritten as host-agent steps with no ocr CLI or model provider; mapped to Orbyn language, security and harness owners; snippet, severity and category required; silent false-positive discard dropped in favour of the fact check; too-large files read in chunks as in the delegation skill. Removed guards reportable with old-side lines; commit mode diffs against the first parent."
         },
         {
           "source": "https://github.com/alibaba/open-code-review/tree/9007ae84e0de7b84d72f9833f6b12a2a731d5cbd",
@@ -797,7 +797,7 @@
           "relationship": "selected-maintained-adaptation",
           "copyright": "Copyright 2026 alibaba/open-code-review Contributors",
           "license_sha256": "1945665fdb6968a66ea29438ddee0aee23035365c862e5c4a75b62b303340acf",
-          "changes": "Rewritten as host-agent steps with no ocr CLI or model provider; mapped to Orbyn language, security and harness owners; snippet, severity and category required; silent false-positive discard dropped in favour of the fact check; too-large files read in chunks as in the delegation skill."
+          "changes": "Rewritten as host-agent steps with no ocr CLI or model provider; mapped to Orbyn language, security and harness owners; snippet, severity and category required; silent false-positive discard dropped in favour of the fact check; too-large files read in chunks as in the delegation skill. Removed guards reportable with old-side lines; commit mode diffs against the first parent."
         }
       ]
     },

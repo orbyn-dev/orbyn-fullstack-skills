@@ -17,7 +17,7 @@ Resolve the mode first and keep it for every later command:
 | Mode | Base | Diff command |
 | --- | --- | --- |
 | Range (branch or PR) | `git merge-base <from> <to>` | `git --no-pager diff --no-ext-diff --no-textconv --no-color <merge_base>..<to> -- "<path>"` |
-| Commit | the commit's parent | `git --no-pager show --no-ext-diff --no-textconv --no-color <commit> -- "<path>"` |
+| Commit | its first parent, `<commit>^1` | `git --no-pager diff --no-ext-diff --no-textconv --no-color <commit>^1 <commit> -- "<path>"`; for a root commit, `git --no-pager show --no-ext-diff --no-textconv --no-color <commit> -- "<path>"` |
 | Workspace | `HEAD` | `git --no-pager diff --no-ext-diff --no-textconv --no-color HEAD -- "<path>"`; read untracked files whole |
 
 `<to>` is `HEAD` unless given. A range compares the merge-base with the target and
@@ -113,8 +113,10 @@ Then review the group under these rules:
 - Review every file in the group on its own pass. Reviewing an implementation does
   not cover its header, interface, config or test counterpart, and being the
   smaller file is no reason to skip one.
-- Comment only on added or changed code. Deleted lines are context. Do not comment
-  on correct code, unchanged code, code comments or generated markers unless asked.
+- Comment only on added or changed code. Deleted lines are context, with one
+  exception: a removed guard, check or behaviour is a finding when the code it
+  protected still runs. Do not comment on correct code, unchanged code outside the
+  hunk, code comments or generated markers unless asked.
 - Look across the group for inconsistencies, missing updates and broken contracts.
 - Use context tools (read, search, `git log`, `git blame`,
   `git show <ref>:<path>`) to confirm, not to widen the review: every finding must
@@ -132,7 +134,8 @@ Mark the file's ledger row once its own pass is done.
 | --- | --- | --- |
 | `path` | yes | File path relative to the repository root |
 | `snippet` | yes | The lines the finding is about, copied from the diff |
-| `start_line`, `end_line` | when known | Lines in the new file |
+| `start_line`, `end_line` | when known | Lines in the new file; for a removal, the surviving lines of the hunk the removal sits in |
+| `old_start_line`, `old_end_line` | for a removal | Lines in the old file, when the hunk has no surviving lines |
 | `severity` | yes | `critical`, `high`, `medium` or `low` |
 | `category` | yes | `bug`, `security`, `performance`, `maintainability`, `test`, `style`, `documentation` or `other` |
 | `content` | yes | What is wrong, the scenario that triggers it and the impact |
@@ -141,7 +144,7 @@ Mark the file's ledger row once its own pass is done.
 
 Before reporting, find each finding's `snippet` in its file's diff. If it does not
 match, re-locate it: copy, word for word from the diff, the smallest contiguous run
-of lines the finding is about; strip the leading `+`, `-` or space; take no
+of lines the finding is about (for a removal, the `-` lines); strip the leading `+`, `-` or space; take no
 surrounding context; and if several places fit, pick the single most relevant one.
 Then recompute `start_line` and `end_line` from that snippet. A finding whose code
 is not in its file's diff at all goes to the fact check under Ground A.
@@ -182,5 +185,7 @@ Changed for Orbyn: rewritten as host-agent steps with no `ocr` CLI or model
 provider, mapped to our language, security and harness owners; `snippet`, `severity`
 and `category` made required; OCR's "discard likely false positives silently"
 dropped, because removal belongs to the fact check, which keeps what it cannot
-disprove. The native pipeline
+disprove; removed guards are reportable, with old-side lines, where OCR keeps
+deleted code as context only; commit mode diffs against the first parent so a
+merge commit's changes are not hidden by a combined diff. The native pipeline
 drops a too-large file; we use the delegation skill's chunked read instead.
