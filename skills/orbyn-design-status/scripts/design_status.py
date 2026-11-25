@@ -491,6 +491,10 @@ def build_state(frame: dict, facts: dict | None = None) -> dict:
     opened = next((p for p in pulls or [] if p["state"] == "open" and current(p)), None)
     if opened:
         return {"state": "building", "reason": "Pull request open", "pr": opened}
+    if tip and facts.get("diverged"):
+        # The branch was reset or rewritten: neither its commits nor a PR merged from its new tip describe the
+        # recorded build, so no merge evidence is accepted until the branch is recorded again.
+        return {"state": "building", "reason": f"Branch {build['branch']} no longer contains the recorded commit; record it again"}
     own = bool(tip and sha and not same_sha(tip, sha) and facts.get("onDefault") and facts.get("ownCommits"))
     if facts.get("recordedMerged") or own or merged:
         out = {"state": "implemented", "reason": "Branch merged into main" if facts.get("recordedMerged") or own else "Pull request merged"}
@@ -500,9 +504,6 @@ def build_state(frame: dict, facts: dict | None = None) -> dict:
                 out["merged"] = merged["mergedAt"]
         return out
     if tip:
-        if facts.get("diverged"):
-            # The branch was reset or rewritten: its commits no longer describe the recorded build.
-            return {"state": "building", "reason": f"Branch {build['branch']} no longer contains the recorded commit; record it again"}
         return {"state": "building", "reason": "Branch not merged yet"}
     closed = next((p for p in pulls or [] if p["state"] == "closed"), None)
     if closed:

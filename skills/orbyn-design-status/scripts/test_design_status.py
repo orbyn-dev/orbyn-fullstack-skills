@@ -247,6 +247,11 @@ class BuildStateTests(Fixture):
         row = self.frame()[0]
         self.assertEqual(row["build"], "building")
         self.assertEqual(row["buildInfo"]["reason"], "Branch feat/p-one no longer contains the recorded commit; record it again")
+        # A PR merged from the rewritten tip is not evidence for the recorded build either.
+        merged = {"headRefName": "feat/p-one", "state": "MERGED", "url": "u", "number": 7, "headRefOid": side}
+        row = self.frame(gh=FakeGh(True, [merged]))[0]
+        self.assertEqual((row["build"], row["buildInfo"]["reason"]),
+                         ("building", "Branch feat/p-one no longer contains the recorded commit; record it again"))
         # Still implemented when the recorded commit is in the merged tip's history.
         git(self.app, "checkout", "-q", "feat/p-one")
         git(self.app, "reset", "-q", "--hard", recorded)

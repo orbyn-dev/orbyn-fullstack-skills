@@ -5345,7 +5345,7 @@
           "effort": "medium",
           "date": "2026-11-25",
           "human_role": "turned on Auto-fix for the PR; reviews and merges",
-          "scope": "Address CodeRabbit review: port Designer buildState head-SHA and open-first PR rules and recordedMerged, require the recorded commit in the tip's history, check PR heads against tracking refs, ls-tree -z, one marker parser, PR reference and fork-head validation, isolated git/gh environment, per-project status lock, keep baseSha; docs and test discovery. Second round: read PR content from the checked commit, keep trailing hyphens in marker ids, ship recorded merges with deleted branches, OS file lock instead of stale-lock removal. Third round: pin gh to github.com despite GH_HOST, name a diverged branch, require a valid matching PR head SHA and note missing refs as unverified."
+          "scope": "Address CodeRabbit review: port Designer buildState head-SHA and open-first PR rules and recordedMerged, require the recorded commit in the tip's history, check PR heads against tracking refs, ls-tree -z, one marker parser, PR reference and fork-head validation, isolated git/gh environment, per-project status lock, keep baseSha; docs and test discovery. Second round: read PR content from the checked commit, keep trailing hyphens in marker ids, ship recorded merges with deleted branches, OS file lock instead of stale-lock removal. Third round: pin gh to github.com despite GH_HOST, name a diverged branch, require a valid matching PR head SHA and note missing refs as unverified. Fourth round: a diverged branch blocks all merge evidence, including a PR merged from its new tip."
         }
       ],
       "reviewed_inspiration": [
