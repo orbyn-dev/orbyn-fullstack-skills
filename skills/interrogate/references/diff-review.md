@@ -17,7 +17,7 @@ Resolve the mode first and keep it for every later command:
 | Mode | Base | Diff command |
 | --- | --- | --- |
 | Range (branch or PR) | `git merge-base <from> <to>` | `git --no-pager diff --no-ext-diff --no-textconv --no-color <merge_base>..<to> -- "<path>"` |
-| Commit | its first parent, `<commit>^1` | `git --no-pager diff --no-ext-diff --no-textconv --no-color <commit>^1 <commit> -- "<path>"`; for a root commit, `git --no-pager show --no-ext-diff --no-textconv --no-color <commit> -- "<path>"` |
+| Commit | its first parent, `<commit>^1` | `git --no-pager diff --no-ext-diff --no-textconv --no-color <commit>^1 <commit> -- "<path>"`; for a root commit, list files against the empty tree (`git diff --name-status $(git hash-object -t tree /dev/null) <commit>`) and read each patch with `git --no-pager show --no-ext-diff --no-textconv --no-color <commit> -- "<path>"` |
 | Workspace | `HEAD` | `git --no-pager diff --no-ext-diff --no-textconv --no-color HEAD -- "<path>"`; read untracked files whole |
 
 `<to>` is `HEAD` unless given. A range compares the merge-base with the target and
@@ -146,7 +146,10 @@ Before reporting, find each finding's `snippet` in its file's diff. If it does n
 match, re-locate it: copy, word for word from the diff, the smallest contiguous run
 of lines the finding is about (for a removal, the `-` lines); strip the leading `+`, `-` or space; take no
 surrounding context; and if several places fit, pick the single most relevant one.
-Then recompute `start_line` and `end_line` from that snippet. A finding whose code
+Then recompute `start_line` and `end_line` from that snippet. For a removal,
+recompute `old_start_line` and `old_end_line` from the old-file positions of the
+`-` lines, and set `start_line` and `end_line` to the hunk's surviving lines, or
+leave them unset when it has none. A finding whose code
 is not in its file's diff at all goes to the fact check under Ground A.
 
 ## 7. Fact-check the findings
