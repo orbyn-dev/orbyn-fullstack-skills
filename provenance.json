@@ -5338,6 +5338,14 @@
           "date": "2026-11-16",
           "human_role": "requested the three confirmed parity fixes and scoped both worktree commits",
           "scope": "Fix colliding rename destinations, preserve inline whitespace in normalization, and accept fork-qualified build heads with PR evidence; add shared normalization and rename regression cases in Python and Designer."
+        },
+        {
+          "tool": "Claude Code",
+          "model": "claude-opus-5-5",
+          "effort": "medium",
+          "date": "2026-11-25",
+          "human_role": "turned on Auto-fix for the PR; reviews and merges",
+          "scope": "Address CodeRabbit review: port Designer buildState head-SHA and open-first PR rules and recordedMerged, require the recorded commit in the tip's history, check PR heads against tracking refs, ls-tree -z, one marker parser, PR reference and fork-head validation, isolated git/gh environment, per-project status lock, keep baseSha; docs and test discovery."
         }
       ],
       "reviewed_inspiration": [

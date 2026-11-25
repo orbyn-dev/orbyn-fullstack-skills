@@ -1,6 +1,7 @@
 """Git/CLI regressions around the shared pure lifecycle rules."""
 import json
 import unittest
+import unittest.mock
 
 import design_status as ds
 from test_design_status import Fixture, FakeGh, git, commit_all, set_origin_main, page
@@ -206,10 +207,10 @@ class ParityTests(Fixture):
 
     def test_fork_head_without_pr_cannot_borrow_local_branch(self):
         self.branch("feat/x")
-        with self.assertRaises(SystemExit):
-            ds.record(self.root, "p/one", "alice:feat/x")
-        recorded = ds.record(self.root, "p/one", "alice:feat/x", allow_missing=True)
-        self.assertNotIn("sha", recorded["build"])
+        # `gh pr list --head` cannot find owner:branch, so a fork head without its PR could never advance.
+        for allow_missing in (False, True):
+            with self.subTest(allow_missing=allow_missing), self.assertRaisesRegex(SystemExit, "--pr"):
+                ds.record(self.root, "p/one", "alice:feat/x", allow_missing=allow_missing)
         self.assertIsNone(ds.Git().branch_tip(self.app, "alice:feat/x"))
 
     def test_record_rejects_invalid_fork_owner_or_branch(self):
@@ -234,6 +235,36 @@ class GhAdapterTests(unittest.TestCase):
         self.assertTrue(ds.matches_tag("v2", "v[!a-z]"))
         self.assertFalse(ds.matches_tag("v2", "v[z-a]"))
         self.assertTrue(ds.matches_tag("v2", "v[^2]"))
+
+    def test_deploy_runs_are_bound_to_the_app_origin(self):
+        gh = ds.Gh()
+        calls = []
+        gh.query = lambda repo, *args: calls.append(args) or []
+        gh.origin = lambda repo: "owner/app"
+        gh.runs("repo", "deploy.yml", "main")
+        self.assertEqual(calls[0][:4], ("run", "list", "--repo", "owner/app"))
+        gh.origin = lambda repo: None
+        self.assertIsNone(gh.runs("repo", "deploy.yml", "main"))
+        self.assertEqual(len(calls), 1)
+
+    def test_fork_head_is_never_sent_to_head_filter(self):
+        gh = ds.Gh()
+        gh.origin = lambda repo: "owner/app"
+        gh.query = lambda repo, *args: self.fail("queried " + " ".join(args))
+        self.assertIsNone(gh.prs("repo", head="alice:feat/x"))
+
+    def test_child_env_drops_repository_location_and_gh_repo(self):
+        with unittest.mock.patch.dict("os.environ", {"GIT_DIR": "x", "GIT_INDEX_FILE": "y", "GH_REPO": "fork/app", "KEEP": "1"}):
+            env = ds.child_env(GIT_TERMINAL_PROMPT="0")
+        self.assertFalse({"GIT_DIR", "GIT_INDEX_FILE", "GH_REPO"} & set(env))
+        self.assertEqual((env["KEEP"], env["GIT_TERMINAL_PROMPT"]), ("1", "0"))
+
+    def test_pr_reference_validation_is_shared(self):
+        self.assertEqual(ds.pr_number("12", None), "12")
+        self.assertEqual(ds.pr_number("https://github.com/owner/app/pull/12", "owner/app"), "12")
+        for bad in ("0", "-1", "https://github.com/fork/app/pull/12", "https://example.test/pull/12"):
+            self.assertIsNone(ds.pr_number(bad, "owner/app"))
+        self.assertIsNone(ds.pr_number("https://github.com/owner/app/pull/12", None))
 
     def test_open_prs_paginate_past_100(self):
         gh = ds.Gh()

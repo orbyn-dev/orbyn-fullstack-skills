@@ -8,6 +8,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import unittest.mock
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -15,9 +16,10 @@ import design_status as ds  # noqa: E402
 
 
 def git(repo: Path, *args: str) -> str:
+    # Same isolation as the script: an inherited GIT_DIR (as in a Git hook) must not redirect fixture setup.
     p = subprocess.run(["git", "-C", str(repo), "-c", "user.name=t", "-c", "user.email=t@example.com",
                         "-c", "commit.gpgsign=false", "-c", "core.autocrlf=false", *args],
-                       capture_output=True, text=True, check=True)
+                       capture_output=True, text=True, check=True, env=ds.child_env())
     return p.stdout.strip()
 
 
@@ -220,6 +222,57 @@ class BuildStateTests(Fixture):
         self.assertEqual(row["suggestedMarkers"], ["src/a.ts:1"])
         self.assertEqual(self.frame("two")[0]["suggestedMarkers"], [])
 
+    def test_merged_pr_from_an_earlier_use_of_the_branch_is_not_evidence(self):
+        base = git(self.app, "rev-parse", "main")
+        tip = self.branch("feat/p-one")
+        self.set_status({self.key(): {"build": self.build(sha=base)}})
+        old = {"headRefName": "feat/p-one", "state": "MERGED", "url": "u1", "number": 11, "headRefOid": "1" * 40}
+        self.assertEqual(self.frame(gh=FakeGh(True, [old]))[0]["build"], "building")
+        reopened = {"headRefName": "feat/p-one", "state": "OPEN", "url": "u2", "number": 22, "headRefOid": tip}
+        row = self.frame(gh=FakeGh(True, [old, reopened]))[0]
+        self.assertEqual((row["build"], row["buildInfo"]["pr"]["number"]), ("building", 22))
+        current = dict(old, headRefOid=tip)
+        self.assertEqual(self.frame(gh=FakeGh(True, [current]))[0]["build"], "implemented")
+
+    def test_branch_reset_away_from_the_recorded_commit_is_not_merged(self):
+        recorded = self.branch("feat/p-one")
+        git(self.app, "checkout", "-q", "-b", "side")
+        (self.app / "side.txt").write_text("s", encoding="utf-8")
+        side = commit_all(self.app, "side")
+        git(self.app, "checkout", "-q", "main")
+        git(self.app, "merge", "-q", "--no-ff", "side", "-m", "merge side")
+        set_origin_main(self.app)
+        git(self.app, "branch", "-f", "feat/p-one", side)  # reset onto a merged commit unrelated to the recording
+        self.set_status({self.key(): {"build": self.build(sha=recorded)}})
+        self.assertEqual(self.frame()[0]["build"], "building")
+        # Still implemented when the recorded commit is in the merged tip's history.
+        git(self.app, "checkout", "-q", "feat/p-one")
+        git(self.app, "reset", "-q", "--hard", recorded)
+        (self.app / "more.txt").write_text("m", encoding="utf-8")
+        commit_all(self.app, "more")
+        git(self.app, "checkout", "-q", "main")
+        git(self.app, "merge", "-q", "--no-ff", "feat/p-one", "-m", "merge feature")
+        set_origin_main(self.app)
+        self.assertEqual(self.frame()[0]["build"], "implemented")
+
+    def test_marker_without_space_confirms_like_it_is_suggested(self):
+        base = git(self.app, "rev-parse", "main")
+        self.branch("feat/p-one")
+        git(self.app, "merge", "-q", "--no-ff", "feat/p-one", "-m", "merged")
+        (self.app / "src" / "a.ts").write_text("// design:p/one\n", encoding="utf-8")
+        commit_all(self.app, "marker")
+        set_origin_main(self.app)
+        self.set_status({self.key(): {"build": self.build(sha=base)}})
+        row = self.frame()[0]
+        self.assertEqual(row["build"], "implemented")
+        self.assertEqual(row["markers"], ["src/a.ts:1"])
+        self.assertFalse(row["unconfirmed"])
+
+    def test_inherited_git_dir_does_not_redirect_lookups(self):
+        sha = git(self.app, "rev-parse", "main")
+        with unittest.mock.patch.dict("os.environ", {"GIT_DIR": str(self.designs / ".git")}):
+            self.assertEqual(ds.Git().rev(self.app, "main"), sha)
+
 
 class DesignStateTests(Fixture):
     def state(self, section="one", gh=None):
@@ -282,6 +335,22 @@ class DesignStateTests(Fixture):
         _, result = self.frame(gh=FakeGh(True, prs))
         extra = result["projects"][0]["extra"]
         self.assertEqual([(e["id"], e["design"], e["branch"]) for e in extra], [("p/three", "publishing", "design/z")])
+        # A tracking ref behind the PR's current head (e.g. after a force-push) is not PR evidence.
+        stale = [dict(prs[0], number=3, headRefOid="2" * 40)]
+        _, result = self.frame(gh=FakeGh(True, stale))
+        self.assertEqual(result["projects"][0]["extra"], [])
+        self.assertTrue(any("PR #3 content unverified" in n for n in result["notes"]))
+
+    def test_pr_only_file_with_non_ascii_name_in_a_directory_source(self):
+        self.write_projects([{"repo": "../designs", "dir": "artifacts"}])
+        git(self.designs, "checkout", "-q", "-b", "design/cafe")
+        (self.designs / "artifacts" / "café.html").write_text(page(("menu", "Menu")), encoding="utf-8", newline="\n")
+        commit_all(self.designs, "cafe")
+        git(self.designs, "update-ref", "refs/remotes/origin/design/cafe", "design/cafe")
+        git(self.designs, "checkout", "-q", "main")
+        prs = [{"headRefName": "design/cafe", "state": "OPEN", "url": "u"}]
+        extra = self.frame(gh=FakeGh(True, prs))[1]["projects"][0]["extra"]
+        self.assertEqual([e["key"] for e in extra], ["designs:artifacts/café.html#menu"])
 
 
 class RecordClearTests(Fixture):
@@ -291,7 +360,8 @@ class RecordClearTests(Fixture):
         self.set_status({self.key("two"): {"group": "g", "planned": True},
                          self.key(): {"group": "g", "legacy": "building"}})
         before = json.loads(self.status.read_text(encoding="utf-8"))
-        out = ds.record(self.root, "p/one", "feat/p-one", pr="https://example.test/pr/9", now="2026-11-15T10:00:00Z")
+        git(self.app, "remote", "add", "origin", "https://github.com/o/app.git")
+        out = ds.record(self.root, "p/one", "feat/p-one", pr="https://github.com/o/app/pull/9", now="2026-11-15T10:00:00Z")
         raw = self.status.read_bytes()
         self.assertNotIn(b"\r\n", raw)
         self.assertTrue(raw.endswith(b"\n") and not raw.endswith(b"\n\n"))
@@ -302,7 +372,7 @@ class RecordClearTests(Fixture):
         self.assertEqual(entry["group"], "g")
         self.assertNotIn("legacy", entry)
         self.assertEqual(entry["build"], {"repo": "../app", "branch": "feat/p-one", "sha": base,
-                                          "pr": "https://example.test/pr/9", "recorded": "2026-11-15T10:00:00Z"})
+                                          "pr": "https://github.com/o/app/pull/9", "recorded": "2026-11-15T10:00:00Z"})
         self.assertEqual(out["key"], self.key())
         self.assertTrue(raw.decode("utf-8").startswith('{\n  "groups"'))
         # Round trip: the recorded fresh branch reads as Building.
@@ -326,10 +396,33 @@ class RecordClearTests(Fixture):
         for branch in ("-bad", "feature/../other", "bad branch", "bad;cmd"):
             with self.subTest(branch=branch), self.assertRaises(SystemExit):
                 ds.record(self.root, "p/one", branch, allow_missing=True)
-        for pr in ("http://example.test/1", "file:///tmp/pr", "abc"):
+        git(self.app, "remote", "add", "origin", "https://github.com/o/app.git")
+        # Only references `check` can resolve: a number, or a PR URL on the app's own GitHub origin.
+        for pr in ("http://example.test/1", "file:///tmp/pr", "abc", "0", "https://example.test/pr/9",
+                   "https://github.com/other/app/pull/9", "https://github.com/o/app/issues/9"):
             with self.subTest(pr=pr), self.assertRaises(SystemExit):
                 ds.record(self.root, "p/one", "feat/p-one", pr=pr, allow_missing=True)
         self.assertFalse(self.status.exists())
+        for pr in ("9", "https://github.com/O/App/pull/9/"):
+            with self.subTest(pr=pr):
+                self.assertEqual(ds.record(self.root, "p/one", "feat/p-one", pr=pr, allow_missing=True)["build"]["pr"], pr)
+
+    def test_concurrent_writers_wait_for_the_status_lock(self):
+        with ds.status_lock(self.root, "p"):
+            with self.assertRaisesRegex(SystemExit, "another process"):
+                with ds.status_lock(self.root, "p", timeout=0.2):
+                    pass
+        with ds.status_lock(self.root, "p", timeout=0.2):  # released, and no file left in the workspace
+            pass
+        self.assertEqual([p.name for p in (self.root / "workspace" / "status").iterdir() if p.name.endswith(".lock")], [])
+
+    def test_record_keeps_designer_base_sha_on_other_frames(self):
+        base = git(self.app, "rev-parse", "main")
+        self.set_status({self.key("two"): {"build": {"repo": "../app", "branch": "feat/b", "sha": base,
+                                                     "baseSha": base, "recorded": "r"}}})
+        ds.record(self.root, "p/one", "feat/p-one", allow_missing=True)
+        saved = json.loads(self.status.read_bytes())["frames"][self.key("two")]["build"]
+        self.assertEqual(saved["baseSha"], base)
 
     def test_record_rejects_repo_other_than_app_repo(self):
         with self.assertRaisesRegex(SystemExit, "appRepo"):

@@ -20,9 +20,11 @@ Shipped requires project deployment settings. This skill uses the Orbyn Designer
    unconfirmed markers, and branches still building. Pass through relevant notes about
    unavailable GitHub lookups.
 3. With the person's go-ahead, record a frame:
-   `python3 <skill dir>/scripts/design_status.py record --designer <root> --frame <project>/<section> --branch <app branch> [--pr <number-or-https-url>]`
+   `python3 <skill dir>/scripts/design_status.py record --designer <root> --frame <project>/<section> --branch <app branch> [--pr <number-or-url>]`
    The recorded repo must be exactly the project's `appRepo`; `--repo` is only for an
-   explicit matching value. A branch must exist unless `--allow-missing` is used.
+   explicit matching value. A branch must exist unless `--allow-missing` is used. `--pr`
+   is a PR number or a pull request URL on the app repo's GitHub origin. A fork head
+   (`owner:branch`) needs `--pr`.
    To clear stale evidence, use `clear --designer <root> --frame <id>` after the person agrees.
 4. Report the frame and file changed. Commit or publish the Designer file only if asked.
 
@@ -37,7 +39,9 @@ duplicate section ids, use the full key shown by the command (`<repo>:<file>#<se
 ## Marker and project settings
 
 In the app repo, put `// design: <project>/<section>` next to the code implementing each
-screen; use the file's comment syntax. `check` searches the app default branch for each
+screen; use the file's comment syntax. When the project has the same section id in more
+than one file, the short form confirms neither: write the full key instead,
+`// design: <repo>:<file>#<section>`. `check` searches the app default branch for each
 screen's marker. A missing marker leaves the build Implemented but unconfirmed.
 
 Projects may set `defaultBranch`, `releaseTagPattern` (for example `v*`) and
