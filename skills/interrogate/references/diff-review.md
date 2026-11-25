@@ -29,8 +29,13 @@ secret ones included. For a rename row, read the patch with both paths, or a gua
 removed during the rename shows up as a plain addition. Name them exactly and shut
 out anything below them, since a literal path still matches a directory's files
 (rename `config` to `config.old` and add `config/.env`, and a plain two-path diff
-prints the `.env`): drop `--literal-pathspecs` for this one command and pass
-`-- ":(literal)<old_path>" ":(literal)<new_path>" ":(exclude,literal)<old_path>/" ":(exclude,literal)<new_path>/"`. List the files in the same mode with two calls,
+prints the `.env`). Drop `--literal-pathspecs` for these commands and select with
+`-- ":(literal)<old_path>" ":(literal)<new_path>"`. First run `--name-status` with that
+selection; for every listed path other than the rename pair, add
+`":(exclude,literal)<that_path>"` and list again until only the rename row is left.
+Then read the patch with the same selection. Excluding exact paths rather than
+`<old_path>/` keeps a rename into its own directory (`config` to `config/moved`)
+intact. List the files in the same mode with two calls,
 `git diff --name-status` and `git diff --numstat` (one call with both flags prints
 only the first); in workspace mode list staged (`--cached`) and unstaged changes
 separately, as their own ledger rows, and add `git ls-files --others --exclude-standard`
