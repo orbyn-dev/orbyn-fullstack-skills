@@ -4274,6 +4274,13 @@
           "effort": "medium",
           "date": "2026-11-12",
           "scope": "Slimmed SKILL.md entry: detail moved to references, no rule changed"
+        },
+        {
+          "tool": "DeepSeek Harness",
+          "model": "deepseek-v4.1-flash (lead)",
+          "effort": "default",
+          "date": "2026-11-26",
+          "scope": "scan() no longer treats a folder name as a secret file: only the dedicated SECRET_FOLDERS count for folders, files keep every rule; regression test a source folder named credentials no longer holds while a credentials.json file still does"
         }
       ],
       "reviewed_inspiration": [
@@ -4591,12 +4598,12 @@
           "relationship": "reviewed-inspiration; independently authored local synthesis, no source text imported"
         },
         {
-          "credit": "Anthropic \u2014 effective agents",
+          "credit": "Anthropic — effective agents",
           "source": "https://www.anthropic.com/research/building-effective-agents",
           "relationship": "reviewed-inspiration; independently authored local synthesis, no source text imported"
         },
         {
-          "credit": "Anthropic \u2014 context engineering",
+          "credit": "Anthropic — context engineering",
           "source": "https://www.anthropic.com/research/effective-context-engineering-for-ai-agents",
           "relationship": "reviewed-inspiration; independently authored local synthesis, no source text imported"
         },
@@ -4606,12 +4613,12 @@
           "relationship": "reviewed-inspiration; independently authored local synthesis, no source text imported"
         },
         {
-          "credit": "Microsoft \u2014 Azure search security-filter limitations",
+          "credit": "Microsoft — Azure search security-filter limitations",
           "source": "https://learn.microsoft.com/en-us/azure/search/search-security-trimming-for-azure-search",
           "relationship": "reviewed-inspiration; independently authored local synthesis, no source text imported"
         },
         {
-          "credit": "Anthropic \u2014 tool design",
+          "credit": "Anthropic — tool design",
           "source": "https://www.anthropic.com/research/writing-tools-for-agents",
           "relationship": "reviewed-inspiration; independently authored local synthesis, no source text imported"
         },
@@ -4626,7 +4633,7 @@
           "relationship": "reviewed-inspiration; independently authored local synthesis, no source text imported"
         },
         {
-          "credit": "Anthropic \u2014 agent evaluations, January 2026",
+          "credit": "Anthropic — agent evaluations, January 2026",
           "source": "https://www.anthropic.com/research/demystifying-evals-for-ai-agents",
           "relationship": "reviewed-inspiration; independently authored local synthesis, no source text imported"
         },
@@ -4739,7 +4746,7 @@
       "license": "MIT",
       "source": "https://github.com/wheresryan22/anatomy/tree/1482e8469b0a9e0d8cc18ea2740a01423d29ae80",
       "revision": "1482e8469b0a9e0d8cc18ea2740a01423d29ae80",
-      "changes": "Orbyn-authored guidance adapting Anatomy\u2019s model-driven illustration methods, with conditional output references. Selected licensed runtime/tests/fixtures adapted with explicit failure-sensitive browser, output preservation, resource ownership and packaging contracts; no active upstream skill, publisher, session harvesting or experimental renderers. Original and maintained fingerprints retained separately. Runtime qualification is finite and separately reported. Added independently authored spatial review adapter, original synthetic V12/timeline sources, strict schema-2 model and shared trusted save-bridge reuse, focused fixtures and development cases. Prepared packages reuse existing pinned Anatomy MIT support with notices; no duplicate upstream renderer is tracked. Reviewed Scenario motion method as inspiration only; no source code, fonts, media, runtime or provider imported. Added independently authored authorable motion-film specs, fourteen deterministic DOM/SVG/CSS-3D primitives, original generated raster studies, shared preview/export renderer, bounded MP4/audio/caption/effects pipeline and failure/qualification tests. No reviewed Scenario ZIP code, fonts or media copied; existing Anatomy lineage retained. Replaced active local-kinetic wording with motion films. Added independently authored code-driven motion composition/time/track/component/inspector contracts, rational film compatibility, source-bound motion review profile and development controls. Reviewed external methods inform the design; no Remotion skills, OBS/LosslessCut implementation, external authored assets or model weights imported. Optional runtime dependency profiles retain their own licenses/notices and qualify separately. Added independently authored lyric-performance guidance and synthetic development cases covering representative previews, bounded local puppeting, registered blink review, motion pacing, actual typography raster checks and cadence/mux evidence. No consumer scripts, media, lyrics or reports imported; historical source lineage is unchanged. Added an independently authored code-only rule, character animation and 3D world methods, a dependency-free rig kit with a procedural film and a source check; five public music videos were reviewed for timing and technique only, with no frames, art, audio or characters copied.",
+      "changes": "Orbyn-authored guidance adapting Anatomy’s model-driven illustration methods, with conditional output references. Selected licensed runtime/tests/fixtures adapted with explicit failure-sensitive browser, output preservation, resource ownership and packaging contracts; no active upstream skill, publisher, session harvesting or experimental renderers. Original and maintained fingerprints retained separately. Runtime qualification is finite and separately reported. Added independently authored spatial review adapter, original synthetic V12/timeline sources, strict schema-2 model and shared trusted save-bridge reuse, focused fixtures and development cases. Prepared packages reuse existing pinned Anatomy MIT support with notices; no duplicate upstream renderer is tracked. Reviewed Scenario motion method as inspiration only; no source code, fonts, media, runtime or provider imported. Added independently authored authorable motion-film specs, fourteen deterministic DOM/SVG/CSS-3D primitives, original generated raster studies, shared preview/export renderer, bounded MP4/audio/caption/effects pipeline and failure/qualification tests. No reviewed Scenario ZIP code, fonts or media copied; existing Anatomy lineage retained. Replaced active local-kinetic wording with motion films. Added independently authored code-driven motion composition/time/track/component/inspector contracts, rational film compatibility, source-bound motion review profile and development controls. Reviewed external methods inform the design; no Remotion skills, OBS/LosslessCut implementation, external authored assets or model weights imported. Optional runtime dependency profiles retain their own licenses/notices and qualify separately. Added independently authored lyric-performance guidance and synthetic development cases covering representative previews, bounded local puppeting, registered blink review, motion pacing, actual typography raster checks and cadence/mux evidence. No consumer scripts, media, lyrics or reports imported; historical source lineage is unchanged. Added an independently authored code-only rule, character animation and 3D world methods, a dependency-free rig kit with a procedural film and a source check; five public music videos were reviewed for timing and technique only, with no frames, art, audio or characters copied.",
       "incorporated_material": [
         {
           "source": "https://github.com/wheresryan22/anatomy/tree/1482e8469b0a9e0d8cc18ea2740a01423d29ae80",
@@ -5131,8 +5138,8 @@
       "changes": "Orbyn skill for using affectUI's free React components: copy the reviewed pinned file, restyle through its CSS variables, drive it from real state, verify; updates only through upstream review. Bundles the unmodified free items as a pinned, hash-checked snapshot under references/upstream/affectui/.",
       "reviewed_sources": [
         {
-          "credit": "Florian H\u00f6ller (adfects), affectUI",
-          "copyright": "Copyright (c) 2026 Florian H\u00f6ller (adfects)",
+          "credit": "Florian Höller (adfects), affectUI",
+          "copyright": "Copyright (c) 2026 Florian Höller (adfects)",
           "source": "https://github.com/flohoeller/affectui/tree/3c5df43893d870ee42d81fad4a4ba3ad72ba1b99",
           "revision": "3c5df43893d870ee42d81fad4a4ba3ad72ba1b99",
           "license": "MIT",
