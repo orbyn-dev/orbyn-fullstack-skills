@@ -529,6 +529,13 @@ class SecretsAndNamesTests(CleanupCase):
         self.assertNotIn('secret-looking', self.item(done)['reason'])
         self.write(done/'crates/orbyn-core/src/credentials/credentials.json', 'K=1')
         self.assertIn('secret-looking', self.item(done)['reason'])
+        (done/'crates/orbyn-core/src/credentials/credentials.json').unlink()
+        # The dedicated secret folders still hold even when their files look ordinary.
+        self.write(done/'.ssh/config', 'Host x')
+        self.assertIn('secret-looking', self.item(done)['reason'])
+        (done/'.ssh/config').unlink()
+        self.write(done/'.kube/config', 'apiVersion: v1')
+        self.assertIn('secret-looking', self.item(done)['reason'])
 
     def test_package_files_in_a_nested_dependency_folder_do_not_hold_a_worktree(self):
         done = self.done()
