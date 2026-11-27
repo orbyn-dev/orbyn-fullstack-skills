@@ -98,6 +98,8 @@ this default:
 - **Tests:** do critical paths and boundary conditions have tests? Does each
   changed test pass the [two-edit check](../../tdd/references/test-strategy.md#judge-a-test-by-two-edits):
   it fails when the behavior breaks and still passes when only internals change?
+  Ask to rewrite a failing test so its checks on results stay; only a test that
+  checks nothing a user can observe is removed.
 
 Matching rules to files keeps the reviewer's attention on the risks that file can
 have, instead of a generic list on every file.

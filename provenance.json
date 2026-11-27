@@ -756,7 +756,7 @@
           "model": "Claude Opus 5.5 (as reported by Kiro)",
           "effort": "not exposed by the host",
           "date": "2026-11-27",
-          "scope": "Diff review's tests question applies tdd's two-edit check"
+          "scope": "Diff review's tests question applies tdd's two-edit check; a failing test is rewritten to keep its result checks"
         }
       ],
       "incorporated_material": [
