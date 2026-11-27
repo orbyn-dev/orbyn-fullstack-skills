@@ -95,7 +95,9 @@ this default:
 - **Performance:** N+1 queries, needless loops, resources released.
 - **Maintainability:** clear code, names that say what they mean, the project's
   existing style and architecture.
-- **Tests:** do critical paths and boundary conditions have tests?
+- **Tests:** do critical paths and boundary conditions have tests? Does each
+  changed test pass the [two-edit check](../../tdd/references/test-strategy.md#judge-a-test-by-two-edits):
+  it fails when the behavior breaks and still passes when only internals change?
 
 Matching rules to files keeps the reviewer's attention on the risks that file can
 have, instead of a generic list on every file.

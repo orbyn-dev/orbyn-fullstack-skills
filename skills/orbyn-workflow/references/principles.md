@@ -1,6 +1,6 @@
 # Conditional engineering methods
 
-The 20 former principle entrypoints and four later additions are maintained references under execution
+The 20 former principle entrypoints and five later additions are maintained references under execution
 owners. Essential rules appear in those owners; load only a method needed for a
 current decision. Each method retains its source attribution and local license.
 These are not discoverable skills or additional mandatory stages.
@@ -28,4 +28,5 @@ These are not discoverable skills or additional mandatory stages.
 - [sequence verifiable units](../../orbyn-plan/references/principles/sequence-verifiable-units.md): Order a multi-part change so failures are localized and delivery is understandable.
 - [simplify in order](../../architect/references/principles/simplify-in-order.md): Question the requirement, delete, simplify, shorten the loop, then automate, in that order.
 - [subtract before you add](../../architect/references/principles/subtract-before-you-add.md): Reduce existing complexity before extending an affected design.
+- [test behavior not implementation](../../tdd/references/test-strategy.md#judge-a-test-by-two-edits): Keep a test that fails when behavior breaks and passes when only internals change.
 - [type system discipline](../../language-best-practices/references/principles/type-system-discipline.md): Use types to express valid states and prevent meaningful contract mistakes.
