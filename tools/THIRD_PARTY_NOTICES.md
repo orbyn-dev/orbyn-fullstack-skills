@@ -49,6 +49,11 @@ bundle unmodified text references: [Corey Haines social source record](../skills
 [Anthropic canvas-design source record](../skills/social-preview/references/source-record.md)
 (Apache-2.0, with the original license). Each record pins its revision and hashes.
 No font binaries or artwork are included. See the [research distinction](research/social-content.md).
+Google's `migrate-to-rust` skill was reviewed at
+[`10c799e`](https://github.com/google/skills/tree/10c799ee69bcdb10b82836403d1531bfcc3d9d24/skills/developers/migrate-to-rust)
+(Apache-2.0) for its staged migration order. The Orbyn method is independently
+written; its telemetry script, scorecard, first-person story and infographic are not
+bundled. See [provenance](../provenance.json).
 UI guidance retains its primary GOV.UK/W3C and other research citations in the
 owning references. Citing an idea does not claim its author directly contributed
 to Orbyn's code or endorses this library.

@@ -53,6 +53,7 @@ explains the handoffs. [The catalog](../skills/README.md) lists every skill.
 | Change a stored format             | `orbyn-data-migration`                     | Compatibility, writer cutover and recovery               |
 | Improve web/mobile task flows      | `orbyn-ui-design` + `orbyn-content-design` | Rendered UI with concise product language                |
 | Implement across languages         | `language-best-practices`                  | Target-aware local guides and resource/error contracts   |
+| Port a legacy codebase to Rust     | `rust-migration`                           | Baseline, parity-first slices and measured optimization  |
 | Choose a technology stack          | `orbyn-stack-selection`                    | Constraint-led comparison, operating costs and exit path |
 | Model TypeScript state             | `language-best-practices`                  | Shared schemas and explicit valid variants               |
 | Review a risky patch               | `interrogate`                              | Concrete findings with scenarios and evidence            |

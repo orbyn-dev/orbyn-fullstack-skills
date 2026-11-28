@@ -1796,6 +1796,13 @@
           "effort": "medium",
           "date": "2026-11-25",
           "scope": "Link or eval case for the diff review pipeline"
+        },
+        {
+          "tool": "OpenCode",
+          "model": "deepseek-v4.1-flash-free",
+          "effort": "default",
+          "date": "2026-11-28",
+          "scope": "Routing and adjacent cases for the rust-migration skill"
         }
       ],
       "reviewed_inspiration": [
@@ -4579,6 +4586,32 @@
           "credit": "Adam Lewis (Three-Tier Hoisting)",
           "source": "https://dev.to/nark3d/a-three-tier-folder-structure-for-long-lived-codebases-3a3l",
           "relationship": "reviewed-inspiration observed 2026-11-09; independently written, no text imported"
+        }
+      ]
+    },
+    "rust-migration": {
+      "relationship": "original",
+      "credit": "Anh Dang and Orbyn contributors",
+      "copyright": "Copyright (c) 2026 Anh Dang and Orbyn contributors",
+      "license": "MIT",
+      "source": "https://github.com/orbyn-dev/orbyn-fullstack-skills/tree/main/skills/rust-migration",
+      "changes": "New Orbyn skill for porting legacy codebases to Rust: source and baseline confirmation, parity-first vertical slices, a benchmark ledger and optional LLVM PGO. Written in Orbyn's words with an original reference; no upstream text, script or template copied. Google's migrate-to-rust skill was reviewed for its stage structure; its telemetry scorecard, first-person story and infographic were not adopted.",
+      "reviewed_inspiration": [
+        {
+          "credit": "Google LLC (google/skills, migrate-to-rust)",
+          "source": "https://github.com/google/skills/blob/10c799ee69bcdb10b82836403d1531bfcc3d9d24/skills/developers/migrate-to-rust/SKILL.md",
+          "revision": "10c799ee69bcdb10b82836403d1531bfcc3d9d24",
+          "license": "Apache-2.0",
+          "relationship": "reviewed-inspiration; no upstream text or code imported"
+        }
+      ],
+      "authoring": [
+        {
+          "tool": "OpenCode",
+          "model": "deepseek-v4.1-flash-free",
+          "effort": "default",
+          "date": "2026-11-28",
+          "scope": "New rust-migration skill, blueprint/PGO reference, catalog, provenance, docs and routing cases"
         }
       ]
     },
