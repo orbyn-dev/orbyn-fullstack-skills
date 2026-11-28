@@ -74,21 +74,26 @@ algorithm, an I/O-bound program or a port that is still behaviorally wrong.
    it to `PATH`; keep using the absolute path. Prefer that binary over an
    unrelated system LLVM. Run the PGO steps in one shell so these variables stay
    set.
-2. **Build the instrumented binary.** Pass the flag after `--` so Cargo keeps its
-   configured rustflags and the path stays one argument:
-   `cargo rustc --release --target "$TARGET" -- -Cprofile-generate="$PGO_DIR"`.
-   This instruments the final crate. If the hot path is in a dependency and the
-   whole graph must be instrumented, set `CARGO_ENCODED_RUSTFLAGS` to the
-   project's effective flags plus the PGO flag, separated by `\x1f`, and use
-   `cargo build` instead. `RUSTFLAGS` splits on whitespace and replaces
-   `build.rustflags`, so avoid it when either matters.
+2. **Build the instrumented binary.** Select one target and pass the flag after
+   `--` so Cargo keeps its configured rustflags and the path stays one argument:
+   `cargo rustc --release --target "$TARGET" --bin <name> -- -Cprofile-generate="$PGO_DIR"`.
+   Use `--lib` or the matching selector when the package has no binary. This
+   instruments the final crate. For a whole-graph profile, put the project's
+   effective flags plus `-Cprofile-generate="$PGO_DIR"` in
+   `CARGO_ENCODED_RUSTFLAGS`, separated by `\x1f`, and run
+   `cargo build --release --target "$TARGET"`; use the same scope in step 5.
+   `RUSTFLAGS` splits on whitespace and replaces `build.rustflags`, so avoid it
+   when either matters.
 3. **Run the representative workload.** Use the same inputs and number of runs as
    the benchmark. Each run updates the `.profraw` files in `$PGO_DIR`.
 4. **Merge the profiles.**
    `"$LLVM_PROFDATA" merge -o "$PGO_DIR/merged.profdata" "$PGO_DIR"`.
-5. **Build with the profile.** Use the same target and release settings, plus the
-   profile:
-   `cargo rustc --release --target "$TARGET" -- -Cprofile-use="$PGO_DIR/merged.profdata" -Cllvm-args=-pgo-warn-missing-function`.
+5. **Build with the profile.** Use the same target, release settings and
+   instrumentation scope:
+   `cargo rustc --release --target "$TARGET" --bin <name> -- -Cprofile-use="$PGO_DIR/merged.profdata" -Cllvm-args=-pgo-warn-missing-function`.
+   For the whole-graph path, replace the generation flag in
+   `CARGO_ENCODED_RUSTFLAGS` with the profile-use flag and run
+   `cargo build --release --target "$TARGET"`.
 6. **Verify and measure.** Re-run the full test suite and parity replay on the PGO
    binary. Benchmark the same workload and record it as `rust_pgo`. Keep
    `$PGO_DIR` out of Git; the profile is workload-specific.
