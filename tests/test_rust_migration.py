@@ -68,11 +68,23 @@ esac
         bundled = self.make_executable(self.bundled_tool(self.host))
         self.assert_selected(self.run_preflight(), bundled)
 
-    def test_explicit_target_overrides_the_host_triple(self):
+    def test_explicit_target_keeps_the_host_tool(self):
         target = 'aarch64-unknown-linux-gnu'
-        self.make_executable(self.bundled_tool(self.host))
-        bundled = self.make_executable(self.bundled_tool(target))
+        bundled = self.make_executable(self.bundled_tool(self.host))
+        self.make_executable(self.bundled_tool(target))
         self.assert_selected(self.run_preflight(TARGET=target), bundled)
+
+    def test_existing_profile_directory_stops_without_deleting_it(self):
+        existing = self.workspace/'pgo-data'
+        existing.mkdir()
+        marker = existing/'keep.txt'
+        marker.write_text('keep', encoding='utf-8')
+        self.make_executable(self.bundled_tool(self.host))
+        result = self.run_preflight()
+        self.assertEqual(result.returncode, 1, result)
+        self.assertEqual(result.stdout, '')
+        self.assertIn('already exists', result.stderr)
+        self.assertEqual(marker.read_text(encoding='utf-8'), 'keep')
 
     def test_missing_or_non_executable_tool_stops_without_using_system_llvm(self):
         self.make_executable(self.bin/'llvm-profdata')

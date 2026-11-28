@@ -50,37 +50,48 @@ PGO is optional. Use it after the safe port passes parity and the profile shows 
 remaining time is in code the compiler can optimize. It does not fix a bad
 algorithm, an I/O-bound program or a port that is still behaviorally wrong.
 
-1. **Check the toolchain and set the profile tool.** Run `rustc --version`,
-   `cargo --version` and `rustc --print sysroot`. Set the target and resolve the
-   matching `llvm-profdata` explicitly:
+1. **Check the toolchain and set the profile paths.** Run `rustc --version`,
+   `cargo --version` and `rustc --print sysroot`. `llvm-profdata` is a host tool,
+   so resolve it with the host triple even when `TARGET` is a cross target:
 
    ```sh
-   TARGET="${TARGET:-$(rustc -vV | sed -n 's/^host: //p')}"
-   LLVM_PROFDATA="$(rustc --print sysroot)/lib/rustlib/$TARGET/bin/llvm-profdata"
+   HOST="$(rustc -vV | sed -n 's/^host: //p')"
+   TARGET="${TARGET:-$HOST}"
+   LLVM_PROFDATA="$(rustc --print sysroot)/lib/rustlib/$HOST/bin/llvm-profdata"
+   PGO_DIR="${PGO_DIR:-$PWD/pgo-data}"
    test -x "$LLVM_PROFDATA" || {
-     echo "missing llvm-profdata for $TARGET; run rustup component add llvm-tools-preview" >&2
+     echo "missing llvm-profdata for $HOST; run rustup component add llvm-tools-preview" >&2
      exit 1
    }
+   test ! -e "$PGO_DIR" || {
+     echo "$PGO_DIR already exists; remove it or set PGO_DIR to a fresh path" >&2
+     exit 1
+   }
+   mkdir -p "$PGO_DIR"
    ```
 
    `rustup component add llvm-tools-preview` installs the binary but does not add
    it to `PATH`; keep using the absolute path. Prefer that binary over an
-   unrelated system LLVM.
-2. **Build the instrumented binary.** Use an absolute path and the target triple:
-   `rm -rf "$PWD/pgo-data"` then
-   `RUSTFLAGS="-Cprofile-generate=$PWD/pgo-data" cargo build --release --target "$TARGET"`.
-   The `--target` flag keeps the instrumentation flags away from Cargo build
-   scripts.
+   unrelated system LLVM. Run the PGO steps in one shell so these variables stay
+   set.
+2. **Build the instrumented binary.** Pass the flag after `--` so Cargo keeps its
+   configured rustflags and the path stays one argument:
+   `cargo rustc --release --target "$TARGET" -- -Cprofile-generate="$PGO_DIR"`.
+   This instruments the final crate. If the hot path is in a dependency and the
+   whole graph must be instrumented, set `CARGO_ENCODED_RUSTFLAGS` to the
+   project's effective flags plus the PGO flag, separated by `\x1f`, and use
+   `cargo build` instead. `RUSTFLAGS` splits on whitespace and replaces
+   `build.rustflags`, so avoid it when either matters.
 3. **Run the representative workload.** Use the same inputs and number of runs as
-   the benchmark. Each run updates the `.profraw` files in the data directory.
+   the benchmark. Each run updates the `.profraw` files in `$PGO_DIR`.
 4. **Merge the profiles.**
-   `"$LLVM_PROFDATA" merge -o "$PWD/pgo-data/merged.profdata" "$PWD/pgo-data"`.
+   `"$LLVM_PROFDATA" merge -o "$PGO_DIR/merged.profdata" "$PGO_DIR"`.
 5. **Build with the profile.** Use the same target and release settings, plus the
    profile:
-   `RUSTFLAGS="-Cprofile-use=$PWD/pgo-data/merged.profdata -Cllvm-args=-pgo-warn-missing-function" cargo build --release --target "$TARGET"`.
+   `cargo rustc --release --target "$TARGET" -- -Cprofile-use="$PGO_DIR/merged.profdata" -Cllvm-args=-pgo-warn-missing-function`.
 6. **Verify and measure.** Re-run the full test suite and parity replay on the PGO
    binary. Benchmark the same workload and record it as `rust_pgo`. Keep
-   `pgo-data` out of Git; the profile is workload-specific.
+   `$PGO_DIR` out of Git; the profile is workload-specific.
 
 If `llvm-profdata` is unavailable, stop and report the non-PGO result. A build with
 `-Ctarget-cpu=native` plus LTO is a different optimization; label it as such and
