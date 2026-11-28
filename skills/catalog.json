@@ -82,6 +82,19 @@
       ]
     },
     {
+      "name": "rust-migration",
+      "category": "Engineering practice",
+      "related": [
+        "language-best-practices",
+        "figure-it-out",
+        "orbyn-stack-selection",
+        "tdd",
+        "show-me-your-work",
+        "how",
+        "orbyn-workflow"
+      ]
+    },
+    {
       "name": "motion-match",
       "category": "Product design",
       "related": [

@@ -37,6 +37,15 @@ class PortableDistributionTests(unittest.TestCase):
         (self.root/path).write_text('/* changed */')
         self.assertNotEqual(sync.inventory(self.root), files)
 
+    def test_rust_migration_keeps_its_reference_and_license_in_the_bundle(self):
+        files = self.copy_distribution()
+        skill = 'skills/rust-migration'
+        for name in ('SKILL.md', 'references/blueprint-and-pgo.md', 'LICENSE'):
+            relative = f'{skill}/{name}'
+            with self.subTest(asset=relative):
+                self.assertIn(relative, files)
+                self.assertEqual((self.root/relative).read_bytes(), (ROOT/relative).read_bytes())
+
     def test_existing_but_unexported_policy_does_not_hide_dependency(self):
         skill = self.root/'skills/example/SKILL.md'
         skill.parent.mkdir(parents=True)

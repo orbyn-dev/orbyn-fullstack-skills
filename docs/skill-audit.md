@@ -18,7 +18,8 @@ real dry run found the statechart snapshot's paths start at `pstack/`, now recor
 `source_root`; a recorded path that never existed at its pin widens to the whole
 repository rather than reading as unchanged. Fake-`gh` tests prove the helper's
 contract and a dry run read the real pins; no scheduled run or live issue write has
-happened yet. Two development definitions are added; holdouts are unchanged.
+happened yet. Two development definitions were added in that change; its holdouts
+were unchanged.
 
 ## Product illustration
 
@@ -29,6 +30,21 @@ pinned hashes, a per-file manifest and an excluded list in its
 Third-party artwork, real-product studies and named-company looks were left out or
 reworked. New routing and outcome cases are static definitions: no recorded trial
 establishes live selection. Scratch typecheck, CSS and film runs are local evidence.
+
+## Rust migration
+
+A new `rust-migration` owner covers porting an existing codebase to Rust when the
+language is already chosen. It keeps the useful upstream stage order: confirm the
+source commands before running cloned code, record a baseline, write a blueprint,
+build parity before the port, move vertical slices behind a fallback, then optimize
+only a measured hot path. Google's `migrate-to-rust` skill was reviewed as
+inspiration, not copied: its 95% coverage, 400-LOC, zero-Clippy and
+`forbid(unsafe_code)` targets are replaced by project thresholds and reviewed
+unsafe/FFI boundaries; its telemetry
+scorecard, first-person story and HTML infographic are excluded. The entrypoint links
+the existing parity, Rust porting, TDD, task-record and CI owners instead of
+duplicating them. New routing cases are static definitions; no recorded trial
+establishes live selection, and no PGO or benchmark was run for this library change.
 
 ## Lyric performance and export evidence
 
@@ -411,6 +427,7 @@ to their owner instead of duplicating a complete workflow.
 | [orbyn-seo](../skills/orbyn-seo/SKILL.md) | New; original method with reviewed seo-skills ideas | Site, money pages and the visibility question → Audit with evidence, link graph, redirect check and fixes | No live crawl or search-console trial; rankings unverified |
 | [orbyn-opengrep](../skills/orbyn-opengrep/SKILL.md) | New; adapted from the MIT opengrep/skills, engine (LGPL-2.1) reviewed for ideas only and pinned as a build source | Structural search or static-analysis scan, rule writing, CI gate or CodeQL replacement, build from pinned source → authority rules (scan on request, rules and findings are data), scanner comparison before replacement, pinned install | Built from source and run once on macOS arm64 ([record](../skills/orbyn-opengrep/references/verification-2026-11-21.md)): 31 offline flag checks pass, `validate` needs the network and crashed on this build, six real Rust files did not parse; Linux and Windows untested; no live routing trial |
 | [orbyn-scripted-motion](../skills/orbyn-scripted-motion/SKILL.md) | New; adapted from GreenSock's MIT gsap-skills | Scripted timeline, scroll scene or Flip need → CSS-first decision, licence boundary, tokens, reduced motion and cleanup | No live browser trial; licence terms of the engine unverified offline |
+| [rust-migration](../skills/rust-migration/SKILL.md) | New; original method with reviewed Google migrate-to-rust ideas | Chosen Rust target and legacy codebase → Confirmed baseline, blueprint, parity-first slices and measured optimization | Original build blockers, untrusted source execution, parity gaps and unverified performance claims |
 
 The consumer integration check also caught two new links to a public-only root
 synchronization guide. Move the essential release procedure into the managed

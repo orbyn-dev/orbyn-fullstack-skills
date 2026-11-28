@@ -324,6 +324,7 @@ def scan(path, top=(), skip_top_git=False, caches=False):
         dirs = (*top, *parts)
         if 'HEAD' in files and 'objects' in folders and 'refs' in folders and (parts or not skip_top_git):
             found['git'].append(os.path.relpath(here, path))
+        folder_set = set(folders)
         for name in folders + files:
             full = os.path.join(here, name)
             try:
@@ -333,7 +334,10 @@ def scan(path, top=(), skip_top_git=False, caches=False):
             if name.casefold() == '.git' and (parts or not skip_top_git):
                 found['git'].append(os.path.relpath(full, path))
             relative = os.path.relpath(full, path)
-            if (secret_name(name) and len(found['secrets']) < 20 and relative.replace(os.sep, '/') not in tracked
+            # A folder's name is not a secret file: only the dedicated secret folders count
+            # (a source directory named "credentials" is ordinary source, and its tracked files are exempt anyway).
+            secret = name.casefold() in SECRET_FOLDERS if name in folder_set else secret_name(name)
+            if (secret and len(found['secrets']) < 20 and relative.replace(os.sep, '/') not in tracked
                     and not ((top or (caches and dirs and dirs[0].casefold() in CACHE_DIRS)) and package_tree(dirs))
                     and not (caches and not top and nested_package(path, dirs))):
                 found['secrets'].append(relative)

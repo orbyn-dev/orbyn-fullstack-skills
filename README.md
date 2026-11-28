@@ -9,7 +9,7 @@ Coding agents can write code. The rest of the job still falls on you: tracing th
 bug, planning the change, picking the model, reviewing the diff, proving it works
 and writing it all up.
 
-Orbyn is a free library of 39 connected skills for Claude Code, Codex and Cursor
+Orbyn is a free library of 48 connected skills for Claude Code, Codex and Cursor
 that hands that work to the agent. You say what you want in plain words. The agent
 picks the method, splits the work across the right models, checks the result and
 stops for your approval before anything leaves your machine.
@@ -81,7 +81,7 @@ verification and the PR gate have passed.
   <img src="docs/images/orbyn-task-flow.png" alt="Statechart: a task moves from received through target, harness, routing and planning into delegated children, review, verification and a report. A failed harness stops the task. It then ends locally, or passes through the PR gate, where drafts wait, gaps are labelled, and only a green PR reaches review and your merge.">
 </picture>
 
-The agent loads only what the job needs, so 39 skills don't crowd its context. Small
+The agent loads only what the job needs, so 48 skills don't crowd its context. Small
 edits skip the ceremony. Rules run as code wherever they can, so CI catches drift
 that written policy would miss.
 
