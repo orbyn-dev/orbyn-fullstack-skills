@@ -50,14 +50,25 @@ PGO is optional. Use it after the safe port passes parity and the profile shows 
 remaining time is in code the compiler can optimize. It does not fix a bad
 algorithm, an I/O-bound program or a port that is still behaviorally wrong.
 
-1. **Check the toolchain.** Run `rustc --version`, `cargo --version` and
-   `rustc --print sysroot`. The matching `llvm-profdata` lives under
-   `$(rustc --print sysroot)/lib/rustlib/<target>/bin/`. If it is missing, install
-   the component with `rustup component add llvm-tools-preview`. Prefer that
-   binary over an unrelated system LLVM.
+1. **Check the toolchain and set the profile tool.** Run `rustc --version`,
+   `cargo --version` and `rustc --print sysroot`. Set the target and resolve the
+   matching `llvm-profdata` explicitly:
+
+   ```sh
+   TARGET="${TARGET:-$(rustc -vV | sed -n 's/^host: //p')}"
+   LLVM_PROFDATA="$(rustc --print sysroot)/lib/rustlib/$TARGET/bin/llvm-profdata"
+   test -x "$LLVM_PROFDATA" || {
+     echo "missing llvm-profdata for $TARGET; run rustup component add llvm-tools-preview" >&2
+     exit 1
+   }
+   ```
+
+   `rustup component add llvm-tools-preview` installs the binary but does not add
+   it to `PATH`; keep using the absolute path. Prefer that binary over an
+   unrelated system LLVM.
 2. **Build the instrumented binary.** Use an absolute path and the target triple:
    `rm -rf "$PWD/pgo-data"` then
-   `RUSTFLAGS="-Cprofile-generate=$PWD/pgo-data" cargo build --release --target <target>`.
+   `RUSTFLAGS="-Cprofile-generate=$PWD/pgo-data" cargo build --release --target "$TARGET"`.
    The `--target` flag keeps the instrumentation flags away from Cargo build
    scripts.
 3. **Run the representative workload.** Use the same inputs and number of runs as
@@ -66,7 +77,7 @@ algorithm, an I/O-bound program or a port that is still behaviorally wrong.
    `"$LLVM_PROFDATA" merge -o "$PWD/pgo-data/merged.profdata" "$PWD/pgo-data"`.
 5. **Build with the profile.** Use the same target and release settings, plus the
    profile:
-   `RUSTFLAGS="-Cprofile-use=$PWD/pgo-data/merged.profdata -Cllvm-args=-pgo-warn-missing-function" cargo build --release --target <target>`.
+   `RUSTFLAGS="-Cprofile-use=$PWD/pgo-data/merged.profdata -Cllvm-args=-pgo-warn-missing-function" cargo build --release --target "$TARGET"`.
 6. **Verify and measure.** Re-run the full test suite and parity replay on the PGO
    binary. Benchmark the same workload and record it as `rust_pgo`. Keep
    `pgo-data` out of Git; the profile is workload-specific.
