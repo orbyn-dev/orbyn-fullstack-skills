@@ -107,7 +107,7 @@ arrive with it; nothing is installed into target repositories.
 ## Reading groups
 
 These groups help select relevant methods from the full canonical source. All
-34 skills remain available at the outer workspace; groups do not install files
+48 skills remain available at the outer workspace; groups do not install files
 or modify host configuration. The default core has 14 methods.
 
 | Group | Purpose | Skills |

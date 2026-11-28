@@ -50,6 +50,7 @@ bundled, and they may carry other licences. Generated from `provenance.json` by
 | [github/awesome-copilot](https://github.com/github/awesome-copilot) | GitHub awesome-copilot contributors; bug-reproduction-brief credits skyestrela/ai-agent-skill-preview | MIT | how, orbyn-workflow |
 | [google/elephant-goldfish-model](https://github.com/google/elephant-goldfish-model) | Google LLC (Elephant-Goldfish Model) | See source | architect, how, interrogate, orbyn-ui-design, orbyn-workflow |
 | [google/eng-practices](https://github.com/google/eng-practices) | Google Engineering Practices contributors | See source | orbyn-workflow, unslop |
+| [google/skills](https://github.com/google/skills) | Google LLC (google/skills, migrate-to-rust) | Apache-2.0 | rust-migration |
 | https://aclanthology.org/2024.eacl-demo.16/ | RAGAs, EACL 2024 | See source | orbyn-ai-application |
 | https://design-system.service.gov.uk/components/back-link/ | GOV.UK back link | Unverified; review only, no copied material | orbyn-ui-design |
 | https://design-system.service.gov.uk/components/error-summary/ | GOV.UK error summary | Unverified; review only, no copied material | orbyn-ui-design |

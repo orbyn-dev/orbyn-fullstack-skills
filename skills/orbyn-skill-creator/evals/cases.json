@@ -15063,6 +15063,142 @@
         "message"
       ],
       "excluded": "Do not start a new audit or scan; fix the object-level check at the server-side owner and add a regression at that boundary."
+    },
+    {
+      "id": "rust-port-cpp",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Port this C++ simulation to Rust and prove the outputs match.",
+      "expected_skills": [
+        "rust-migration"
+      ],
+      "forbidden_skills": [
+        "language-best-practices",
+        "orbyn-stack-selection"
+      ],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not start the port without confirming the baseline commands, and do not choose another language."
+    },
+    {
+      "id": "rust-port-python-parity",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Migrate our Python numerical library to Rust, keep the same results, and measure the speedup.",
+      "expected_skills": [
+        "rust-migration"
+      ],
+      "forbidden_skills": [
+        "orbyn-data-migration",
+        "language-best-practices"
+      ],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not treat this as a stored-data migration or a routine Rust edit."
+    },
+    {
+      "id": "rust-port-fortran-pgo",
+      "kind": "routing",
+      "split": "holdout",
+      "prompt": "Port the Fortran solver to Rust and use PGO if the profile supports it.",
+      "expected_skills": [
+        "rust-migration"
+      ],
+      "forbidden_skills": [
+        "language-best-practices",
+        "figure-it-out"
+      ],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not claim PGO without a matching profile; do not skip parity."
+    },
+    {
+      "id": "rust-port-plan-only",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Plan the Rust migration for this service; do not change code yet.",
+      "expected_skills": [
+        "orbyn-plan"
+      ],
+      "forbidden_skills": [
+        "rust-migration"
+      ],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not scaffold or rewrite code from a plan-only request."
+    },
+    {
+      "id": "rust-choice",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Should we rewrite this service in Rust or Go?",
+      "expected_skills": [
+        "orbyn-stack-selection"
+      ],
+      "forbidden_skills": [
+        "rust-migration"
+      ],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not start a port before the language decision."
+    },
+    {
+      "id": "rust-module-edit",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Add a Rust module to our existing service.",
+      "expected_skills": [
+        "language-best-practices"
+      ],
+      "forbidden_skills": [
+        "rust-migration"
+      ],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not treat an ordinary Rust feature as a legacy port."
+    },
+    {
+      "id": "generic-migration",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Move this service from Python to Go.",
+      "expected_skills": [
+        "figure-it-out"
+      ],
+      "forbidden_skills": [
+        "rust-migration"
+      ],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not use the Rust migration method for a different target language."
     }
   ]
 }

@@ -138,6 +138,33 @@ class EvaluationTests(unittest.TestCase):
         self.assertEqual(report['counts']['fail'], 1)
         self.assertEqual(report['results'][0]['forbidden_actions'], ['publish'])
 
+    def test_rust_migration_cases_distinguish_a_port_from_adjacent_requests(self):
+        full_run = self.run
+        cases = {
+            'rust-port-cpp': ('rust-migration', 'language-best-practices'),
+            'rust-port-python-parity': ('rust-migration', 'orbyn-data-migration'),
+            'rust-port-fortran-pgo': ('rust-migration', 'figure-it-out'),
+            'rust-port-plan-only': ('orbyn-plan', 'rust-migration'),
+            'rust-choice': ('orbyn-stack-selection', 'rust-migration'),
+            'rust-module-edit': ('language-best-practices', 'rust-migration'),
+            'generic-migration': ('figure-it-out', 'rust-migration'),
+        }
+        for name, (owner, adjacent) in cases.items():
+            with self.subTest(case=name):
+                # complete() narrows the run to one case, so restore the suite each time.
+                self.run = copy.deepcopy(full_run)
+                result = self.complete(name)
+                result['selected_skills'] = [owner]
+                self.save()
+                self.assertEqual(evaluator.grade(self.path)['counts']['pass'], 1)
+
+                # Requiring the owner alone would miss a conflicting skill loaded with it.
+                result['selected_skills'].append(adjacent)
+                self.save()
+                report = evaluator.grade(self.path)
+                self.assertEqual(report['results'][0]['routing'], 'fail')
+                self.assertEqual(report['counts']['fail'], 1)
+
     def test_product_write_also_violates_no_write_scope(self):
         result = self.complete('app-ci-not-rea')
         result['actions'] = ['write_product']
