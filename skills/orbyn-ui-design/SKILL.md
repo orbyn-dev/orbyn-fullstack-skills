@@ -94,6 +94,7 @@ inspector or handing a preview to a person.
 
 - Views of agent runs beyond one chat (sub-agent tree, trace with time and cost, handoffs, background inbox, context usage, decision inbox, generative UI): [agent-run views](references/agent-run-views.md); ready React pieces in [orbyn-affectui](../orbyn-affectui/SKILL.md).
 - A project that uses or adopts Meta's Astryx design system (`@astryxdesign/*`): [orbyn-astryx](../orbyn-astryx/SKILL.md) for its templates, components, theming and agent setup.
+- Implementing a screen that has an Orbyn Designer frame key: [Designer handoff](references/designer-handoff.md).
 - Interactive sketch to resolve a design question: [prototyping](references/prototypes.md).
 - Unknown platform or accessibility requirements: `orbyn-research`.
 - Page titles, descriptions, canonical, social cards, icons or structured data:

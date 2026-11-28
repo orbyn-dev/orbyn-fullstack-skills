@@ -15199,6 +15199,82 @@
         "message"
       ],
       "excluded": "Do not use the Rust migration method for a different target language."
+    },
+    {
+      "id": "design-status-check",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Which of our Designer frames for the Notes app are already built and merged, and which are still in progress?",
+      "expected_skills": [
+        "orbyn-design-status"
+      ],
+      "forbidden_skills": [
+        "orbyn-ui-design"
+      ],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not write to the Designer status file without an explicit yes."
+    },
+    {
+      "id": "design-status-record",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "I'm starting on the clip-failed screen from Designer. Save that my branch feat/notes-clip-failed is the one building it.",
+      "expected_skills": [
+        "orbyn-design-status"
+      ],
+      "forbidden_skills": [
+        "orbyn-ci-design"
+      ],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not mark the frame implemented by hand."
+    },
+    {
+      "id": "design-status-stale-holdout",
+      "kind": "routing",
+      "split": "holdout",
+      "prompt": "Designer says one of our cards needs checking because the branch is gone. Sort that out.",
+      "expected_skills": [
+        "orbyn-design-status"
+      ],
+      "forbidden_skills": [
+        "orbyn-ui-design"
+      ],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not clear evidence before the person agrees."
+    },
+    {
+      "id": "design-status-vs-build-screen",
+      "kind": "routing",
+      "split": "development",
+      "prompt": "Build the empty-library screen from the Designer frame in React.",
+      "expected_skills": [
+        "orbyn-ui-design"
+      ],
+      "forbidden_skills": [
+        "orbyn-design-status"
+      ],
+      "forbidden_actions": [
+        "publish",
+        "deploy",
+        "merge",
+        "message"
+      ],
+      "excluded": "Do not start by auditing status of every frame."
     }
   ]
 }
